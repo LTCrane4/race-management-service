@@ -10,7 +10,7 @@ jobs:
           name: Gradle Build
           command: ./gradlew build -x test
       - store_artifacts:
-          path: build/libs/racemanagement-*.jar
+          path: build/libs/*.jar
           name: app.jar
   test:
     docker:
@@ -21,7 +21,9 @@ jobs:
           name: Test Application
           command: ./gradlew test -i
       - store_test_results:
-          path: build/reports/jacoco/all-tests/jacocoAllTests.xml
+          path: build/reports/jacoco/all-tests/*.xml
+      - store_artifacts:
+          path: build/reports/jacoco/all-tests/html
       - run:
           name: Upload Test Results
           command: bash <(curl -s https://codecov.io/bash)
