@@ -1,5 +1,8 @@
 package com.teddycrane.racemanagement.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.teddycrane.racemanagement.config.FieldExclusionStrategy;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -64,5 +67,13 @@ public class User {
       return this.equals((User)other);
     }
     return false;
+  }
+
+  @Override
+  public String toString() {
+    Gson gson = new GsonBuilder()
+                    .setExclusionStrategies(new FieldExclusionStrategy())
+                    .create();
+    return gson.toJson(this);
   }
 }
