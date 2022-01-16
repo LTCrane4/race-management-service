@@ -20,8 +20,11 @@ jobs:
       - run:
           name: Test Application
           command: ./gradlew test -i
+      - run:
+          name: Consolidate test results
+          command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
       - store_test_results:
-          path: build/reports/jacoco/all-tests
+          path: build/test-results/test/*.xml
       - store_artifacts:
           path: build/reports/jacoco/html
       - run:
