@@ -1,0 +1,38 @@
+# .circleci/config.yml
+version: 2.1
+jobs:
+  build-application:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Gradle Build
+          command: ./gradlew build -x test
+      - store_artifacts:
+          path: build/libs/*.jar
+          name: app.jar
+  test:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Test Application
+          command: ./gradlew test -i
+      - run:
+          name: Consolidate test results
+          command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
+      - store_test_results:
+          path: build/test-results/test
+      - store_artifacts:
+          path: build/reports/jacoco/html
+      - run:
+          name: Upload Test Results
+          command: bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  build:
+    jobs:
+      - build-application
+      - test

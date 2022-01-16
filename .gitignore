@@ -8,7 +8,7 @@ logs/
 .m2
 # Gradle output
 .gradle/
-.bin/
+bin
 
 
 ### STS ###
