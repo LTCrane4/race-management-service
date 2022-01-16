@@ -1,0 +1,27 @@
+# .circleci/config.yml
+version: 2.1
+jobs:
+  build-application:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Gradle Build
+          command: ./gradlew build -x test
+      - store_artifacts:
+          path: build/libs/racemanagement-*.jar
+          name: app.jar
+  test:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Test Application
+          command: ./gradlew test
+      - store_test_results:
+          path: build/test-results/test/*.xml
+
+workflows:
+  build
