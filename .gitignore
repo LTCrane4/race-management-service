@@ -6,7 +6,9 @@ target/
 logs/
 .env
 .m2
+# Gradle output
 .gradle/
+.bin/
 
 
 ### STS ###
