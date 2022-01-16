@@ -22,6 +22,9 @@ jobs:
           command: ./gradlew test -i
       - store_test_results:
           path: build/reports/jacoco/all-tests/jacocoAllTests.xml
+      - run:
+          name: Upload Test Results
+          command: bash <(curl -s https://codecov.io/bash)
 
 workflows:
   build:
