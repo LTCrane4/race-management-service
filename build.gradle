@@ -30,4 +30,12 @@ test {
 
 jacocoTestReport {
 	dependsOn test // require test run before report generation 
+	executionData tasks.withType(Test).findAll { it.state.executed }
+
+	reports {
+		xml.enabled true
+		xml.destination(file("${jacoco.reportsDir}/all-tests/jacocoAllTests.xml"))
+		html.enabled true
+		html.destination(file("${jacoco.reportsDir}/all-tests/html"))
+	}
 }

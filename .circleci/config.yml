@@ -21,7 +21,7 @@ jobs:
           name: Test Application
           command: ./gradlew test -i
       - store_test_results:
-          path: build/test-results/test/*.xml
+          path: build/reports/jacoco/all-tests/jacocoAllTests.xml
 
 workflows:
   build:
