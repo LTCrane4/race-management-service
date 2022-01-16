@@ -22,7 +22,18 @@ public class User {
 
   public User() { this.id = UUID.randomUUID(); }
 
-  // private User(UUID id) { this.id = id; }
+  private User(UUID id) { this.id = id; }
+
+  private User(UUID id, String firstName, String lastName, String username,
+               String email, String password, UserType userType) {
+    this(id);
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.username = username;
+    this.password = password;
+    this.userType = userType;
+  }
 
   public User(String firstName, String lastName, String username, String email,
               String password) {
@@ -38,6 +49,11 @@ public class User {
               String password, UserType userType) {
     this(firstName, lastName, username, email, password);
     this.userType = userType;
+  }
+
+  public User(User other) {
+    this(other.id, other.firstName, other.lastName, other.username, other.email,
+         other.password, other.userType);
   }
 
   private boolean equals(User other) { return this.id.equals(other.id); }
