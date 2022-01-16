@@ -24,4 +24,7 @@ jobs:
           path: build/test-results/test/*.xml
 
 workflows:
-  build
+  build:
+    jobs:
+      - build-application
+      - test
