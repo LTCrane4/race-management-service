@@ -70,4 +70,13 @@ public class UserTest {
     assertNotEquals(expected, actual);
     assertNotEquals(expected, new User());
   }
+
+  @Test
+  public void setEmailShouldValidateEmail() {
+    user.setEmail("test@test.fake");
+    assertEquals("test@test.fake", user.getEmail());
+
+    user.setEmail("test");
+    assertNotEquals("test", user.getEmail());
+  }
 }
