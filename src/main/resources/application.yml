@@ -14,8 +14,7 @@ spring:
 server:
   error:
     include-message: always
-secret:
-  key: ${SECRET_KEY}
+secret: ${SECRET_KEY}
 users:
   test-user:
     username: ${TEST_USER}
