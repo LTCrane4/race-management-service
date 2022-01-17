@@ -5,6 +5,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
 import com.teddycrane.racemanagement.services.UserService;
+import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +26,19 @@ public class UserController extends BaseController {
   }
 
   @GetMapping("/{id}")
-  public User getUser(@PathVariable String id) throws BadRequestException {
+  public User getUser(@PathVariable String id)
+      throws BadRequestException, NotFoundException {
     logger.trace("getUser called");
 
     try {
       UUID userId = UUID.fromString(id);
-      return this.userService.getUser(userId);
+      Optional<User> _user = this.userService.getUser(userId);
+      if (_user.isPresent()) {
+        return _user.get();
+      } else {
+        logger.error("No user found for the id {}", id);
+        throw new NotFoundException("No user found for the provided id");
+      }
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id");
       throw new BadRequestException("Invalid user id provided");

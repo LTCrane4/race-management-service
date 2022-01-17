@@ -38,9 +38,9 @@ public class UserServiceTest {
     when(this.userRepository.findById(any(UUID.class)))
         .thenReturn(Optional.of(TestResourceGenerator.generateUser()));
 
-    User result = this.userService.getUser(UUID.randomUUID());
+    Optional<User> result = this.userService.getUser(UUID.randomUUID());
 
-    assertNotNull(result);
+    assertNotNull(result.get());
   }
 
   @Test

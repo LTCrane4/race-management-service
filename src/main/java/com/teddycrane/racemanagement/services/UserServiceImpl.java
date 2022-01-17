@@ -2,7 +2,6 @@ package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
-import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import java.util.Optional;
@@ -19,17 +18,9 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public User getUser(UUID id) throws NotFoundException {
+  public Optional<User> getUser(UUID id) {
     logger.trace("getUser called");
-
-    Optional<User> user = this.userRepository.findById(id);
-
-    if (user.isPresent()) {
-      return user.get();
-    } else {
-      logger.error("No user found for the id {}", id);
-      throw new NotFoundException("No user found for the provided id");
-    }
+    return this.userRepository.findById(id);
   }
 
   @Override
