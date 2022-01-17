@@ -1,37 +1,95 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.UserNotFoundException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.UserPrincipal;
+import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
+import com.teddycrane.racemanagement.security.util.TokenManager;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl extends BaseService implements UserService {
+
   private final UserRepository userRepository;
 
-  public UserServiceImpl(UserRepository userRepository) {
+  private final TokenManager tokenManager;
+
+  private final AuthenticationManager authenticationManager;
+
+  public UserServiceImpl(UserRepository userRepository,
+                         TokenManager tokenManager,
+                         AuthenticationManager authenticationManager) {
     super();
     this.userRepository = userRepository;
+    this.tokenManager = tokenManager;
+    this.authenticationManager = authenticationManager;
   }
 
   @Override
-  public User getUser(UUID id) throws UserNotFoundException {
-    logger.trace("getUser called");
+  public Optional<User> getUser(UUID id) {
+    logger.info("getUser called");
+    return this.userRepository.findById(id);
+  }
 
-    Optional<User> user = this.userRepository.findById(id);
-
-    // todo update this when user creation works
-    return user.orElse(new User());
+  private String encodePassword(String password) {
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    return encoder.encode(password);
   }
 
   @Override
   public User createUser(String username, String password, String firstName,
-                         String lastName, String email, UserType userType) {
-    User u = new User(firstName, lastName, username, email, password, userType);
+                         String lastName, String email, UserType userType)
+      throws DuplicateItemException {
+    logger.info("createUser called");
+    Optional<User> existing = this.userRepository.findByUsername(username);
 
-    return this.userRepository.save(u);
+    if (existing.isPresent()) {
+      logger.error("A user with the same username already exists! ");
+      throw new DuplicateItemException(
+          "This username is already taken.  Please try a different username");
+    }
+
+    return this.userRepository.save(new User(firstName, lastName, username,
+                                             email, encodePassword(password),
+                                             userType));
+  }
+
+  @Override
+  public AuthenticationResponse login(String username, String password)
+      throws NotAuthorizedException {
+    logger.info("login called");
+    String token;
+
+    try {
+      this.authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(username, password));
+
+      Optional<User> user = this.userRepository.findByUsername(username);
+      if (user.isPresent()) {
+        token = this.tokenManager.generateToken(new UserPrincipal(user.get()));
+        return new AuthenticationResponse(token);
+      } else {
+        throw new UsernameNotFoundException(
+            "No user found for the provided username");
+      }
+    } catch (AuthenticationException | NotFoundException e) {
+      logger.warn("Unable to authenticate with the provided credentials");
+      throw new NotAuthorizedException("Unauthorized");
+    }
   }
 }

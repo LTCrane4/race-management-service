@@ -6,10 +6,16 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.controller.UserController;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.services.AuthenticationService;
 import com.teddycrane.racemanagement.services.UserService;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +26,15 @@ public class UserControllerTest {
 
   private UserController userController;
 
+  private User expected;
+
   @Mock private UserService userService;
 
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
     this.userController = new UserController(this.userService);
+    this.expected = TestResourceGenerator.generateUser();
   }
 
   @Test
@@ -35,7 +44,8 @@ public class UserControllerTest {
 
   @Test
   public void getUser_shouldReturnUser() {
-    when(this.userService.getUser(any(UUID.class))).thenReturn(new User());
+    when(this.userService.getUser(any(UUID.class)))
+        .thenReturn(Optional.of(new User()));
     User result = this.userController.getUser(UUID.randomUUID().toString());
     assertNotNull(result);
   }
@@ -44,6 +54,16 @@ public class UserControllerTest {
   public void getUser_shouldThrowBadRequestErrorIfBadId() {
     assertThrows(BadRequestException.class,
                  () -> this.userController.getUser("test"));
+  }
+
+  @Test
+  public void getUserShouldThrowNotFoundIfNoUserPresent() {
+    when(this.userService.getUser(any(UUID.class)))
+        .thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 
   @Test
@@ -58,5 +78,49 @@ public class UserControllerTest {
         new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertNotNull(result);
     assertEquals(expected, result);
+  }
+
+  @Test
+  public void createUserShouldCreateUserWithouType() {
+    when(this.userService.createUser(anyString(), anyString(), anyString(),
+                                     anyString(), anyString(),
+                                     eq(UserType.USER)))
+        .thenReturn(expected);
+
+    User actual = this.userController.createUser(
+        new CreateUserRequest("", "", "", "", ""));
+
+    assertNotNull(actual);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void createUserShouldHandleServiceErrors() {
+    when(this.userService.getUser(any(UUID.class)))
+        .thenThrow(NotFoundException.class);
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userController.getUser(UUID.randomUUID().toString()));
+  }
+
+  @Test
+  public void loginShouldAuthenticateUser() throws Exception {
+    AuthenticationResponse expected = new AuthenticationResponse("valid token");
+    when(this.userService.login(anyString(), anyString())).thenReturn(expected);
+
+    AuthenticationResponse actual =
+        this.userController.login(new AuthenticationRequest("test", "test"));
+    assertEquals(actual, expected);
+  }
+
+  @Test
+  public void loginShouldHandleExceptions() throws Exception {
+    when(this.userService.login(anyString(), anyString()))
+        .thenThrow(NotAuthorizedException.class);
+
+    assertThrows(
+        NotAuthorizedException.class,
+        () -> this.userController.login(new AuthenticationRequest("", "")));
   }
 }

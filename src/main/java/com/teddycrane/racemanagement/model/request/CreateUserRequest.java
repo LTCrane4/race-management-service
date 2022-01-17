@@ -3,7 +3,15 @@ package com.teddycrane.racemanagement.model.request;
 import com.teddycrane.racemanagement.enums.UserType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class CreateUserRequest {
 
   @NotBlank(message = "A username must be provided") private String username;
@@ -17,8 +25,6 @@ public class CreateUserRequest {
 
   private UserType userType;
 
-  public CreateUserRequest() {}
-
   public CreateUserRequest(String username, String password, String firstName,
                            String lastName, String email) {
     this.username = username;
@@ -28,22 +34,4 @@ public class CreateUserRequest {
     this.email = email;
     this.userType = UserType.USER;
   }
-
-  public CreateUserRequest(String username, String password, String firstName,
-                           String lastName, String email, UserType userType) {
-    this(username, password, firstName, lastName, email);
-    this.userType = userType;
-  }
-
-  public String getUsername() { return username; }
-
-  public String getPassword() { return password; }
-
-  public String getFirstName() { return firstName; }
-
-  public String getLastName() { return lastName; }
-
-  public String getEmail() { return email; }
-
-  public UserType getUserType() { return userType; }
 }

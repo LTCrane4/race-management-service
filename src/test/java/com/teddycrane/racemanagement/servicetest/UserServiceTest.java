@@ -2,12 +2,18 @@ package com.teddycrane.racemanagement.servicetest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
+import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.UserService;
 import com.teddycrane.racemanagement.services.UserServiceImpl;
 import java.util.Optional;
@@ -16,16 +22,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.AuthenticationManager;
 
 public class UserServiceTest {
   @Mock private UserRepository userRepository;
+  @Mock private TokenManager tokenManager;
+  @Mock private AuthenticationManager authenticationManager;
 
   private UserService userService;
+
+  private User existing;
 
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
-    this.userService = new UserServiceImpl(this.userRepository);
+    this.userService = new UserServiceImpl(
+        this.userRepository, this.tokenManager, this.authenticationManager);
+    this.existing = TestResourceGenerator.generateUser();
   }
 
   @Test
@@ -38,9 +51,9 @@ public class UserServiceTest {
     when(this.userRepository.findById(any(UUID.class)))
         .thenReturn(Optional.of(TestResourceGenerator.generateUser()));
 
-    User result = this.userService.getUser(UUID.randomUUID());
+    Optional<User> result = this.userService.getUser(UUID.randomUUID());
 
-    assertNotNull(result);
+    assertNotNull(result.get());
   }
 
   @Test
@@ -51,5 +64,35 @@ public class UserServiceTest {
     User actual =
         this.userService.createUser("", "", "", "", "", UserType.USER);
     assertEquals(expected, actual);
+  }
+
+  @Test
+  public void createUserShouldHandleDuplicates() {
+    User existing = TestResourceGenerator.generateUser();
+    when(this.userRepository.findByUsername(anyString()))
+        .thenReturn(Optional.of(existing));
+
+    assertThrows(
+        DuplicateItemException.class,
+        () -> this.userService.createUser("", "", "", "", "", UserType.USER));
+  }
+
+  @Test
+  public void loginShouldReturnToken() throws Exception {
+    when(this.userRepository.findByUsername(anyString()))
+        .thenReturn(Optional.of(this.existing));
+
+    AuthenticationResponse response =
+        this.userService.login(existing.getUsername(), existing.getPassword());
+    assertNotNull(response);
+  }
+
+  @Test
+  public void loginShouldHandleUserNotFound() {
+    when(this.userRepository.findByUsername(anyString()))
+        .thenReturn(Optional.empty());
+
+    assertThrows(NotAuthorizedException.class,
+                 () -> this.userService.login("test", "test"));
   }
 }
