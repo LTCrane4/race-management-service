@@ -14,3 +14,12 @@ spring:
 server:
   error:
     include-message: always
+secret:
+  key: ${SECRET_KEY}
+users:
+  test-user:
+    username: ${TEST_USER}
+    password: ${TEST_USER_PW}
+  test-admin:
+    username: ${TEST_ADMIN}
+    password: ${TEST_ADMIN_PW}
