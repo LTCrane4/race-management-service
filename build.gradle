@@ -20,8 +20,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-  implementation 'com.google.code.gson:gson:2.8.9'
-  implementation 'org.springframework.boot:spring-boot-starter-security'
+  	implementation 'com.google.code.gson:gson:2.8.9'
+  	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-test'
 	implementation 'com.github.javafaker:javafaker:1.0.2'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
@@ -39,12 +39,24 @@ test {
 	testLogging {
 		events "PASSED", "SKIPPED", "FAILED"
 	}
+
+
 	finalizedBy jacocoTestReport // always generate test reports
 }
 
 jacocoTestReport {
 	dependsOn test // require test run before report generation 
 	executionData tasks.withType(Test).findAll { it.state.executed }
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					'com/teddycrane/racemanagement/Application.class',
+					'com/teddycrane/racemanagement/config/*.class',
+					'com/teddycrane/racemanagement/security/**/*.class'
+			])
+		}))
+	}
 
 	reports {
 		xml.enabled true

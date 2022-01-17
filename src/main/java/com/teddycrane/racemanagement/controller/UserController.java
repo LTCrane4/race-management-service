@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -61,15 +61,9 @@ public class UserController extends BaseController {
 
   @PostMapping("/login")
   public AuthenticationResponse
-  login(@RequestBody @Valid AuthenticationRequest request) {
+  login(@RequestBody @Valid AuthenticationRequest request)
+      throws NotAuthorizedException {
     logger.info("login requested");
-
-    try {
-      return this.userService.login(request.getUsername(),
-                                    request.getPassword());
-    } catch (Exception e) {
-      logger.error("an exception occurred");
-      return new AuthenticationResponse("");
-    }
+    return this.userService.login(request.getUsername(), request.getPassword());
   }
 }

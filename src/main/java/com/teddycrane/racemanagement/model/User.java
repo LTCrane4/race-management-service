@@ -3,7 +3,6 @@ package com.teddycrane.racemanagement.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.teddycrane.racemanagement.config.FieldExclusionStrategy;
-import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.util.UUID;
 import javax.persistence.Entity;

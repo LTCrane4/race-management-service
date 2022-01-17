@@ -6,10 +6,14 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.controller.UserController;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.services.AuthenticationService;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +61,9 @@ public class UserControllerTest {
     when(this.userService.getUser(any(UUID.class)))
         .thenReturn(Optional.empty());
 
-    assertThrows(NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 
   @Test
@@ -96,5 +102,25 @@ public class UserControllerTest {
     assertThrows(
         NotFoundException.class,
         () -> this.userController.getUser(UUID.randomUUID().toString()));
+  }
+
+  @Test
+  public void loginShouldAuthenticateUser() throws Exception {
+    AuthenticationResponse expected = new AuthenticationResponse("valid token");
+    when(this.userService.login(anyString(), anyString())).thenReturn(expected);
+
+    AuthenticationResponse actual =
+        this.userController.login(new AuthenticationRequest("test", "test"));
+    assertEquals(actual, expected);
+  }
+
+  @Test
+  public void loginShouldHandleExceptions() throws Exception {
+    when(this.userService.login(anyString(), anyString()))
+        .thenThrow(NotAuthorizedException.class);
+
+    assertThrows(
+        NotAuthorizedException.class,
+        () -> this.userController.login(new AuthenticationRequest("", "")));
   }
 }
