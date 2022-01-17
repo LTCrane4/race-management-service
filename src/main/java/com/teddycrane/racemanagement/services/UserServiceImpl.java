@@ -1,7 +1,8 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.UserNotFoundException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import java.util.Optional;
@@ -18,20 +19,32 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public User getUser(UUID id) throws UserNotFoundException {
+  public User getUser(UUID id) throws NotFoundException {
     logger.trace("getUser called");
 
     Optional<User> user = this.userRepository.findById(id);
 
-    // todo update this when user creation works
-    return user.orElse(new User());
+    if (user.isPresent()) {
+      return user.get();
+    } else {
+      logger.error("No user found for the id {}", id);
+      throw new NotFoundException("No user found for the provided id");
+    }
   }
 
   @Override
   public User createUser(String username, String password, String firstName,
-                         String lastName, String email, UserType userType) {
-    User u = new User(firstName, lastName, username, email, password, userType);
+                         String lastName, String email, UserType userType)
+      throws DuplicateItemException {
+    Optional<User> existing = this.userRepository.findByUsername(username);
 
-    return this.userRepository.save(u);
+    if (existing.isPresent()) {
+      logger.error("A user with the same username already exists! ");
+      throw new DuplicateItemException(
+          "This username is already taken.  Please try a different username");
+    }
+
+    return this.userRepository.save(
+        new User(firstName, lastName, username, email, password, userType));
   }
 }

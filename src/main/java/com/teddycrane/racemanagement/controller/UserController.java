@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
 import com.teddycrane.racemanagement.services.UserService;
@@ -33,6 +34,9 @@ public class UserController extends BaseController {
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id");
       throw new BadRequestException("Invalid user id provided");
+    } catch (NotFoundException e) {
+      // pass error up chain
+      throw new NotFoundException(e.getMessage());
     }
   }
 
