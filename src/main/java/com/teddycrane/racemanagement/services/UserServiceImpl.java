@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,7 +31,10 @@ public class UserServiceImpl
 
   @Value("${users.test-user.username}") private String testUsername;
 
-  @Value("${users.test-user.password") private String testUserPassword;
+  @Value("${users.test-user.password}") private String testUserPassword;
+
+  //  @Value("${users.test-admin.username}") private String testAdmin;
+  //  @Value("${users.test-admin.password}") private String testAdminPassword;
 
   public UserServiceImpl(UserRepository userRepository,
                          TokenManager tokenManager,
@@ -56,6 +60,11 @@ public class UserServiceImpl
     return this.userRepository.findById(id);
   }
 
+  private String encodePassword(String password) {
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    return encoder.encode(password);
+  }
+
   @Override
   public User createUser(String username, String password, String firstName,
                          String lastName, String email, UserType userType)
@@ -69,8 +78,9 @@ public class UserServiceImpl
           "This username is already taken.  Please try a different username");
     }
 
-    return this.userRepository.save(
-        new User(firstName, lastName, username, email, password, userType));
+    return this.userRepository.save(new User(firstName, lastName, username,
+                                             email, encodePassword(password),
+                                             userType));
   }
 
   @Override

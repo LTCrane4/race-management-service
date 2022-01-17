@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(path = "/user")
 @RestController
 public class UserController extends BaseController {
 
@@ -28,7 +27,7 @@ public class UserController extends BaseController {
     this.userService = userService;
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/user/{id}")
   public User getUser(@PathVariable String id)
       throws BadRequestException, NotFoundException {
     logger.info("getUser called");
@@ -51,7 +50,7 @@ public class UserController extends BaseController {
     }
   }
 
-  @PostMapping("/new")
+  @PostMapping("/user/new")
   public User createUser(@Valid @RequestBody CreateUserRequest request) {
     logger.info("createUser called");
 
