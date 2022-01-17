@@ -6,6 +6,8 @@ import com.teddycrane.racemanagement.config.FieldExclusionStrategy;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,7 +23,7 @@ public class User {
 
   @NonNull private String firstName, lastName, email, username, password;
 
-  @NonNull private UserType userType;
+  @Enumerated(EnumType.STRING) @NonNull private UserType userType;
 
   public User() { this.id = UUID.randomUUID(); }
 
