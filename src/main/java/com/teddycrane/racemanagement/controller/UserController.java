@@ -3,7 +3,9 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +30,7 @@ public class UserController extends BaseController {
   @GetMapping("/{id}")
   public User getUser(@PathVariable String id)
       throws BadRequestException, NotFoundException {
-    logger.trace("getUser called");
+    logger.info("getUser called");
 
     try {
       UUID userId = UUID.fromString(id);
@@ -40,7 +42,7 @@ public class UserController extends BaseController {
         throw new NotFoundException("No user found for the provided id");
       }
     } catch (IllegalArgumentException e) {
-      logger.error("The id {} is not a valid user id");
+      logger.error("The id {} is not a valid user id", id);
       throw new BadRequestException("Invalid user id provided");
     } catch (NotFoundException e) {
       // pass error up chain
@@ -50,10 +52,18 @@ public class UserController extends BaseController {
 
   @PostMapping("/new")
   public User createUser(@Valid @RequestBody CreateUserRequest request) {
-    logger.trace("createUser called");
+    logger.info("createUser called");
 
     return this.userService.createUser(
         request.getUsername(), request.getPassword(), request.getFirstName(),
         request.getLastName(), request.getEmail(), request.getUserType());
+  }
+
+  @PostMapping("/login")
+  public AuthenticationResponse
+  login(@RequestBody @Valid AuthenticationRequest request) {
+    logger.info("login requested");
+
+    return this.userService.login(request.getUsername(), request.getPassword());
   }
 }

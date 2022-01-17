@@ -10,22 +10,27 @@ import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.services.UserService;
 import com.teddycrane.racemanagement.services.UserServiceImpl;
+import com.teddycrane.racemanagement.util.TokenManager;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.AuthenticationManager;
 
 public class UserServiceTest {
   @Mock private UserRepository userRepository;
+  @Mock private TokenManager tokenManager;
+  @Mock private AuthenticationManager authenticationManager;
 
   private UserService userService;
 
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
-    this.userService = new UserServiceImpl(this.userRepository);
+    this.userService = new UserServiceImpl(
+        this.userRepository, this.tokenManager, this.authenticationManager);
   }
 
   @Test

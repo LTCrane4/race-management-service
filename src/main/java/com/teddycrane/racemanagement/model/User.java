@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.teddycrane.racemanagement.config.FieldExclusionStrategy;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -25,10 +26,12 @@ public class User {
   private final UUID id;
 
   @Setter
-  @NonNull private String firstName, lastName, email, username, password;
+  @NonNull
+  private String firstName, lastName, email, username, password;
 
-  @Setter
-  @Enumerated(EnumType.STRING) @NonNull private UserType userType;
+  @Setter @Enumerated(EnumType.STRING) @NonNull private UserType userType;
+
+  @Setter @Enumerated(EnumType.STRING) @NonNull private UserStatus status;
 
   public User() { this.id = UUID.randomUUID(); }
 
@@ -59,6 +62,12 @@ public class User {
               String password, UserType userType) {
     this(firstName, lastName, username, email, password);
     this.userType = userType;
+  }
+
+  public User(String firstName, String lastName, String username, String email,
+              String password, UserType userType, UserStatus status) {
+    this(firstName, lastName, username, email, password, userType);
+    this.status = status;
   }
 
   public User(User other) {
