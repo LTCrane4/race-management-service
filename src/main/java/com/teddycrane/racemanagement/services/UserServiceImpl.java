@@ -6,7 +6,7 @@ import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.UserPrincipal;
 import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
-import com.teddycrane.racemanagement.util.TokenManager;
+import com.teddycrane.racemanagement.security.util.TokenManager;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.PostConstruct;

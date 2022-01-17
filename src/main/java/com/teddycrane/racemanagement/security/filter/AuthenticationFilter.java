@@ -1,8 +1,7 @@
-package com.teddycrane.racemanagement.filter;
+package com.teddycrane.racemanagement.security.filter;
 
-import com.teddycrane.racemanagement.services.UserService;
-import com.teddycrane.racemanagement.services.UserServiceImpl;
-import com.teddycrane.racemanagement.util.TokenManager;
+import com.teddycrane.racemanagement.security.util.TokenManager;
+import com.teddycrane.racemanagement.services.AuthenticationService;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,11 +20,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
   private final Logger logger;
-  private final UserServiceImpl userService;
+  private final AuthenticationService userService;
 
   private final TokenManager tokenManager;
 
-  public AuthenticationFilter(UserServiceImpl userService,
+  public AuthenticationFilter(AuthenticationService userService,
                               TokenManager tokenManager) {
     this.logger = LogManager.getLogger(this.getClass());
     this.userService = userService;
@@ -48,7 +47,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       try {
         username = tokenManager.getUsernameFromToken(token);
       } catch (Exception e) {
-        logger.error("an error occurred");
+        logger.error("No username was found in the provided token!");
       }
     } else {
       logger.error("No authorization header provided");
@@ -67,5 +66,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }
     }
+    filterChain.doFilter(request, response);
   }
 }

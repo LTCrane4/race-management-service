@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/user")
 @RestController
 public class UserController extends BaseController {
+
   private final UserService userService;
 
   public UserController(UserService userService) {
@@ -64,6 +65,12 @@ public class UserController extends BaseController {
   login(@RequestBody @Valid AuthenticationRequest request) {
     logger.info("login requested");
 
-    return this.userService.login(request.getUsername(), request.getPassword());
+    try {
+      return this.userService.login(request.getUsername(),
+                                    request.getPassword());
+    } catch (Exception e) {
+      logger.error("an exception occurred");
+      return new AuthenticationResponse("");
+    }
   }
 }

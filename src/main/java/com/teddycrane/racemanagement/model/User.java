@@ -31,8 +31,6 @@ public class User {
 
   @Setter @Enumerated(EnumType.STRING) @NonNull private UserType userType;
 
-  @Setter @Enumerated(EnumType.STRING) @NonNull private UserStatus status;
-
   public User() { this.id = UUID.randomUUID(); }
 
   private User(UUID id) { this.id = id; }
@@ -64,11 +62,13 @@ public class User {
     this.userType = userType;
   }
 
-  public User(String firstName, String lastName, String username, String email,
-              String password, UserType userType, UserStatus status) {
-    this(firstName, lastName, username, email, password, userType);
-    this.status = status;
-  }
+  // TODO enable when user status works
+  //  public User(String firstName, String lastName, String username, String
+  //  email,
+  //              String password, UserType userType, UserStatus status) {
+  //    this(firstName, lastName, username, email, password, userType);
+  //    this.status = status;
+  //  }
 
   public User(User other) {
     this(other.id, other.firstName, other.lastName, other.username, other.email,
