@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.teddycrane.racemanagement.controller.UserController;
+import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.request.CreateUserRequest;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,5 +44,19 @@ public class UserControllerTest {
   public void getUser_shouldThrowBadRequestErrorIfBadId() {
     assertThrows(BadRequestException.class,
                  () -> this.userController.getUser("test"));
+  }
+
+  @Test
+  public void createUserShouldCreateAUser() {
+    User expected = TestResourceGenerator.generateUser();
+    when(this.userService.createUser(anyString(), anyString(), anyString(),
+                                     anyString(), anyString(),
+                                     any(UserType.class)))
+        .thenReturn(expected);
+
+    User result = this.userController.createUser(
+        new CreateUserRequest("", "", "", "", "", UserType.USER));
+    assertNotNull(result);
+    assertEquals(expected, result);
   }
 }

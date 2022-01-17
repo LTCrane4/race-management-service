@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.repositories.UserRepository;
@@ -40,5 +41,15 @@ public class UserServiceTest {
     User result = this.userService.getUser(UUID.randomUUID());
 
     assertNotNull(result);
+  }
+
+  @Test
+  public void createUserShouldCreate() {
+    User expected = TestResourceGenerator.generateUser();
+    when(this.userRepository.save(any(User.class))).thenReturn(expected);
+
+    User actual =
+        this.userService.createUser("", "", "", "", "", UserType.USER);
+    assertEquals(expected, actual);
   }
 }
