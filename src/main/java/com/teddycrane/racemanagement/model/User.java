@@ -18,15 +18,16 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
-@Setter
 public class User {
   @Id
   @Type(type = "uuid-char")
   @GeneratedValue(strategy = GenerationType.AUTO)
   private final UUID id;
 
+  @Setter
   @NonNull private String firstName, lastName, email, username, password;
 
+  @Setter
   @Enumerated(EnumType.STRING) @NonNull private UserType userType;
 
   public User() { this.id = UUID.randomUUID(); }

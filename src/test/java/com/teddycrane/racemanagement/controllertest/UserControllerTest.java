@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.controller.UserController;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
@@ -58,5 +59,15 @@ public class UserControllerTest {
         new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertNotNull(result);
     assertEquals(expected, result);
+  }
+
+  @Test
+  public void createUserShouldHandleServiceErrors() {
+    when(this.userService.getUser(any(UUID.class)))
+        .thenThrow(NotFoundException.class);
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 }

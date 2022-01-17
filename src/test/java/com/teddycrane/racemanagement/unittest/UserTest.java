@@ -57,6 +57,9 @@ public class UserTest {
     actual.setUserType(UserType.ADMIN);
     assertNotEquals(expected, actual);
 
+    actual.setEmail("test");
+    assertNotEquals(expected, actual);
+
     actual.setPassword("test");
     assertNotEquals(expected, actual);
 
