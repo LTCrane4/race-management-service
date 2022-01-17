@@ -1,0 +1,39 @@
+version: "3.2"
+
+services:
+  docker-mysql:
+    # image: mysql:8.0.20
+    restart: unless-stopped
+    build:
+      context: ./containers
+      dockerfile: database.dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
+      - MYSQL_DATABASE=SPRING
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 3307:3306
+    volumes:
+      - db:/var/lib/mysql
+
+  race-management-service:
+    depends_on:
+      - docker-mysql
+    build: 
+      context: .
+      dockerfile: racemanagement.dockerfile
+      args:
+        - SECRET_KEY=$SECRET_KEY
+    restart: on-failure
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/SPRING
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+volumes:
+  db: 
