@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.ser.std.ClassSerializer
+
 plugins {
 	id 'org.springframework.boot' version '2.6.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -44,6 +46,8 @@ test {
 	finalizedBy jacocoTestReport // always generate test reports
 }
 
+tasks.build.dependsOn(jacocoTestReport)
+
 jacocoTestReport {
 	dependsOn test // require test run before report generation 
 	executionData tasks.withType(Test).findAll { it.state.executed }
@@ -63,5 +67,16 @@ jacocoTestReport {
 		xml.destination(file("${jacoco.reportsDir}/all-tests/jacocoAllTests.xml"))
 		html.enabled true
 		html.destination(file("${jacoco.reportsDir}/html"))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true
+			limit {
+				minimum = 0.9
+			}
+		}
 	}
 }

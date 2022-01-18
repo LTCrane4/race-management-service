@@ -6,16 +6,13 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.User;
 import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController extends BaseController {
@@ -65,5 +62,31 @@ public class UserController extends BaseController {
       throws NotAuthorizedException {
     logger.info("login requested");
     return this.userService.login(request.getUsername(), request.getPassword());
+  }
+
+  @PatchMapping("/user/{id}")
+  public User updateUser(@PathVariable String id,
+                         @Valid @RequestBody UpdateUserRequest request)
+      throws BadRequestException {
+    logger.info("updateUser called");
+
+    try {
+      UUID userId = UUID.fromString(id);
+      // validate that at least one of the request body parameters are not null
+      if (request.getFirstName() != null || request.getLastName() != null ||
+          request.getEmail() != null || request.getUserType() != null) {
+        return this.userService.updateUser(
+            userId, request.getFirstName(), request.getLastName(),
+            request.getEmail(), request.getUserType());
+      } else {
+        logger.error(
+            "At least one parameter must be supplied to update a User!");
+        throw new BadRequestException(
+            "Not enough parameters supplied to update a user");
+      }
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id {}", id);
+      throw new BadRequestException("Unable to parse the provided id");
+    }
   }
 }

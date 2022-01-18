@@ -20,6 +20,9 @@ public interface UserService {
                   String lastName, String email, UserType userType)
       throws DuplicateItemException;
 
+  User updateUser(UUID id, String firstName, String lastName, String email,
+                  UserType userType);
+
   AuthenticationResponse login(String username, String password)
       throws NotAuthorizedException;
 }

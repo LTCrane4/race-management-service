@@ -70,6 +70,12 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
+  public User updateUser(UUID id, String firstName, String lastName,
+                         String email, UserType userType) {
+    return null;
+  }
+
+  @Override
   public AuthenticationResponse login(String username, String password)
       throws NotAuthorizedException {
     logger.info("login called");
