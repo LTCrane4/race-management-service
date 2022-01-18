@@ -68,6 +68,16 @@ public class UserServiceTest {
   }
 
   @Test
+  public void createUserShouldCreateWithNoType() {
+    User expected = TestResourceGenerator.generateUser();
+    when(this.userRepository.save(any(User.class))).thenReturn(expected);
+
+    User actual = this.userService.createUser("", "", "", "", "", null);
+    assertEquals(expected, actual);
+    assertEquals("user", actual.getUserType().toString());
+  }
+
+  @Test
   public void createUserShouldHandleDuplicates() {
     User existing = TestResourceGenerator.generateUser();
     when(this.userRepository.findByUsername(anyString()))
