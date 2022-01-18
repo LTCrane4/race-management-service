@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.model.response;
+package com.teddycrane.racemanagement.model.user.response;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -2,7 +2,7 @@ package com.teddycrane.racemanagement.config;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
-import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.user.User;
 
 public class FieldExclusionStrategy implements ExclusionStrategy {
   public boolean shouldSkipClass(Class<?> arg0) { return false; }

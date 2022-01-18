@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.model;
+package com.teddycrane.racemanagement.model.user;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -95,6 +95,7 @@ public class User {
     Gson gson = new GsonBuilder()
                     .setExclusionStrategies(new FieldExclusionStrategy())
                     .create();
-    return gson.toJson(this);
+    String result = gson.toJson(this);
+    return result;
   }
 }

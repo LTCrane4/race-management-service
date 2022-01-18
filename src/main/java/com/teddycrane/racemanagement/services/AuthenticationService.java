@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.UserPrincipal;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
