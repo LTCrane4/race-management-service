@@ -3,7 +3,7 @@ package com.teddycrane.racemanagement.unittest;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.UserPrincipal;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

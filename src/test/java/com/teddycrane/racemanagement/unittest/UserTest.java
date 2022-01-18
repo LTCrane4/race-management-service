@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

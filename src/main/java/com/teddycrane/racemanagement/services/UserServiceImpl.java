@@ -4,20 +4,17 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.UserPrincipal;
-import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
+import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +35,12 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
+  }
+
+  @Override
+  public Collection<User> getAllUsers() {
+    logger.info("getAllUsers called");
+    return this.userRepository.findAll().stream().toList();
   }
 
   @Override
@@ -64,9 +67,11 @@ public class UserServiceImpl extends BaseService implements UserService {
           "This username is already taken.  Please try a different username");
     }
 
-    return this.userRepository.save(new User(firstName, lastName, username,
-                                             email, encodePassword(password),
-                                             userType));
+    // If userType is not present or null, set user type to user
+    UserType type = userType == null ? UserType.USER : userType;
+
+    return this.userRepository.save(new User(
+        firstName, lastName, username, email, encodePassword(password), type));
   }
 
   @Override

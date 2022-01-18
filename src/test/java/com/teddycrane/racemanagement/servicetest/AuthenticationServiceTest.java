@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.UserPrincipal;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.services.AuthenticationService;
 import java.util.Optional;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public class AuthenticationServiceTest {
 

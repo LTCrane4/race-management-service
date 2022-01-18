@@ -8,14 +8,15 @@ import static org.mockito.Mockito.when;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
-import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.UserService;
 import com.teddycrane.racemanagement.services.UserServiceImpl;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,16 @@ public class UserServiceTest {
   }
 
   @Test
+  public void createUserShouldCreateWithNoType() {
+    User expected = TestResourceGenerator.generateUser();
+    when(this.userRepository.save(any(User.class))).thenReturn(expected);
+
+    User actual = this.userService.createUser("", "", "", "", "", null);
+    assertEquals(expected, actual);
+    assertEquals("user", actual.getUserType().toString());
+  }
+
+  @Test
   public void createUserShouldHandleDuplicates() {
     User existing = TestResourceGenerator.generateUser();
     when(this.userRepository.findByUsername(anyString()))
@@ -94,5 +105,15 @@ public class UserServiceTest {
 
     assertThrows(NotAuthorizedException.class,
                  () -> this.userService.login("test", "test"));
+  }
+
+  @Test
+  public void getAllUsersShouldReturnListOfUsers() {
+    Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
+    when(this.userRepository.findAll()).thenReturn((List<User>)expectedList);
+
+    Collection<User> result = this.userService.getAllUsers();
+
+    assertNotNull(result);
   }
 }

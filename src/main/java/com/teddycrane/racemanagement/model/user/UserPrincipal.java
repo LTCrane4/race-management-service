@@ -1,5 +1,6 @@
-package com.teddycrane.racemanagement.model;
+package com.teddycrane.racemanagement.model.user;
 
+import com.teddycrane.racemanagement.model.user.User;
 import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
