@@ -67,9 +67,11 @@ public class UserServiceImpl extends BaseService implements UserService {
           "This username is already taken.  Please try a different username");
     }
 
-    return this.userRepository.save(new User(firstName, lastName, username,
-                                             email, encodePassword(password),
-                                             userType));
+    // If userType is not present or null, set user type to user
+    UserType type = userType == null ? UserType.USER : userType;
+
+    return this.userRepository.save(new User(
+        firstName, lastName, username, email, encodePassword(password), type));
   }
 
   @Override
