@@ -30,9 +30,25 @@ jobs:
       - run:
           name: Upload Test Results
           command: bash <(curl -s https://codecov.io/bash)
+  integration-test:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Run Integration Tests
+          command: ./gradlew integrationTest
 
 workflows:
   build:
     jobs:
       - build-application
       - test
+      - integration-test:
+          requires:
+            - build-application
+            - test
+# Uncomment this when we validate that the automation runs in the pipeline ok
+#          filters:
+#            branches:
+#              only:
+#                - main

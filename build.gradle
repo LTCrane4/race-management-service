@@ -29,17 +29,23 @@ dependencies {
 	implementation "com.github.javafaker:javafaker:$java_faker_version"
 	implementation "io.jsonwebtoken:jjwt:$jwt_version"
 
+	implementation "mysql:mysql-connector-java"
+
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.testcontainers:testcontainers:$testcontainers_version"
 	testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
 	testImplementation "org.testcontainers:mysql:$testcontainers_version"
 
 	developmentOnly "org.springframework.boot:spring-boot-devtools"
-	runtimeOnly "mysql:mysql-connector-java"
 	compileOnly "org.projectlombok:lombok:$lombok_version"
 	annotationProcessor "org.projectlombok:lombok:$lombok_version"
 	testCompileOnly "org.projectlombok:lombok:$lombok_version"
 	testAnnotationProcessor "org.projectlombok:lombok:$lombok_version"
+}
+
+bootRun {
+	String activeProfile = System.properties['spring.profiles.active']
+	systemProperty "spring.profiles.active", activeProfile
 }
 
 sourceSets {
@@ -49,7 +55,6 @@ sourceSets {
 			compileClasspath += sourceSets.test.compileClasspath
 			runtimeClasspath += sourceSets.test.runtimeClasspath
 		}
-		resources.srcDir('src/integrationTest/resources')
 	}
 }
 
@@ -59,16 +64,15 @@ test {
 		events "PASSED", "SKIPPED", "FAILED"
 	}
 
-
 	finalizedBy jacocoTestReport // always generate test reports
 }
 
 task integrationTest(type: Test) {
 	useJUnitPlatform()
 	testLogging.showStandardStreams = true
-	 environment('spring.profiles.active', 'test')
+	environment('spring.profiles.active', 'integration')
 
-	group = 'verification'
+	group = 'integration'
 	description = 'run integration tests'
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
