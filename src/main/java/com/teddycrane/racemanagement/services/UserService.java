@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 public interface UserService {
   Collection<User> getAllUsers();
   Optional<User> getUser(UUID id);
+
+  Collection<User> searchUsers(SearchType searchType, String searchValue);
 
   User createUser(String username, String password, String firstName,
                   String lastName, String email, UserType userType)

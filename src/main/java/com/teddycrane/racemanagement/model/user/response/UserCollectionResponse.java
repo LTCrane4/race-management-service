@@ -7,6 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class GetAllUsersResponse {
+public class UserCollectionResponse {
   private Collection<User> users;
 }

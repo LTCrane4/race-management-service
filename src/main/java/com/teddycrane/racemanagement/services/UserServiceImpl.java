@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
@@ -47,6 +48,14 @@ public class UserServiceImpl extends BaseService implements UserService {
   public Optional<User> getUser(UUID id) {
     logger.info("getUser called");
     return this.userRepository.findById(id);
+  }
+
+  @Override
+  public Collection<User> searchUsers(SearchType searchType,
+                                      String searchValue) {
+    logger.info("searchUsers called");
+
+    return null;
   }
 
   private String encodePassword(String password) {

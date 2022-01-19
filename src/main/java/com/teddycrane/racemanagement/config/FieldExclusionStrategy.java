@@ -12,6 +12,6 @@ public class FieldExclusionStrategy implements ExclusionStrategy {
    */
   public boolean shouldSkipField(FieldAttributes f) {
     return (f.getDeclaringClass() == User.class &&
-            f.getName().equals("password"));
+            f.getName().equalsIgnoreCase("password"));
   }
 }

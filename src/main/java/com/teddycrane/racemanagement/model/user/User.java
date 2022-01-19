@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -18,6 +19,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
+@EqualsAndHashCode
 public class User {
   @Id
   @Type(type = "uuid-char")
@@ -72,22 +74,6 @@ public class User {
   public User(User other) {
     this(other.id, other.firstName, other.lastName, other.username, other.email,
          other.password, other.userType);
-  }
-
-  private boolean equals(User other) {
-    return this.id.equals(other.id) && this.firstName.equals(other.firstName) &&
-        this.lastName.equals(other.lastName) &&
-        this.username.equals(other.username) &&
-        this.password.equals(other.password) &&
-        this.email.equals(other.email) && this.userType.equals(other.userType);
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (other.getClass().equals(this.getClass())) {
-      return this.equals((User)other);
-    }
-    return false;
   }
 
   @Override

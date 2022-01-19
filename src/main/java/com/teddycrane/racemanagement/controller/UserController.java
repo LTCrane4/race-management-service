@@ -1,17 +1,18 @@
 package com.teddycrane.racemanagement.controller;
 
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.model.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
-import com.teddycrane.racemanagement.model.user.response.GetAllUsersResponse;
+import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.services.UserService;
-import java.util.Optional;
-import java.util.UUID;
+import io.micrometer.core.instrument.search.Search;
+import java.util.*;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,10 @@ public class UserController extends BaseController {
   }
 
   @GetMapping("/user")
-  public GetAllUsersResponse getAllUsers() {
+  public UserCollectionResponse getAllUsers() {
     logger.info("getAllUsers called");
 
-    return new GetAllUsersResponse(this.userService.getAllUsers());
+    return new UserCollectionResponse(this.userService.getAllUsers());
   }
 
   @GetMapping("/user/{id}")
@@ -53,6 +54,16 @@ public class UserController extends BaseController {
       // pass error up chain
       throw new NotFoundException(e.getMessage());
     }
+  }
+
+  @GetMapping("/user/search")
+  public UserCollectionResponse
+  searchUsers(@RequestParam("type") SearchType searchType,
+              @RequestParam("value") String searchValue) {
+    logger.info("searchUsers called");
+
+    return new UserCollectionResponse(
+        this.userService.searchUsers(searchType, searchValue));
   }
 
   @PostMapping("/user/new")
