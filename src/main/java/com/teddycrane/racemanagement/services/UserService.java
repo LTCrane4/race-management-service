@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.services;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import java.util.Collection;
@@ -18,6 +19,9 @@ public interface UserService {
   User createUser(String username, String password, String firstName,
                   String lastName, String email, UserType userType)
       throws DuplicateItemException;
+
+  User updateUser(UUID id, String firstName, String lastName, String email,
+                  UserType userType) throws NotFoundException;
 
   AuthenticationResponse login(String username, String password)
       throws NotAuthorizedException;
