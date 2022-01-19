@@ -2,8 +2,9 @@ package com.teddycrane.racemanagement.helper;
 
 import com.github.javafaker.Faker;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.user.User;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class TestResourceGenerator {
   private static Faker faker = new Faker();
@@ -14,7 +15,7 @@ public class TestResourceGenerator {
                     faker.bothify("??????"), UserType.USER);
   }
 
-  public static Iterable<User> generateUserList(int length) {
+  public static Collection<User> generateUserList(int length) {
     ArrayList<User> result = new ArrayList<>();
     for (int i = 0; i < length; i++) {
       result.add(generateUser());

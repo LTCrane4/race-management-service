@@ -3,11 +3,12 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
-import com.teddycrane.racemanagement.model.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.request.UpdateUserRequest;
-import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.response.GetAllUsersResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,13 @@ public class UserController extends BaseController {
   public UserController(UserService userService) {
     super();
     this.userService = userService;
+  }
+
+  @GetMapping("/user")
+  public GetAllUsersResponse getAllUsers() {
+    logger.info("getAllUsers called");
+
+    return new GetAllUsersResponse(this.userService.getAllUsers());
   }
 
   @GetMapping("/user/{id}")

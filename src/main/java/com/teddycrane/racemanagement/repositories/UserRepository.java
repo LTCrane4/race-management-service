@@ -1,6 +1,6 @@
 package com.teddycrane.racemanagement.repositories;
 
-import com.teddycrane.racemanagement.model.User;
+import com.teddycrane.racemanagement.model.user.User;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

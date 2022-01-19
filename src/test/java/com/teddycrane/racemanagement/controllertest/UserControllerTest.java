@@ -9,13 +9,14 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.User;
-import com.teddycrane.racemanagement.model.request.AuthenticationRequest;
-import com.teddycrane.racemanagement.model.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.request.UpdateUserRequest;
-import com.teddycrane.racemanagement.model.response.AuthenticationResponse;
-import com.teddycrane.racemanagement.services.AuthenticationService;
+import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.response.GetAllUsersResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,6 +130,16 @@ public class UserControllerTest {
     assertThrows(
         NotAuthorizedException.class,
         () -> this.userController.login(new AuthenticationRequest("", "")));
+  }
+
+  @Test
+  public void getAllUsersShouldReturnCorrectResponse() {
+    Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
+    when(this.userService.getAllUsers()).thenReturn(expectedList);
+
+    GetAllUsersResponse actual = this.userController.getAllUsers();
+
+    assertEquals(expectedList, actual.getUsers());
   }
 
   @Test
