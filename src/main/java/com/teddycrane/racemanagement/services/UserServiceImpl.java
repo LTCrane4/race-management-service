@@ -71,8 +71,28 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   @Override
   public User updateUser(UUID id, String firstName, String lastName,
-                         String email, UserType userType) {
-    return null;
+                         String email, UserType userType)
+      throws NotFoundException {
+    logger.info("updateUser called");
+    Optional<User> existing = this.userRepository.findById(id);
+
+    if (existing.isPresent()) {
+      User user = existing.get();
+      if (firstName != null)
+        user.setFirstName(firstName);
+      if (lastName != null)
+        user.setLastName(lastName);
+      if (email != null)
+        user.setEmail(email);
+      // todo update so that non-admin/root users can't update the user type
+      if (userType != null)
+        user.setUserType(userType);
+
+      return this.userRepository.save(user);
+    } else {
+      logger.error("No user found for the id {}", id);
+      throw new NotFoundException("No user found for the provided id");
+    }
   }
 
   @Override

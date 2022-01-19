@@ -145,53 +145,64 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserShouldNotThrowErrorIfSomeRequestParamsAreMissing() {
-    // if type is null
-    when(this.userService.updateUser(eq(testId), anyString(), anyString(),
+  public void updateUserWithType() {
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(),
+                                     any(UserType.class)))
+        .thenReturn(expected);
+    User actual = this.userController.updateUser(
+        testString, new UpdateUserRequest(null, null, null, UserType.USER));
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void updateUserWithEmail() {
+    // email is null
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(),
                                      anyString(), isNull()))
         .thenReturn(expected);
     User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest("", "", "", null));
+        testString, new UpdateUserRequest(null, null, "", null));
     assertEquals(expected, actual);
+  }
 
-    // email is null
-    when(this.userService.updateUser(eq(testId), anyString(), anyString(),
-                                     isNull(), any(UserType.class)))
-        .thenReturn(expected);
-    actual = this.userController.updateUser(
-        testString, new UpdateUserRequest("", "", null, UserType.USER));
-    assertEquals(expected, actual);
-
-    // lastName is null
-    when(this.userService.updateUser(eq(testId), anyString(), isNull(),
-                                     anyString(), any(UserType.class)))
-        .thenReturn(expected);
-    actual = this.userController.updateUser(
-        testString, new UpdateUserRequest("", null, "", UserType.USER));
-    assertEquals(expected, actual);
-
-    // firstName is null
+  @Test
+  void updateUserWithLastName() {
     when(this.userService.updateUser(eq(testId), isNull(), anyString(),
-                                     anyString(), any(UserType.class)))
+                                     isNull(), isNull()))
         .thenReturn(expected);
-    actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, "", "", UserType.USER));
+    User actual = this.userController.updateUser(
+        testString, new UpdateUserRequest(null, "", null, null));
     assertEquals(expected, actual);
+  }
 
-    // first and last name are null
+  @Test
+  void updateUserWithFirstName() {
+    when(this.userService.updateUser(eq(testId), anyString(), isNull(),
+                                     isNull(), isNull()))
+        .thenReturn(expected);
+    User actual = this.userController.updateUser(
+        testString, new UpdateUserRequest("", null, null, null));
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(eq(testId), isNull(), isNull(),
                                      anyString(), any(UserType.class)))
         .thenReturn(expected);
-    actual = this.userController.updateUser(
+    User actual = this.userController.updateUser(
         testString, new UpdateUserRequest(null, null, "", UserType.USER));
     assertEquals(expected, actual);
+  }
 
-    // email and userType are null
-    when(this.userService.updateUser(eq(testId), anyString(), anyString(),
-                                     isNull(), isNull()))
+  @Test
+  void updateUserWithEmailOnly() {
+    // userType is null and email is not null
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(),
+                                     anyString(), isNull()))
         .thenReturn(expected);
-    actual = this.userController.updateUser(
-        testString, new UpdateUserRequest("", "", null, null));
+    User actual = this.userController.updateUser(
+        testString, new UpdateUserRequest(null, null, "", null));
     assertEquals(expected, actual);
   }
 

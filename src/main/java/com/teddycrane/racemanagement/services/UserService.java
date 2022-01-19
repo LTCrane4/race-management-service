@@ -21,7 +21,7 @@ public interface UserService {
       throws DuplicateItemException;
 
   User updateUser(UUID id, String firstName, String lastName, String email,
-                  UserType userType);
+                  UserType userType) throws NotFoundException;
 
   AuthenticationResponse login(String username, String password)
       throws NotAuthorizedException;
