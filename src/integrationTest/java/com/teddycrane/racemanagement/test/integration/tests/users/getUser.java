@@ -33,9 +33,13 @@ class getUser extends IntegrationBase {
 
   @Test
   void getUser() throws Exception {
-    var result = this.mockMvc.perform(get("/user/" + testId)
+    var result = this.mockMvc.perform(
+        get("/user/" + testId)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser")));
+            .header("Authorization",
+                    String.format(
+                        "%s %s", BEARER,
+                        JwtTokenProviderMock.generateMockToken("testuser"))));
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
   }
