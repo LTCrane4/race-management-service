@@ -38,6 +38,7 @@ jobs:
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
+      - run: Install Supported Java Version
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
@@ -61,8 +62,8 @@ workflows:
       - build-application
       - test
       - integration-test:
-          requires:
-            - build-application
+#          requires:
+#            - build-application
 #          filters:
 #            branches:
 #              only:
