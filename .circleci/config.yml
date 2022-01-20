@@ -60,10 +60,10 @@ workflows:
       - integration-test:
           requires:
             - build-application
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
       - store-built-application:
           requires:
             - test
