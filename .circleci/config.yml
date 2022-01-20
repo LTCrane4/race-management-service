@@ -37,7 +37,7 @@ jobs:
       - checkout
       - run:
           name: Start Docker Daemon
-          run: sudo systemctl start docker
+          command: sudo systemctl start docker
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
