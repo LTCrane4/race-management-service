@@ -63,13 +63,13 @@ workflows:
     jobs:
       - build-application
       - test
-      - integration-test
-#          requires:
-#            - build-application
-#          filters:
-#            branches:
-#              only:
-#                - main
+      - integration-test:
+          requires:
+            - build-application
+          filters:
+            branches:
+              only:
+                - main
       - store-built-application:
           requires:
             - test
