@@ -53,10 +53,20 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public Collection<User> searchUsers(SearchType searchType, String searchValue) {
+  public Collection<User> searchUsers(SearchType searchType, String searchValue)
+      throws IllegalArgumentException {
     logger.info("searchUsers called");
 
-    return null;
+    switch (searchType) {
+      case TYPE:
+        return this.userRepository.findAllByUserType(UserType.valueOf(searchValue.toUpperCase()));
+      case NAME:
+        {
+          return this.userRepository.findAllByLastName(searchValue);
+        }
+      default:
+        return null;
+    }
   }
 
   private String encodePassword(String password) {

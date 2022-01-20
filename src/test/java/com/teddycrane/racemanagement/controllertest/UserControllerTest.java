@@ -226,4 +226,13 @@ public class UserControllerTest {
     var response = this.userController.searchUsers(SearchType.TYPE, "test");
     assertNotNull(response, "response should not be null");
   }
+
+  @Test
+  void shouldThrowErrorIfSearchTypeAndValueMismatched() {
+    when(this.userService.searchUsers(SearchType.TYPE, "not a type"))
+        .thenThrow(IllegalArgumentException.class);
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
+  }
 }

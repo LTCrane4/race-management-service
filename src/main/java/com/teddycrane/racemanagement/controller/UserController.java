@@ -56,10 +56,16 @@ public class UserController extends BaseController {
 
   @GetMapping("/user/search")
   public UserCollectionResponse searchUsers(
-      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue) {
+      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue)
+      throws BadRequestException {
     logger.info("searchUsers called");
 
-    return new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue));
+    try {
+      return new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue));
+    } catch (IllegalArgumentException e) {
+      logger.error("Mismatch: Unable to map search type {}, to value", searchType);
+      throw new BadRequestException("Unable to map the search type to the search value");
+    }
   }
 
   @PostMapping("/user/new")

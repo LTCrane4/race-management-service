@@ -18,7 +18,8 @@ public interface UserService {
 
   Optional<User> getUser(UUID id);
 
-  Collection<User> searchUsers(SearchType searchType, String searchValue);
+  Collection<User> searchUsers(SearchType searchType, String searchValue)
+      throws IllegalArgumentException;
 
   User createUser(
       String username,
