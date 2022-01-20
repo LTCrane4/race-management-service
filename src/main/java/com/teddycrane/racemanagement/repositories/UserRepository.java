@@ -12,6 +12,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   /**
    * This method is required for Spring Security.
+   *
    * @param username The username to find by.
    * @return The user found for the username, or null.
    */

@@ -16,9 +16,10 @@ class GetUser extends UserBase {
   @Test
   void getUser_shouldReturnValidUser() throws Exception {
     this.mockMvc
-        .perform(get("/user/" + USER_ID)
-                     .contentType(MediaType.APPLICATION_JSON)
-                     .header(AUTHORIZATION_HEADER, USER_TOKEN))
+        .perform(
+            get("/user/" + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION_HEADER, USER_TOKEN))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(jsonPath("$.username").value("testuser"));

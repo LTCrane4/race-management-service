@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -30,9 +29,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
-  public UserServiceImpl(UserRepository userRepository,
-                         TokenManager tokenManager,
-                         AuthenticationManager authenticationManager) {
+  public UserServiceImpl(
+      UserRepository userRepository,
+      TokenManager tokenManager,
+      AuthenticationManager authenticationManager) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
@@ -57,8 +57,13 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public User createUser(String username, String password, String firstName,
-                         String lastName, String email, UserType userType)
+  public User createUser(
+      String username,
+      String password,
+      String firstName,
+      String lastName,
+      String email,
+      UserType userType)
       throws DuplicateItemException {
     logger.info("createUser called");
     Optional<User> existing = this.userRepository.findByUsername(username);
@@ -72,28 +77,24 @@ public class UserServiceImpl extends BaseService implements UserService {
     // If userType is not present or null, set user type to user
     UserType type = userType == null ? UserType.USER : userType;
 
-    return this.userRepository.save(new User(
-        firstName, lastName, username, email, encodePassword(password), type));
+    return this.userRepository.save(
+        new User(firstName, lastName, username, email, encodePassword(password), type));
   }
 
   @Override
-  public User updateUser(UUID id, String firstName, String lastName,
-                         String email, UserType userType)
+  public User updateUser(
+      UUID id, String firstName, String lastName, String email, UserType userType)
       throws NotFoundException {
     logger.info("updateUser called");
     Optional<User> existing = this.userRepository.findById(id);
 
     if (existing.isPresent()) {
       User user = existing.get();
-      if (firstName != null)
-        user.setFirstName(firstName);
-      if (lastName != null)
-        user.setLastName(lastName);
-      if (email != null)
-        user.setEmail(email);
+      if (firstName != null) user.setFirstName(firstName);
+      if (lastName != null) user.setLastName(lastName);
+      if (email != null) user.setEmail(email);
       // todo update so that non-admin/root users can't update the user type
-      if (userType != null)
-        user.setUserType(userType);
+      if (userType != null) user.setUserType(userType);
 
       return this.userRepository.save(user);
     } else {
@@ -117,8 +118,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         token = this.tokenManager.generateToken(new UserPrincipal(user.get()));
         return new AuthenticationResponse(token);
       } else {
-        throw new UsernameNotFoundException(
-            "No user found for the provided username");
+        throw new UsernameNotFoundException("No user found for the provided username");
       }
     } catch (AuthenticationException | NotFoundException e) {
       logger.warn("Unable to authenticate with the provided credentials");

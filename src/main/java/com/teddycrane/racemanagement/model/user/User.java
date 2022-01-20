@@ -24,18 +24,29 @@ public class User {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private final UUID id;
 
+  @Setter @NonNull private String firstName, lastName, email, username, password;
+
   @Setter
+  @Enumerated(EnumType.STRING)
   @NonNull
-  private String firstName, lastName, email, username, password;
+  private UserType userType;
 
-  @Setter @Enumerated(EnumType.STRING) @NonNull private UserType userType;
+  public User() {
+    this.id = UUID.randomUUID();
+  }
 
-  public User() { this.id = UUID.randomUUID(); }
+  private User(UUID id) {
+    this.id = id;
+  }
 
-  private User(UUID id) { this.id = id; }
-
-  private User(UUID id, String firstName, String lastName, String username,
-               String email, String password, UserType userType) {
+  private User(
+      UUID id,
+      String firstName,
+      String lastName,
+      String username,
+      String email,
+      String password,
+      UserType userType) {
     this(id);
     this.firstName = firstName;
     this.lastName = lastName;
@@ -45,8 +56,7 @@ public class User {
     this.userType = userType;
   }
 
-  public User(String firstName, String lastName, String username, String email,
-              String password) {
+  public User(String firstName, String lastName, String username, String email, String password) {
     this();
     this.firstName = firstName;
     this.lastName = lastName;
@@ -55,8 +65,13 @@ public class User {
     this.password = password;
   }
 
-  public User(String firstName, String lastName, String username, String email,
-              String password, UserType userType) {
+  public User(
+      String firstName,
+      String lastName,
+      String username,
+      String email,
+      String password,
+      UserType userType) {
     this(firstName, lastName, username, email, password);
     this.userType = userType;
   }
@@ -70,31 +85,37 @@ public class User {
   //  }
 
   public User(User other) {
-    this(other.id, other.firstName, other.lastName, other.username, other.email,
-         other.password, other.userType);
+    this(
+        other.id,
+        other.firstName,
+        other.lastName,
+        other.username,
+        other.email,
+        other.password,
+        other.userType);
   }
 
   private boolean equals(User other) {
-    return this.id.equals(other.id) && this.firstName.equals(other.firstName) &&
-        this.lastName.equals(other.lastName) &&
-        this.username.equals(other.username) &&
-        this.password.equals(other.password) &&
-        this.email.equals(other.email) && this.userType.equals(other.userType);
+    return this.id.equals(other.id)
+        && this.firstName.equals(other.firstName)
+        && this.lastName.equals(other.lastName)
+        && this.username.equals(other.username)
+        && this.password.equals(other.password)
+        && this.email.equals(other.email)
+        && this.userType.equals(other.userType);
   }
 
   @Override
   public boolean equals(Object other) {
     if (other.getClass().equals(this.getClass())) {
-      return this.equals((User)other);
+      return this.equals((User) other);
     }
     return false;
   }
 
   @Override
   public String toString() {
-    Gson gson = new GsonBuilder()
-                    .setExclusionStrategies(new FieldExclusionStrategy())
-                    .create();
+    Gson gson = new GsonBuilder().setExclusionStrategies(new FieldExclusionStrategy()).create();
     String result = gson.toJson(this);
     return result;
   }

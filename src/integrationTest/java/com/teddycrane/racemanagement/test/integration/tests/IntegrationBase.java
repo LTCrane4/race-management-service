@@ -42,8 +42,8 @@ public class IntegrationBase {
 
   protected static final String AUTHORIZATION_HEADER = "Authorization";
   protected static final String BEARER = "Bearer";
-  protected static final String USER_TOKEN = String.format(
-      "%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
+  protected static final String USER_TOKEN =
+      String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
 
   protected Logger logger = LogManager.getLogger(this.getClass());
 
@@ -62,11 +62,9 @@ public class IntegrationBase {
   }
 
   private void setUpMockTokenManager() {
-    when(this.tokenManager.validateToken(anyString(), any(UserDetails.class)))
-        .thenReturn(true);
+    when(this.tokenManager.validateToken(anyString(), any(UserDetails.class))).thenReturn(true);
     // hard code token manager to return the test user
-    when(this.tokenManager.getUsernameFromToken(anyString()))
-        .thenReturn("testuser");
+    when(this.tokenManager.getUsernameFromToken(anyString())).thenReturn("testuser");
   }
 
   @BeforeEach

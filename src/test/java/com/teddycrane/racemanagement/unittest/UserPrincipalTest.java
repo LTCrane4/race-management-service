@@ -13,8 +13,7 @@ public class UserPrincipalTest {
 
   @BeforeEach
   public void init() {
-    this.userPrincipal =
-        new UserPrincipal(TestResourceGenerator.generateUser());
+    this.userPrincipal = new UserPrincipal(TestResourceGenerator.generateUser());
   }
 
   @Test

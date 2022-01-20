@@ -31,11 +31,9 @@ public class AuthenticationServiceTest {
   @Test
   public void loadsByUserName() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userRepository.findOneByUsername(anyString()))
-        .thenReturn(expected);
+    when(this.userRepository.findOneByUsername(anyString())).thenReturn(expected);
 
-    UserPrincipal actual =
-        (UserPrincipal)this.authenticationService.loadUserByUsername("test");
+    UserPrincipal actual = (UserPrincipal) this.authenticationService.loadUserByUsername("test");
 
     assertEquals(expected, actual.getUser());
   }
@@ -49,8 +47,7 @@ public class AuthenticationServiceTest {
 
   @Test
   public void initializeShouldDoNothingIfDataExists() {
-    when(this.userRepository.findByUsername(anyString()))
-        .thenReturn(Optional.of(new User()));
+    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User()));
 
     this.authenticationService.initialize();
   }
