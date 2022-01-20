@@ -10,9 +10,10 @@ public class TestResourceGenerator {
   private static Faker faker = new Faker();
 
   public static User generateUser() {
-    return new User(faker.name().firstName(), faker.name().lastName(),
-                    faker.name().username(), faker.bothify("????##@fake.fake"),
-                    faker.bothify("??????"), UserType.USER);
+    return new User(
+        faker.name().firstName(), faker.name().lastName(),
+        faker.name().username(), faker.bothify("????##@fake.fake"),
+        faker.bothify("??????"), UserType.USER);
   }
 
   public static Collection<User> generateUserList(int length) {

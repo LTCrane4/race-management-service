@@ -7,7 +7,9 @@ public enum UserType {
 
   private final String text;
 
-  private UserType(final String text) { this.text = text; }
+  private UserType(final String text) {
+    this.text = text;
+  }
 
   @Override
   public String toString() {

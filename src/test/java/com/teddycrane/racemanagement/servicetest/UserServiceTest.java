@@ -45,8 +45,8 @@ public class UserServiceTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    this.userService = new UserServiceImpl(
-        this.userRepository, this.tokenManager, this.authenticationManager);
+    this.userService =
+        new UserServiceImpl(this.userRepository, this.tokenManager, this.authenticationManager);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -71,8 +71,7 @@ public class UserServiceTest {
     User expected = TestResourceGenerator.generateUser();
     when(this.userRepository.save(any(User.class))).thenReturn(expected);
 
-    User actual =
-        this.userService.createUser("", "", "", "", "", UserType.USER);
+    User actual = this.userService.createUser("", "", "", "", "", UserType.USER);
     assertEquals(expected, actual);
   }
 
@@ -89,8 +88,7 @@ public class UserServiceTest {
   @Test
   void createUserShouldHandleDuplicates() {
     User existing = TestResourceGenerator.generateUser();
-    when(this.userRepository.findByUsername(anyString()))
-        .thenReturn(Optional.of(existing));
+    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(existing));
 
     assertThrows(
         DuplicateItemException.class,
@@ -99,8 +97,7 @@ public class UserServiceTest {
 
   @Test
   void loginShouldReturnToken() throws Exception {
-    when(this.userRepository.findByUsername(anyString()))
-        .thenReturn(Optional.of(this.existing));
+    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(this.existing));
 
     AuthenticationResponse response =
         this.userService.login(existing.getUsername(), existing.getPassword());
@@ -109,17 +106,15 @@ public class UserServiceTest {
 
   @Test
   void loginShouldHandleUserNotFound() {
-    when(this.userRepository.findByUsername(anyString()))
-        .thenReturn(Optional.empty());
+    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
-    assertThrows(NotAuthorizedException.class,
-                 () -> this.userService.login("test", "test"));
+    assertThrows(NotAuthorizedException.class, () -> this.userService.login("test", "test"));
   }
 
   @Test
   public void getAllUsersShouldReturnListOfUsers() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
-    when(this.userRepository.findAll()).thenReturn((List<User>)expectedList);
+    when(this.userRepository.findAll()).thenReturn((List<User>) expectedList);
 
     Collection<User> result = this.userService.getAllUsers();
 
@@ -128,41 +123,31 @@ public class UserServiceTest {
 
   @Test
   void updateUser() {
-    when(this.userRepository.findById(testId))
-        .thenReturn(Optional.of(existing));
-    when(this.userRepository.save(any(User.class)))
-        .thenAnswer((input) -> input.getArguments()[0]);
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.userRepository.save(any(User.class))).thenAnswer((input) -> input.getArguments()[0]);
 
-    var actual = this.userService.updateUser(testId, "firstName", "lastName",
-                                             "email", UserType.USER);
+    var actual =
+        this.userService.updateUser(testId, "firstName", "lastName", "email", UserType.USER);
     verify(this.userRepository).save(user.capture());
 
     assertAll(
-        ()
-            -> assertNotNull(actual, "The result should not be null"),
-        ()
-            -> assertEquals(actual, user.getValue(),
-                            "The saved user should match the user returned"));
+        () -> assertNotNull(actual, "The result should not be null"),
+        () ->
+            assertEquals(actual, user.getValue(), "The saved user should match the user returned"));
   }
 
   @Test
   void updateUserWithNoParams() {
-    when(this.userRepository.findById(testId))
-        .thenReturn(Optional.of(existing));
-    when(this.userRepository.save(any(User.class)))
-        .thenAnswer((input) -> input.getArguments()[0]);
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.userRepository.save(any(User.class))).thenAnswer((input) -> input.getArguments()[0]);
 
     var actual = this.userService.updateUser(testId, null, null, null, null);
     verify(this.userRepository).save(user.capture());
 
-    assertAll(()
-                  -> assertNotNull(actual, "The result should not be null"),
-              ()
-                  -> assertEquals(existing, user.getValue(),
-                                  "The user should not be updated"),
-              ()
-                  -> assertEquals(existing, actual,
-                                  "The result should not have been updated"));
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(existing, user.getValue(), "The user should not be updated"),
+        () -> assertEquals(existing, actual, "The result should not have been updated"));
   }
 
   @Test
@@ -170,7 +155,6 @@ public class UserServiceTest {
     when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
 
     assertThrows(
-        NotFoundException.class,
-        () -> this.userService.updateUser(testId, null, null, null, null));
+        NotFoundException.class, () -> this.userService.updateUser(testId, null, null, null, null));
   }
 }
