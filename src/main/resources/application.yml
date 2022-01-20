@@ -11,6 +11,7 @@ spring:
         ddl-auto: create
         dialect:
           storage_engine: innodb
+    open-in-view: false
 server:
   error:
     include-message: always

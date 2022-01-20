@@ -23,12 +23,10 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-web"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
   	implementation "com.google.code.gson:gson:$gson_version"
-	
   	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.security:spring-security-test"
 	implementation "com.github.javafaker:javafaker:$java_faker_version"
 	implementation "io.jsonwebtoken:jjwt:$jwt_version"
-
 	implementation "mysql:mysql-connector-java"
 
 	testImplementation "org.springframework.boot:spring-boot-starter-test"

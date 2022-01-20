@@ -21,7 +21,7 @@ jobs:
           name: Test Application
           command: ./gradlew test -i
       - run:
-          name: Consolidate test results
+          name: Consolidate Test Results
           command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
       - store_test_results:
           path: build/test-results/test
@@ -37,6 +37,19 @@ jobs:
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
+      - store_test_results:
+          path: build/test-results/integrationTest
+  store-built-application:
+      docker:
+        - image: cimg/openjdk:17.0
+      steps:
+        - checkout
+        - run:
+            name: Build Application
+            command: ./gradlew jar
+        - store_artifacts:
+            path: build/libs/*.jar
+            name: app.jar
 
 workflows:
   build:
@@ -46,9 +59,15 @@ workflows:
       - integration-test:
           requires:
             - build-application
+          filters:
+            branches:
+              only:
+                - main
+      - store-built-application:
+          requires:
             - test
-# Uncomment this when we validate that the automation runs in the pipeline ok
-#          filters:
-#            branches:
-#              only:
-#                - main
+            - integration-test
+          filters:
+            branches:
+              only:
+                - main

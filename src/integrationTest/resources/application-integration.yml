@@ -10,6 +10,11 @@ spring:
     properties:
       hibernate:
         ddl-auto: create
+logging:
+  group:
+    testImpl: com.teddycrane.racemanagement.test.integration.tests
+  level:
+    testImpl: info
 server:
   error:
     include-message: always

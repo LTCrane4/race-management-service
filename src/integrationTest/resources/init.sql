@@ -1,3 +1,5 @@
+use test;
+
 create table user
 (
     id         varchar(255) not null
@@ -9,3 +11,10 @@ create table user
     user_type  varchar(255) null,
     username   varchar(255) null
 );
+
+-- Seed User Data
+
+--      UUID                                    username    password    email              first/last_name  user_type
+
+INSERT INTO user (id, username, password, email, first_name, last_name, user_type)
+VALUES('bf68eea7-25a6-4dbf-867b-0829e308bbdd', 'testuser', 'password', 'email@fake.fake', 'Test', 'User', 'USER');
