@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.google.gson.Gson;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.AuthenticationService;
@@ -35,10 +36,13 @@ public class IntegrationBase {
   @Container
   public static final MySQLContainer<?> CONTAINER =
       new MySQLContainer<>("mysql:8.0.20")
+          .withReuse(true)
           .withDatabaseName("test")
           .withUsername("tester")
           .withPassword("password")
           .waitingFor(Wait.defaultWaitStrategy());
+
+  protected final Gson gson = new Gson();
 
   protected static final String AUTHORIZATION_HEADER = "Authorization";
   protected static final String BEARER = "Bearer";

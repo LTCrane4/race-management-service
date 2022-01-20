@@ -4,13 +4,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetUser extends UserBase {
 
   @Test
@@ -23,5 +22,15 @@ class GetUser extends UserBase {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(jsonPath("$.username").value("testuser"));
+  }
+
+  @Test
+  void getUser_ShouldReturn404WhenNoUserIsFound() throws Exception {
+    this.mockMvc
+        .perform(
+            get("/user/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION_HEADER, USER_TOKEN))
+        .andExpect(status().isNotFound());
   }
 }
