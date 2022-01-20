@@ -9,9 +9,11 @@ import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -40,7 +42,7 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public Collection<User> getAllUsers() {
     logger.info("getAllUsers called");
-    return this.userRepository.findAll().stream().toList();
+    return new ArrayList<>(this.userRepository.findAll());
   }
 
   @Override
