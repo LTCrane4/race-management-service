@@ -31,9 +31,16 @@ jobs:
           name: Upload Test Results
           command: bash <(curl -s https://codecov.io/bash)
   integration-test:
-    machine: true
+    machine:
+      image: ubuntu-2004:202008-01
     steps:
       - checkout
+      - run:
+          name: Start Docker Daemon
+          command: sudo systemctl start docker
+      - run:
+          name: Java Version Check
+          command: java --version
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
