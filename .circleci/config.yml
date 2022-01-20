@@ -21,7 +21,7 @@ jobs:
           name: Test Application
           command: ./gradlew test -i
       - run:
-          name: Consolidate test results
+          name: Consolidate Test Results
           command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
       - store_test_results:
           path: build/test-results/test
@@ -30,9 +30,44 @@ jobs:
       - run:
           name: Upload Test Results
           command: bash <(curl -s https://codecov.io/bash)
+  integration-test:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Run Integration Tests
+          command: ./gradlew integrationTest
+      - store_test_results:
+          path: build/test-results/integrationTest
+  store-built-application:
+      docker:
+        - image: cimg/openjdk:17.0
+      steps:
+        - checkout
+        - run:
+            name: Build Application
+            command: ./gradlew jar
+        - store_artifacts:
+            path: build/libs/*.jar
+            name: app.jar
 
 workflows:
   build:
     jobs:
       - build-application
       - test
+      - integration-test:
+          requires:
+            - build-application
+          filters:
+            branches:
+              only:
+                - main
+      - store-built-application:
+          requires:
+            - test
+            - integration-test
+          filters:
+            branches:
+              only:
+                - main
