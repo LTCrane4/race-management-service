@@ -40,7 +40,7 @@ jobs:
           command: sudo systemctl start docker
       - run:
           name: Install Supported Java Version
-          run: sudo apt-get install openjdk@11
+          command: sudo apt-get install openjdk@11
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
