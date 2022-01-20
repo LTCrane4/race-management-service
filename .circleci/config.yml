@@ -31,10 +31,13 @@ jobs:
           name: Upload Test Results
           command: bash <(curl -s https://codecov.io/bash)
   integration-test:
-    docker:
-      - image: cimg/openjdk:17.0
+    machine:
+      image: ubuntu-1604:202004-01
     steps:
       - checkout
+      - run:
+          name: Start Docker Daemon
+          run: sudo systemctl start docker
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
