@@ -32,15 +32,15 @@ jobs:
           command: bash <(curl -s https://codecov.io/bash)
   integration-test:
     machine:
-      image: ubuntu-1604:202004-01
+      image: ubuntu-2004:202008-01
     steps:
       - checkout
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
       - run:
-          name: Install Supported Java Version
-          command: sudo apt-get install openjdk@11
+          name: Java Version Check
+          command: java --version
       - run:
           name: Run Integration Tests
           command: ./gradlew integrationTest
