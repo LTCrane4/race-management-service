@@ -24,17 +24,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private final TokenManager tokenManager;
 
-  public AuthenticationFilter(AuthenticationService userService,
-                              TokenManager tokenManager) {
+  public AuthenticationFilter(AuthenticationService userService, TokenManager tokenManager) {
     this.logger = LogManager.getLogger(this.getClass());
     this.userService = userService;
     this.tokenManager = tokenManager;
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  FilterChain filterChain)
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     logger.info("doFilterInternal called");
     String tokenHeader = request.getHeader("Authorization");
@@ -61,8 +59,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authToken =
             new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
-        authToken.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request));
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }
     }

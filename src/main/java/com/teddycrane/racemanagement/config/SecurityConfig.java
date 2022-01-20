@@ -31,9 +31,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  public SecurityConfig(AuthenticationService authenticationService,
-                        JwtAuthenticationEntryPoint authenticationEntryPoint,
-                        AuthenticationFilter filter) {
+  public SecurityConfig(
+      AuthenticationService authenticationService,
+      JwtAuthenticationEntryPoint authenticationEntryPoint,
+      AuthenticationFilter filter) {
     this.authenticationService = authenticationService;
     this.authenticationEntryPoint = authenticationEntryPoint;
     this.filter = filter;
@@ -64,8 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Override
-  public void configure(final AuthenticationManagerBuilder auth)
-      throws Exception {
+  public void configure(final AuthenticationManagerBuilder auth) throws Exception {
     auth.eraseCredentials(true)
         .userDetailsService(this.authenticationService)
         .passwordEncoder(passwordEncoder());

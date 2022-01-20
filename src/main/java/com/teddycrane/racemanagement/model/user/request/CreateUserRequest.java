@@ -14,9 +14,11 @@ import lombok.Setter;
 @Setter
 public class CreateUserRequest {
 
-  @NotBlank(message = "A username must be provided") private String username;
+  @NotBlank(message = "A username must be provided")
+  private String username;
 
-  @NotBlank(message = "A password must be provided") private String password;
+  @NotBlank(message = "A password must be provided")
+  private String password;
 
   @NotBlank(message = "A first and last name must both be provided")
   private String firstName, lastName;
@@ -25,8 +27,8 @@ public class CreateUserRequest {
 
   private UserType userType;
 
-  public CreateUserRequest(String username, String password, String firstName,
-                           String lastName, String email) {
+  public CreateUserRequest(
+      String username, String password, String firstName, String lastName, String email) {
     this.username = username;
     this.password = password;
     this.firstName = firstName;

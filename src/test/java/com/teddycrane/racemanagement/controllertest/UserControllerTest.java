@@ -53,51 +53,44 @@ public class UserControllerTest {
 
   @Test
   public void getUser_shouldReturnUser() {
-    when(this.userService.getUser(any(UUID.class)))
-        .thenReturn(Optional.of(new User()));
+    when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.of(new User()));
     User result = this.userController.getUser(UUID.randomUUID().toString());
     assertNotNull(result);
   }
 
   @Test
   public void getUser_shouldThrowBadRequestErrorIfBadId() {
-    assertThrows(BadRequestException.class,
-                 () -> this.userController.getUser("test"));
+    assertThrows(BadRequestException.class, () -> this.userController.getUser("test"));
   }
 
   @Test
   public void getUserShouldThrowNotFoundIfNoUserPresent() {
-    when(this.userService.getUser(any(UUID.class)))
-        .thenReturn(Optional.empty());
+    when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.empty());
 
     assertThrows(
-        NotFoundException.class,
-        () -> this.userController.getUser(UUID.randomUUID().toString()));
+        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 
   @Test
   public void createUserShouldCreateAUser() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userService.createUser(anyString(), anyString(), anyString(),
-                                     anyString(), anyString(),
-                                     any(UserType.class)))
+    when(this.userService.createUser(
+            anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
 
-    User result = this.userController.createUser(
-        new CreateUserRequest("", "", "", "", "", UserType.USER));
+    User result =
+        this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertNotNull(result);
     assertEquals(expected, result);
   }
 
   @Test
   public void createUserShouldCreateUserWithouType() {
-    when(this.userService.createUser(anyString(), anyString(), anyString(),
-                                     anyString(), anyString(),
-                                     eq(UserType.USER)))
+    when(this.userService.createUser(
+            anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
         .thenReturn(expected);
 
-    User actual = this.userController.createUser(
-        new CreateUserRequest("", "", "", "", ""));
+    User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
 
     assertNotNull(actual);
     assertEquals(expected, actual);
@@ -105,12 +98,10 @@ public class UserControllerTest {
 
   @Test
   public void createUserShouldHandleServiceErrors() {
-    when(this.userService.getUser(any(UUID.class)))
-        .thenThrow(NotFoundException.class);
+    when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
 
     assertThrows(
-        NotFoundException.class,
-        () -> this.userController.getUser(UUID.randomUUID().toString()));
+        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 
   @Test
@@ -125,8 +116,7 @@ public class UserControllerTest {
 
   @Test
   public void loginShouldHandleExceptions() throws Exception {
-    when(this.userService.login(anyString(), anyString()))
-        .thenThrow(NotAuthorizedException.class);
+    when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
 
     assertThrows(
         NotAuthorizedException.class,
@@ -145,76 +135,73 @@ public class UserControllerTest {
 
   @Test
   public void updateUserShouldUpdateWithFullRequestBody() {
-    when(this.userService.updateUser(any(UUID.class), anyString(), anyString(),
-                                     anyString(), any(UserType.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
 
-    User actual = this.userController.updateUser(
-        UUID.randomUUID().toString(),
-        new UpdateUserRequest("", "", "", UserType.ADMIN));
+    User actual =
+        this.userController.updateUser(
+            UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
 
     assertEquals(expected, actual);
   }
 
   @Test
   public void updateUserWithType() {
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(),
-                                     any(UserType.class)))
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, null, null, UserType.USER));
+    User actual =
+        this.userController.updateUser(
+            testString, new UpdateUserRequest(null, null, null, UserType.USER));
     assertEquals(expected, actual);
   }
 
   @Test
   void updateUserWithEmail() {
     // email is null
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(),
-                                     anyString(), isNull()))
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, null, "", null));
+    User actual =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
     assertEquals(expected, actual);
   }
 
   @Test
   void updateUserWithLastName() {
-    when(this.userService.updateUser(eq(testId), isNull(), anyString(),
-                                     isNull(), isNull()))
+    when(this.userService.updateUser(eq(testId), isNull(), anyString(), isNull(), isNull()))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, "", null, null));
+    User actual =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
     assertEquals(expected, actual);
   }
 
   @Test
   void updateUserWithFirstName() {
-    when(this.userService.updateUser(eq(testId), anyString(), isNull(),
-                                     isNull(), isNull()))
+    when(this.userService.updateUser(eq(testId), anyString(), isNull(), isNull(), isNull()))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest("", null, null, null));
+    User actual =
+        this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
     assertEquals(expected, actual);
   }
 
   @Test
   void updateUserWithNoFirstOrLastName() {
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(),
-                                     anyString(), any(UserType.class)))
+    when(this.userService.updateUser(
+            eq(testId), isNull(), isNull(), anyString(), any(UserType.class)))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, null, "", UserType.USER));
+    User actual =
+        this.userController.updateUser(
+            testString, new UpdateUserRequest(null, null, "", UserType.USER));
     assertEquals(expected, actual);
   }
 
   @Test
   void updateUserWithEmailOnly() {
     // userType is null and email is not null
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(),
-                                     anyString(), isNull()))
+    when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
-    User actual = this.userController.updateUser(
-        testString, new UpdateUserRequest(null, null, "", null));
+    User actual =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
     assertEquals(expected, actual);
   }
 
@@ -222,14 +209,13 @@ public class UserControllerTest {
   void updateUserShouldHandleBadRequest() {
     assertThrows(
         BadRequestException.class,
-        ()
-            -> this.userController.updateUser(
+        () ->
+            this.userController.updateUser(
                 testString, new UpdateUserRequest(null, null, null, null)));
 
-    assertThrows(BadRequestException.class,
-                 ()
-                     -> this.userController.updateUser(
-                         "bad id", new UpdateUserRequest()));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.updateUser("bad id", new UpdateUserRequest()));
   }
 
   @Test

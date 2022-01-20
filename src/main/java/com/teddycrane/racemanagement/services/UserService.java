@@ -15,17 +15,22 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
   Collection<User> getAllUsers();
+
   Optional<User> getUser(UUID id);
 
   Collection<User> searchUsers(SearchType searchType, String searchValue);
 
-  User createUser(String username, String password, String firstName,
-                  String lastName, String email, UserType userType)
+  User createUser(
+      String username,
+      String password,
+      String firstName,
+      String lastName,
+      String email,
+      UserType userType)
       throws DuplicateItemException;
 
-  User updateUser(UUID id, String firstName, String lastName, String email,
-                  UserType userType) throws NotFoundException;
+  User updateUser(UUID id, String firstName, String lastName, String email, UserType userType)
+      throws NotFoundException;
 
-  AuthenticationResponse login(String username, String password)
-      throws NotAuthorizedException;
+  AuthenticationResponse login(String username, String password) throws NotAuthorizedException;
 }
