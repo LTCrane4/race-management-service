@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
@@ -16,6 +17,9 @@ public interface UserService {
   Collection<User> getAllUsers();
 
   Optional<User> getUser(UUID id);
+
+  Collection<User> searchUsers(SearchType searchType, String searchValue)
+      throws IllegalArgumentException;
 
   User createUser(
       String username,

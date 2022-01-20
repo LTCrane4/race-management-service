@@ -1,6 +1,8 @@
 package com.teddycrane.racemanagement.repositories;
 
+import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.user.User;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
    * @return The user found for the username, or null.
    */
   User findOneByUsername(String username);
+
+  Collection<User> findAllByUserType(UserType userType);
+
+  Collection<User> findAllByLastName(String lastName);
 }

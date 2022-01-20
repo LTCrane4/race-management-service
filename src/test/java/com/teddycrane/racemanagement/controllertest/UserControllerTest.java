@@ -4,17 +4,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.teddycrane.racemanagement.controller.UserController;
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
-import com.teddycrane.racemanagement.model.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
-import com.teddycrane.racemanagement.model.user.response.GetAllUsersResponse;
+import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Collection;
 import java.util.Optional;
@@ -127,7 +128,7 @@ public class UserControllerTest {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userService.getAllUsers()).thenReturn(expectedList);
 
-    GetAllUsersResponse actual = this.userController.getAllUsers();
+    UserCollectionResponse actual = this.userController.getAllUsers();
 
     assertEquals(expectedList, actual.getUsers());
   }
@@ -205,7 +206,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserShouldHandleBadRequest() {
+  void updateUserShouldHandleBadRequest() {
     assertThrows(
         BadRequestException.class,
         () ->
@@ -215,5 +216,23 @@ public class UserControllerTest {
     assertThrows(
         BadRequestException.class,
         () -> this.userController.updateUser("bad id", new UpdateUserRequest()));
+  }
+
+  @Test
+  void shouldSearchUsers() {
+    when(this.userService.searchUsers(any(SearchType.class), anyString()))
+        .thenReturn(TestResourceGenerator.generateUserList(5));
+
+    var response = this.userController.searchUsers(SearchType.TYPE, "test");
+    assertNotNull(response, "response should not be null");
+  }
+
+  @Test
+  void shouldThrowErrorIfSearchTypeAndValueMismatched() {
+    when(this.userService.searchUsers(SearchType.TYPE, "not a type"))
+        .thenThrow(IllegalArgumentException.class);
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
   }
 }

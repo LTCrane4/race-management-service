@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
@@ -17,6 +18,7 @@ import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.UserService;
 import com.teddycrane.racemanagement.services.UserServiceImpl;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 
 public class UserServiceTest {
+
   @Mock private UserRepository userRepository;
   @Mock private TokenManager tokenManager;
   @Mock private AuthenticationManager authenticationManager;
@@ -58,12 +61,18 @@ public class UserServiceTest {
 
   @Test
   void getUserShouldReturnUser() {
-    when(this.userRepository.findById(any(UUID.class)))
-        .thenReturn(Optional.of(TestResourceGenerator.generateUser()));
+    User expected = TestResourceGenerator.generateUser();
+    when(this.userRepository.findById(any(UUID.class))).thenReturn(Optional.of(expected));
 
     Optional<User> result = this.userService.getUser(UUID.randomUUID());
 
-    assertNotNull(result.get());
+    assertAll(
+        () -> assertTrue(result.isPresent(), "The result should not be null"),
+        () ->
+            assertEquals(
+                expected,
+                result.orElse(new User()),
+                "The actual value should equal the expected one"));
   }
 
   @Test
@@ -156,5 +165,35 @@ public class UserServiceTest {
 
     assertThrows(
         NotFoundException.class, () -> this.userService.updateUser(testId, null, null, null, null));
+  }
+
+  @Test
+  void shouldReturnUsersFromTypeSearch() {
+    List<User> expectedList = new ArrayList<>(TestResourceGenerator.generateUserList(3));
+    when(this.userRepository.findAllByUserType(UserType.USER)).thenReturn(expectedList);
+
+    List<User> actual = new ArrayList<>(this.userService.searchUsers(SearchType.TYPE, "USER"));
+
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(expectedList, actual));
+  }
+
+  @Test
+  void shouldReturnUsersFromNameSearch() {
+    List<User> expectedList = new ArrayList<>(TestResourceGenerator.generateUserList(3));
+    when(this.userRepository.findAllByLastName(anyString())).thenReturn(expectedList);
+
+    List<User> actual = new ArrayList<>(this.userService.searchUsers(SearchType.NAME, "test"));
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(expectedList, actual));
+  }
+
+  @Test
+  void shouldThrowErrorIfArgumentMismatch() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> this.userService.searchUsers(SearchType.TYPE, "not a type"));
   }
 }

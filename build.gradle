@@ -67,7 +67,7 @@ test {
 
 task integrationTest(type: Test) {
 	useJUnitPlatform()
-	testLogging.showStandardStreams = true
+	testLogging.showStandardStreams = false
 	environment('spring.profiles.active', 'integration')
 
 	group = 'integration'
