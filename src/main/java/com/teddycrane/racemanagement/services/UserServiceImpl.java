@@ -61,9 +61,8 @@ public class UserServiceImpl extends BaseService implements UserService {
       case TYPE:
         return this.userRepository.findAllByUserType(UserType.valueOf(searchValue.toUpperCase()));
       case NAME:
-        return this.userRepository.findAllByLastName(searchValue);
       default:
-        return null;
+        return this.userRepository.findAllByLastName(searchValue);
     }
   }
 
