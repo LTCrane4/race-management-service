@@ -1,8 +1,8 @@
-version: "3.2"
+version: "3.4"
 
 services:
   docker-mysql:
-    # image: mysql:8.0.20
+    container_name: docker-mysql
     restart: unless-stopped
     build:
       context: ./containers
@@ -18,22 +18,28 @@ services:
       - db:/var/lib/mysql
 
   race-management-service:
+    container_name: racemanagement
+    image: racemanagement
     depends_on:
       - docker-mysql
     build: 
       context: .
-      dockerfile: racemanagement.dockerfile
-      args:
-        - SECRET_KEY=$SECRET_KEY
+      target: dev
+      dockerfile: containers/racemanagement.dockerfile
     restart: on-failure
     ports:
       - 8080:8080
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/SPRING
+      - 5015:5015
     volumes:
-      - .m2:/root/.m2
-    stdin_open: true
-    tty: true
+      - ./:/app
+      - cache:/root/.gradle
+    command: ./gradlew bootRun
 
 volumes:
-  db: 
+  db:
+  cache:
+
+networks:
+  default:
+    external:
+      name: race-management
