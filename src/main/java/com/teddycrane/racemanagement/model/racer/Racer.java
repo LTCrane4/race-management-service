@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.model.racer;
 
+import com.google.gson.Gson;
 import com.teddycrane.racemanagement.enums.Category;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -89,5 +90,11 @@ public class Racer {
         other.email,
         other.bibNumber,
         other.id);
+  }
+
+  @Override
+  public String toString() {
+    Gson gson = new Gson();
+    return gson.toJson(this);
   }
 }

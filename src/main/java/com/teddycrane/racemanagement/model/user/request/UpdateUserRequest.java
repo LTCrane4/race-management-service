@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.model.user.request;
 
 import com.teddycrane.racemanagement.enums.UserType;
+import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateUserRequest {
 
-  private String firstName, lastName, email;
+  private String firstName, lastName;
+
+  @Email private String email;
 
   private UserType userType;
 }

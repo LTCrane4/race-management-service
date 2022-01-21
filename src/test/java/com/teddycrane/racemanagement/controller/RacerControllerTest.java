@@ -64,7 +64,7 @@ class RacerControllerTest {
   }
 
   @Test
-  void shouldHandleBadId() {
+  void getShouldHandleBadId() {
     assertThrows(
         BadRequestException.class,
         () -> this.racerController.getRacer("bad id"),
