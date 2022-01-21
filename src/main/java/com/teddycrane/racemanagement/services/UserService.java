@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
+
   Collection<User> getAllUsers();
 
   Optional<User> getUser(UUID id);

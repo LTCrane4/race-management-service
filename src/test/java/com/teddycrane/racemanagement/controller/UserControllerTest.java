@@ -6,10 +6,12 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
@@ -23,6 +25,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 class UserControllerTest {
 
@@ -34,15 +39,31 @@ class UserControllerTest {
 
   private String testString;
 
+  private UserPrincipal authPrincipal;
+
   @Mock private UserService userService;
+
+  private void setUpSecurityContext(User principalUser) {
+    this.authPrincipal = new UserPrincipal(principalUser);
+    Authentication authentication = mock(Authentication.class);
+    SecurityContext securityContext = mock(SecurityContext.class);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+
+    SecurityContextHolder.setContext(securityContext);
+
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+        .thenReturn(authPrincipal);
+  }
 
   @BeforeEach
   void init() {
     MockitoAnnotations.openMocks(this);
     this.userController = new UserController(this.userService);
-    this.expected = TestResourceGenerator.generateUser();
-    testId = UUID.randomUUID();
-    testString = testId.toString();
+    this.expected = TestResourceGenerator.generateUser(UserType.ADMIN);
+    this.testId = UUID.randomUUID();
+    this.testString = testId.toString();
+    this.setUpSecurityContext(this.expected);
   }
 
   @Test
@@ -215,6 +236,19 @@ class UserControllerTest {
     assertThrows(
         BadRequestException.class,
         () -> this.userController.updateUser("bad id", new UpdateUserRequest()));
+  }
+
+  @Test
+  void updateUserShouldNotUpdateUserIfTheUserTypeIsInsufficient() {
+    this.expected = TestResourceGenerator.generateUser(UserType.USER);
+    this.setUpSecurityContext(this.expected);
+
+    assertThrows(
+        InsufficientPermissionsException.class,
+        () ->
+            this.userController.updateUser(
+                testString, new UpdateUserRequest(null, null, null, null)),
+        "Users with the user type of USER should not be able to update other users");
   }
 
   @Test

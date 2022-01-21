@@ -10,15 +10,25 @@ import java.util.Collection;
 
 public class TestResourceGenerator {
 
-  private TestResourceGenerator() {}
+  private static final Faker faker = new Faker();
 
-  private static Faker faker = new Faker();
+  private TestResourceGenerator() {}
 
   public static User generateUser() {
     return new User(
         faker.name().firstName(), faker.name().lastName(),
         faker.name().username(), faker.bothify("????##@fake.fake"),
         faker.bothify("??????"), UserType.USER);
+  }
+
+  public static User generateUser(UserType type) {
+    return new User(
+        faker.name().firstName(),
+        faker.name().lastName(),
+        faker.name().username(),
+        faker.bothify("????##@fake.fake"),
+        faker.bothify("??????"),
+        type);
   }
 
   public static Collection<User> generateUserList(int length) {

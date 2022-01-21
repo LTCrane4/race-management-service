@@ -1,10 +1,13 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
@@ -13,6 +16,7 @@ import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.*;
 import javax.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +27,16 @@ public class UserController extends BaseController {
   public UserController(UserService userService) {
     super();
     this.userService = userService;
+  }
+
+  private UserType printUserActionAuditLog(String method) {
+    var principal =
+        ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+            .getUser();
+
+    logger.info(
+        "{} requested by user {} with role {}", method, principal.getId(), principal.getUserType());
+    return principal.getUserType();
   }
 
   @GetMapping("/user")
@@ -90,8 +104,14 @@ public class UserController extends BaseController {
 
   @PatchMapping("/user/{id}")
   public User updateUser(@PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
-      throws BadRequestException {
+      throws BadRequestException, InsufficientPermissionsException {
     logger.info("updateUser called");
+    UserType userPrivileges = printUserActionAuditLog("update");
+
+    if (userPrivileges.equals(UserType.USER)) {
+      logger.error("This user does not have the proper permissions to update other users");
+      throw new InsufficientPermissionsException();
+    }
 
     try {
       UUID userId = UUID.fromString(id);
@@ -116,6 +136,8 @@ public class UserController extends BaseController {
     }
   }
 
+  // todo update delete so that users a) can't delete themselves, and b) gate deletion to admins
+  // only
   @DeleteMapping("/{id}")
   public User deleteUser(@PathVariable String id) throws BadRequestException, NotFoundException {
     logger.info("deleteUser called");
