@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,11 @@ class RacerTest {
     Racer finalRacer = racer;
     assertAll(
         () -> assertNotNull(finalRacer, "The copy constructor should construct valid racers"),
-        () -> assertEquals(this.racer, finalRacer));
+        () -> assertEquals(this.racer, finalRacer),
+        () ->
+            assertEquals(
+                Category.CAT1.toString(),
+                finalRacer.getCategory().toString(),
+                "The racer category should match"));
   }
 }
