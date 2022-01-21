@@ -66,6 +66,14 @@ public class Racer {
     this.bibNumber = bibNumber;
   }
 
+  public Racer(String firstName, String lastName, Category category, String middleName) {
+    this();
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.category = category;
+    this.middleName = middleName;
+  }
+
   public Racer(Racer other) {
     this(
         other.firstName,
