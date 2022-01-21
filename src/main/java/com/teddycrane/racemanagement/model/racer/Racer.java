@@ -66,7 +66,11 @@ public class Racer {
     this.bibNumber = bibNumber;
   }
 
-  public Racer(String firstName, String lastName, Category category, String middleName) {
+  public Racer(
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull Category category,
+      String middleName) {
     this();
     this.firstName = firstName;
     this.lastName = lastName;

@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 
-public class UserServiceTest {
+class UserServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private TokenManager tokenManager;
