@@ -5,8 +5,8 @@ services:
     container_name: docker-mysql
     restart: unless-stopped
     build:
-      context: ./containers
-      dockerfile: database.dockerfile
+      context: .
+      dockerfile: containers/database.dockerfile
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
       - MYSQL_DATABASE=SPRING
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./:/app
       - cache:/root/.gradle
-    command: ./gradlew bootRun
+    command: ./gradlew bootRun --no-daemon
 
 volumes:
   db:

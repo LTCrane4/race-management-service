@@ -43,6 +43,7 @@ dependencies {
 
 bootRun {
 	String activeProfile = System.properties['spring.profiles.active']
+	jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5015"]
 	systemProperty "spring.profiles.active", activeProfile
 }
 
@@ -108,6 +109,25 @@ jacocoTestCoverageVerification {
 			enabled = true
 			limit {
 				minimum = 0.9
+			}
+		}
+	}
+}
+
+static void setConfiguration(configuration) {
+	if (configuration.canBeResolved) {
+		configuration.resolve()
+	}
+}
+
+task resolveDependencies {
+	doLast {
+		project.rootProject.allprojects.each { project ->
+			project.buildscript.configurations.each { configuration ->
+				setConfiguration(configuration)
+			}
+			project.configurations.each { configuration ->
+				setConfiguration(configuration)
 			}
 		}
 	}
