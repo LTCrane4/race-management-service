@@ -34,4 +34,6 @@ public interface UserService {
       throws NotFoundException;
 
   AuthenticationResponse login(String username, String password) throws NotAuthorizedException;
+
+  User deleteUser(UUID id) throws NotFoundException;
 }

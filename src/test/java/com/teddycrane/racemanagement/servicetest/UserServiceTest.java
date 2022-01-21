@@ -196,4 +196,23 @@ class UserServiceTest {
         IllegalArgumentException.class,
         () -> this.userService.searchUsers(SearchType.TYPE, "not a type"));
   }
+
+  @Test
+  void shouldDeleteUser() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+
+    var result = this.userService.deleteUser(testId);
+    verify(this.userRepository).delete(user.capture());
+
+    assertAll(
+        () -> assertNotNull(result, "The returned user should not be null"),
+        () -> assertEquals(existing, result, "The result should equal the expected value"));
+  }
+
+  @Test
+  void deleteUserShouldThrowWhenUserIsNotFound() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> this.userService.deleteUser(testId));
+  }
 }

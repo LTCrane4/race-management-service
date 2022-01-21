@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class UserControllerTest {
+class UserControllerTest {
 
   private UserController userController;
 
@@ -38,7 +38,7 @@ public class UserControllerTest {
   @Mock private UserService userService;
 
   @BeforeEach
-  public void init() {
+  void init() {
     MockitoAnnotations.openMocks(this);
     this.userController = new UserController(this.userService);
     this.expected = TestResourceGenerator.generateUser();
@@ -47,24 +47,24 @@ public class UserControllerTest {
   }
 
   @Test
-  public void userController_shouldConstruct() {
+  void userController_shouldConstruct() {
     assertNotNull(userController);
   }
 
   @Test
-  public void getUser_shouldReturnUser() {
+  void getUser_shouldReturnUser() {
     when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.of(new User()));
     User result = this.userController.getUser(UUID.randomUUID().toString());
     assertNotNull(result);
   }
 
   @Test
-  public void getUser_shouldThrowBadRequestErrorIfBadId() {
+  void getUser_shouldThrowBadRequestErrorIfBadId() {
     assertThrows(BadRequestException.class, () -> this.userController.getUser("test"));
   }
 
   @Test
-  public void getUserShouldThrowNotFoundIfNoUserPresent() {
+  void getUserShouldThrowNotFoundIfNoUserPresent() {
     when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.empty());
 
     assertThrows(
@@ -72,7 +72,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldCreateAUser() {
+  void createUserShouldCreateAUser() {
     User expected = TestResourceGenerator.generateUser();
     when(this.userService.createUser(
             anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
@@ -85,7 +85,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldCreateUserWithouType() {
+  void createUserShouldCreateUserWithouType() {
     when(this.userService.createUser(
             anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
         .thenReturn(expected);
@@ -97,7 +97,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldHandleServiceErrors() {
+  void createUserShouldHandleServiceErrors() {
     when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
 
     assertThrows(
@@ -105,7 +105,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void loginShouldAuthenticateUser() throws Exception {
+  void loginShouldAuthenticateUser() throws Exception {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
@@ -115,7 +115,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void loginShouldHandleExceptions() throws Exception {
+  void loginShouldHandleExceptions() throws Exception {
     when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
 
     assertThrows(
@@ -124,7 +124,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void getAllUsersShouldReturnCorrectResponse() {
+  void getAllUsersShouldReturnCorrectResponse() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userService.getAllUsers()).thenReturn(expectedList);
 
@@ -134,7 +134,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserShouldUpdateWithFullRequestBody() {
+  void updateUserShouldUpdateWithFullRequestBody() {
     when(this.userService.updateUser(
             any(UUID.class), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
@@ -147,7 +147,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserWithType() {
+  void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
     User actual =
@@ -234,5 +234,24 @@ public class UserControllerTest {
     assertThrows(
         BadRequestException.class,
         () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
+  }
+
+  @Test
+  void deleteUserShouldDelete() {
+    when(this.userService.deleteUser(testId)).thenReturn(expected);
+
+    var actual = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(expected, actual, "The result should match the expected value"));
+  }
+
+  @Test
+  void deleteUserShouldHandleBadId() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.deleteUser("not uuid"),
+        "Invalid UUID values should throw an exception");
   }
 }

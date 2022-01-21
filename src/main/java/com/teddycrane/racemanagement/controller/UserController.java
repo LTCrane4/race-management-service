@@ -115,4 +115,10 @@ public class UserController extends BaseController {
       throw new BadRequestException("Unable to parse the provided id");
     }
   }
+
+  @DeleteMapping("/{id}")
+  public User deleteUser(@PathVariable String id) throws BadRequestException, NotFoundException {
+    logger.info("deleteUser called");
+    return null;
+  }
 }

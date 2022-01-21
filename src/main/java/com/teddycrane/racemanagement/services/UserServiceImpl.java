@@ -148,4 +148,10 @@ public class UserServiceImpl extends BaseService implements UserService {
       throw new NotAuthorizedException("Unauthorized");
     }
   }
+
+  @Override
+  public User deleteUser(UUID id) throws NotFoundException {
+    logger.info("deleteUser called for {} by {}", id, "test");
+    return null;
+  }
 }
