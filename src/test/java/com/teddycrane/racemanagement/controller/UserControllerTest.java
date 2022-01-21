@@ -1,9 +1,8 @@
-package com.teddycrane.racemanagement.controllertest;
+package com.teddycrane.racemanagement.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.teddycrane.racemanagement.controller.UserController;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;

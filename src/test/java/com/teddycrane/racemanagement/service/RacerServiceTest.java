@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.servicetest;
+package com.teddycrane.racemanagement.service;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;

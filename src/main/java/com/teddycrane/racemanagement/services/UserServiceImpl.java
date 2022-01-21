@@ -152,6 +152,15 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public User deleteUser(UUID id) throws NotFoundException {
     logger.info("deleteUser called for {} by {}", id, "test");
-    return null;
+
+    User u = this.userRepository.findById(id).orElse(null);
+
+    if (u != null) {
+      this.userRepository.delete(u);
+      return u;
+    } else {
+      logger.error("No user found with the id {}", id);
+      throw new NotFoundException("No user found to delete with the specified id");
+    }
   }
 }

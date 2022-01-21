@@ -119,6 +119,13 @@ public class UserController extends BaseController {
   @DeleteMapping("/{id}")
   public User deleteUser(@PathVariable String id) throws BadRequestException, NotFoundException {
     logger.info("deleteUser called");
-    return null;
+
+    try {
+      UUID userId = UUID.fromString(id);
+      return this.userService.deleteUser(userId);
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id {}", id);
+      throw new BadRequestException("Unable to parse the provided id");
+    }
   }
 }

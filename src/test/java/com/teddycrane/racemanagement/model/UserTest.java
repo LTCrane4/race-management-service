@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.unittest;
+package com.teddycrane.racemanagement.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.controllertest;
+package com.teddycrane.racemanagement.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.teddycrane.racemanagement.controller.RacerController;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
@@ -19,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class RacerControllerTest {
+class RacerControllerTest {
 
   @Mock private RacerService racerService;
 
