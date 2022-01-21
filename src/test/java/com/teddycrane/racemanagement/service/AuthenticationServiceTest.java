@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.servicetest;
+package com.teddycrane.racemanagement.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,20 +16,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AuthenticationServiceTest {
+class AuthenticationServiceTest {
 
   @Mock private UserRepository userRepository;
 
   private AuthenticationService authenticationService;
 
   @BeforeEach
-  public void init() {
+  void init() {
     MockitoAnnotations.openMocks(this);
     this.authenticationService = new AuthenticationService(this.userRepository);
   }
 
   @Test
-  public void loadsByUserName() {
+  void loadsByUserName() {
     User expected = TestResourceGenerator.generateUser();
     when(this.userRepository.findOneByUsername(anyString())).thenReturn(expected);
 
@@ -39,14 +39,14 @@ public class AuthenticationServiceTest {
   }
 
   @Test
-  public void initializeShouldCallMethods() {
+  void initializeShouldCallMethods() {
     when(this.userRepository.save(any(User.class))).thenReturn(new User());
 
     this.authenticationService.initialize();
   }
 
   @Test
-  public void initializeShouldDoNothingIfDataExists() {
+  void initializeShouldDoNothingIfDataExists() {
     when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User()));
 
     this.authenticationService.initialize();

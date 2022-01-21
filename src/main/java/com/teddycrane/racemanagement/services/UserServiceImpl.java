@@ -61,11 +61,8 @@ public class UserServiceImpl extends BaseService implements UserService {
       case TYPE:
         return this.userRepository.findAllByUserType(UserType.valueOf(searchValue.toUpperCase()));
       case NAME:
-        {
-          return this.userRepository.findAllByLastName(searchValue);
-        }
       default:
-        return null;
+        return this.userRepository.findAllByLastName(searchValue);
     }
   }
 
@@ -108,11 +105,19 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     if (existing.isPresent()) {
       User user = existing.get();
-      if (firstName != null) user.setFirstName(firstName);
-      if (lastName != null) user.setLastName(lastName);
-      if (email != null) user.setEmail(email);
+      if (firstName != null) {
+        user.setFirstName(firstName);
+      }
+      if (lastName != null) {
+        user.setLastName(lastName);
+      }
+      if (email != null) {
+        user.setEmail(email);
+      }
       // todo update so that non-admin/root users can't update the user type
-      if (userType != null) user.setUserType(userType);
+      if (userType != null) {
+        user.setUserType(userType);
+      }
 
       return this.userRepository.save(user);
     } else {
@@ -141,6 +146,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     } catch (AuthenticationException | NotFoundException e) {
       logger.warn("Unable to authenticate with the provided credentials");
       throw new NotAuthorizedException("Unauthorized");
+    }
+  }
+
+  @Override
+  public User deleteUser(UUID id) throws NotFoundException {
+    logger.info("deleteUser called for {} by {}", id, "test");
+
+    User u = this.userRepository.findById(id).orElse(null);
+
+    if (u != null) {
+      this.userRepository.delete(u);
+      return u;
+    } else {
+      logger.error("No user found with the id {}", id);
+      throw new NotFoundException("No user found to delete with the specified id");
     }
   }
 }

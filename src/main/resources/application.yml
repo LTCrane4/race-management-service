@@ -2,12 +2,15 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
+    url: jdbc:mysql://docker-mysql:3306/SPRING
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
       hibernate:
+        hbm2ddl:
+          auto: update
         ddl-auto: create
         dialect:
           storage_engine: innodb

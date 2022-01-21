@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
+
   Collection<User> getAllUsers();
 
   Optional<User> getUser(UUID id);
@@ -34,4 +35,6 @@ public interface UserService {
       throws NotFoundException;
 
   AuthenticationResponse login(String username, String password) throws NotAuthorizedException;
+
+  User deleteUser(UUID id) throws NotFoundException;
 }

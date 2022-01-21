@@ -1,16 +1,17 @@
-package com.teddycrane.racemanagement.controllertest;
+package com.teddycrane.racemanagement.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.teddycrane.racemanagement.controller.UserController;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
@@ -24,8 +25,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-public class UserControllerTest {
+class UserControllerTest {
 
   private UserController userController;
 
@@ -35,36 +39,52 @@ public class UserControllerTest {
 
   private String testString;
 
+  private UserPrincipal authPrincipal;
+
   @Mock private UserService userService;
 
+  private void setUpSecurityContext(User principalUser) {
+    this.authPrincipal = new UserPrincipal(principalUser);
+    Authentication authentication = mock(Authentication.class);
+    SecurityContext securityContext = mock(SecurityContext.class);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+
+    SecurityContextHolder.setContext(securityContext);
+
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+        .thenReturn(authPrincipal);
+  }
+
   @BeforeEach
-  public void init() {
+  void init() {
     MockitoAnnotations.openMocks(this);
     this.userController = new UserController(this.userService);
-    this.expected = TestResourceGenerator.generateUser();
-    testId = UUID.randomUUID();
-    testString = testId.toString();
+    this.expected = TestResourceGenerator.generateUser(UserType.ADMIN);
+    this.testId = UUID.randomUUID();
+    this.testString = testId.toString();
+    this.setUpSecurityContext(this.expected);
   }
 
   @Test
-  public void userController_shouldConstruct() {
+  void userController_shouldConstruct() {
     assertNotNull(userController);
   }
 
   @Test
-  public void getUser_shouldReturnUser() {
+  void getUser_shouldReturnUser() {
     when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.of(new User()));
     User result = this.userController.getUser(UUID.randomUUID().toString());
     assertNotNull(result);
   }
 
   @Test
-  public void getUser_shouldThrowBadRequestErrorIfBadId() {
+  void getUser_shouldThrowBadRequestErrorIfBadId() {
     assertThrows(BadRequestException.class, () -> this.userController.getUser("test"));
   }
 
   @Test
-  public void getUserShouldThrowNotFoundIfNoUserPresent() {
+  void getUserShouldThrowNotFoundIfNoUserPresent() {
     when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.empty());
 
     assertThrows(
@@ -72,7 +92,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldCreateAUser() {
+  void createUserShouldCreateAUser() {
     User expected = TestResourceGenerator.generateUser();
     when(this.userService.createUser(
             anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
@@ -85,7 +105,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldCreateUserWithouType() {
+  void createUserShouldCreateUserWithouType() {
     when(this.userService.createUser(
             anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
         .thenReturn(expected);
@@ -97,7 +117,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void createUserShouldHandleServiceErrors() {
+  void createUserShouldHandleServiceErrors() {
     when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
 
     assertThrows(
@@ -105,7 +125,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void loginShouldAuthenticateUser() throws Exception {
+  void loginShouldAuthenticateUser() throws Exception {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
@@ -115,7 +135,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void loginShouldHandleExceptions() throws Exception {
+  void loginShouldHandleExceptions() throws Exception {
     when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
 
     assertThrows(
@@ -124,7 +144,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void getAllUsersShouldReturnCorrectResponse() {
+  void getAllUsersShouldReturnCorrectResponse() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userService.getAllUsers()).thenReturn(expectedList);
 
@@ -134,7 +154,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserShouldUpdateWithFullRequestBody() {
+  void updateUserShouldUpdateWithFullRequestBody() {
     when(this.userService.updateUser(
             any(UUID.class), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
@@ -147,7 +167,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void updateUserWithType() {
+  void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
     User actual =
@@ -219,6 +239,19 @@ public class UserControllerTest {
   }
 
   @Test
+  void updateUserShouldNotUpdateUserIfTheUserTypeIsInsufficient() {
+    this.expected = TestResourceGenerator.generateUser(UserType.USER);
+    this.setUpSecurityContext(this.expected);
+
+    assertThrows(
+        InsufficientPermissionsException.class,
+        () ->
+            this.userController.updateUser(
+                testString, new UpdateUserRequest(null, null, null, null)),
+        "Users with the user type of USER should not be able to update other users");
+  }
+
+  @Test
   void shouldSearchUsers() {
     when(this.userService.searchUsers(any(SearchType.class), anyString()))
         .thenReturn(TestResourceGenerator.generateUserList(5));
@@ -234,5 +267,24 @@ public class UserControllerTest {
     assertThrows(
         BadRequestException.class,
         () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
+  }
+
+  @Test
+  void deleteUserShouldDelete() {
+    when(this.userService.deleteUser(testId)).thenReturn(expected);
+
+    var actual = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(expected, actual, "The result should match the expected value"));
+  }
+
+  @Test
+  void deleteUserShouldHandleBadId() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.deleteUser("not uuid"),
+        "Invalid UUID values should throw an exception");
   }
 }

@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.servicetest;
+package com.teddycrane.racemanagement.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 
-public class UserServiceTest {
+class UserServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private TokenManager tokenManager;
@@ -195,5 +195,24 @@ public class UserServiceTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> this.userService.searchUsers(SearchType.TYPE, "not a type"));
+  }
+
+  @Test
+  void shouldDeleteUser() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+
+    var result = this.userService.deleteUser(testId);
+    verify(this.userRepository).delete(user.capture());
+
+    assertAll(
+        () -> assertNotNull(result, "The returned user should not be null"),
+        () -> assertEquals(existing, result, "The result should equal the expected value"));
+  }
+
+  @Test
+  void deleteUserShouldThrowWhenUserIsNotFound() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> this.userService.deleteUser(testId));
   }
 }
