@@ -64,15 +64,21 @@ class UserServiceTest {
     User expected = TestResourceGenerator.generateUser();
     when(this.userRepository.findById(any(UUID.class))).thenReturn(Optional.of(expected));
 
-    Optional<User> result = this.userService.getUser(UUID.randomUUID());
+    var result = this.userService.getUser(UUID.randomUUID());
 
     assertAll(
-        () -> assertTrue(result.isPresent(), "The result should not be null"),
-        () ->
-            assertEquals(
-                expected,
-                result.orElse(new User()),
-                "The actual value should equal the expected one"));
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(expected, result, "The actual value should equal the expected one"));
+  }
+
+  @Test
+  void getUserShouldThrowErrorIfNotFound() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userService.getUser(testId),
+        "It should throw an exception if the user is not found");
   }
 
   @Test
