@@ -287,4 +287,23 @@ class UserControllerTest {
         () -> this.userController.deleteUser("not uuid"),
         "Invalid UUID values should throw an exception");
   }
+
+  @Test
+  void deleteUserShouldThrowForInsufficientPermissions() {
+    this.expected.setUserType(UserType.USER);
+    this.setUpSecurityContext(this.expected);
+
+    assertThrows(
+        InsufficientPermissionsException.class,
+        () -> this.userController.deleteUser(testString),
+        "A user with the type of USER should not be able to delete users");
+  }
+
+  @Test
+  void deleteUserShouldNotAllowUsersToDeleteThemselves() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.deleteUser(expected.getId().toString()),
+        "Users should not be able to delete themselves");
+  }
 }
