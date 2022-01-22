@@ -19,7 +19,6 @@ import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,9 +72,14 @@ class UserControllerTest {
 
   @Test
   void getUser_shouldReturnUser() {
-    when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.of(new User()));
-    User result = this.userController.getUser(UUID.randomUUID().toString());
-    assertNotNull(result);
+    when(this.userService.getUser(any(UUID.class))).thenReturn(new User());
+    var result = this.userController.getUser(UUID.randomUUID().toString());
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertFalse(
+                result.toString().contains("password"),
+                "The response should not include a password"));
   }
 
   @Test
@@ -85,7 +89,7 @@ class UserControllerTest {
 
   @Test
   void getUserShouldThrowNotFoundIfNoUserPresent() {
-    when(this.userService.getUser(any(UUID.class))).thenReturn(Optional.empty());
+    when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
 
     assertThrows(
         NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
@@ -150,7 +154,7 @@ class UserControllerTest {
 
     UserCollectionResponse actual = this.userController.getAllUsers();
 
-    assertEquals(expectedList, actual.getUsers());
+    assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers());
   }
 
   @Test

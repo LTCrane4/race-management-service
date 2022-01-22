@@ -3,11 +3,16 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.util.UUID;
+import javax.validation.Valid;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,5 +45,20 @@ public class RacerController extends BaseController {
       logger.error("Could not parse a valid UUID from the provided id");
       throw new BadRequestException("Invalid user id provided");
     }
+  }
+
+  @PostMapping
+  public Racer createRacer(@NonNull @RequestBody @Valid CreateRacerRequest request) {
+    logger.info("createRacer called");
+
+    return this.racerService.createRacer(
+        request.getFirstName(),
+        request.getLastName(),
+        request.getCategory(),
+        request.getMiddleName(),
+        request.getTeamName(),
+        request.getPhoneNumber(),
+        request.getEmail(),
+        request.getBibNumber());
   }
 }

@@ -4,11 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.util.List;
@@ -64,10 +69,42 @@ class RacerControllerTest {
   }
 
   @Test
-  void shouldHandleBadId() {
+  void getShouldHandleBadId() {
     assertThrows(
         BadRequestException.class,
         () -> this.racerController.getRacer("bad id"),
         "The controller should throw a bad request exception if an invalid id is provided");
+  }
+
+  @Test
+  void shouldCreateRacerWithAllFields() {
+    when(this.racerService.createRacer(
+            anyString(),
+            anyString(),
+            any(Category.class),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt()))
+        .thenReturn(expected);
+
+    CreateRacerRequest request =
+        CreateRacerRequest.builder()
+            .firstName("Test")
+            .lastName("lname")
+            .category(Category.CAT2)
+            .middleName("mid")
+            .teamName("team")
+            .email("email@email.fake")
+            .phoneNumber("Phone Number")
+            .bibNumber(2)
+            .build();
+
+    var actual = this.racerController.createRacer(request);
+
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(expected, actual, "The result should match the expected value"));
   }
 }

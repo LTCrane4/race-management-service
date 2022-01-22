@@ -8,7 +8,6 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ public interface UserService {
 
   Collection<User> getAllUsers();
 
-  Optional<User> getUser(UUID id);
+  User getUser(UUID id) throws NotFoundException;
 
   Collection<User> searchUsers(SearchType searchType, String searchValue)
       throws IllegalArgumentException;

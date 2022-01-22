@@ -12,6 +12,7 @@ import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
+import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.*;
 import javax.validation.Valid;
@@ -35,24 +36,17 @@ public class UserController extends BaseController {
   }
 
   @GetMapping("/user/{id}")
-  public User getUser(@PathVariable String id) throws BadRequestException, NotFoundException {
+  public UserResponse getUser(@PathVariable String id)
+      throws BadRequestException, NotFoundException {
     logger.info("getUser called");
 
     try {
       UUID userId = UUID.fromString(id);
-      Optional<User> _user = this.userService.getUser(userId);
-      if (_user.isPresent()) {
-        return _user.get();
-      } else {
-        logger.error("No user found for the id {}", id);
-        throw new NotFoundException("No user found for the provided id");
-      }
+      User user = this.userService.getUser(userId);
+      return new UserResponse(user);
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id", id);
       throw new BadRequestException("Invalid user id provided");
-    } catch (NotFoundException e) {
-      // pass error up chain
-      throw new NotFoundException(e.getMessage());
     }
   }
 

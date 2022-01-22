@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
@@ -62,7 +64,20 @@ class RacerServiceTest {
   @Test
   void shouldThrowNotFoundErrorIfNoRacerIsFound() {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.empty());
-
     assertThrows(NotFoundException.class, () -> this.racerService.getRacer(testId));
+  }
+
+  @Test
+  void shouldCreateRacer() {
+    when(this.racerRepository.save(any(Racer.class)))
+        .thenAnswer((i) -> i.getArgument(0, Racer.class));
+
+    var actual =
+        this.racerService.createRacer(
+            "first", "last", Category.CAT1, "middle", "team", "phone", "email@email.fake", 1);
+
+    assertAll(
+        () -> assertNotNull(actual, "the actual result should not be null"),
+        () -> assertEquals("first", actual.getFirstName()));
   }
 }

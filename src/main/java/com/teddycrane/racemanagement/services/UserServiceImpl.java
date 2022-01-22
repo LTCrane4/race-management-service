@@ -47,9 +47,11 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public Optional<User> getUser(UUID id) {
+  public User getUser(UUID id) throws NotFoundException {
     logger.info("getUser called");
-    return this.userRepository.findById(id);
+    return this.userRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
   }
 
   @Override

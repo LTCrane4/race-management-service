@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.model.racer;
 
+import com.google.gson.Gson;
 import com.teddycrane.racemanagement.enums.Category;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -78,6 +79,22 @@ public class Racer {
     this.middleName = middleName;
   }
 
+  public Racer(
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull Category category,
+      String middleName,
+      String teamName,
+      String phoneNumber,
+      String email,
+      int bibNumber) {
+    this(firstName, lastName, category, middleName);
+    this.teamName = teamName;
+    this.phoneNumber = phoneNumber;
+    this.email = email;
+    this.bibNumber = bibNumber;
+  }
+
   public Racer(Racer other) {
     this(
         other.firstName,
@@ -89,5 +106,11 @@ public class Racer {
         other.email,
         other.bibNumber,
         other.id);
+  }
+
+  @Override
+  public String toString() {
+    Gson gson = new Gson();
+    return gson.toJson(this);
   }
 }
