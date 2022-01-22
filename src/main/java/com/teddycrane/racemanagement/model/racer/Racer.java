@@ -79,6 +79,22 @@ public class Racer {
     this.middleName = middleName;
   }
 
+  public Racer(
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull Category category,
+      String middleName,
+      String teamName,
+      String phoneNumber,
+      String email,
+      int bibNumber) {
+    this(firstName, lastName, category, middleName);
+    this.teamName = teamName;
+    this.phoneNumber = phoneNumber;
+    this.email = email;
+    this.bibNumber = bibNumber;
+  }
+
   public Racer(Racer other) {
     this(
         other.firstName,

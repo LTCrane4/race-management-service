@@ -48,6 +48,10 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       throws DuplicateItemException {
     logger.info("createRacer called");
 
-    return null;
+    Racer r =
+        new Racer(
+            firstName, lastName, category, middleName, teamName, phoneNumber, email, bibNumber);
+
+    return this.racerRepository.save(r);
   }
 }
