@@ -86,7 +86,8 @@ public class UserController extends BaseController {
   }
 
   @PatchMapping("/user/{id}")
-  public User updateUser(@PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
+  public UserResponse updateUser(
+      @PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, InsufficientPermissionsException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
@@ -104,12 +105,13 @@ public class UserController extends BaseController {
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return this.userService.updateUser(
-            userId,
-            request.getFirstName(),
-            request.getLastName(),
-            request.getEmail(),
-            request.getUserType());
+        return new UserResponse(
+            this.userService.updateUser(
+                userId,
+                request.getFirstName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getUserType()));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         throw new BadRequestException("Not enough parameters supplied to update a user");

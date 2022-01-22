@@ -169,21 +169,41 @@ class UserControllerTest {
             any(UUID.class), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
 
-    User actual =
+    var actual =
         this.userController.updateUser(
             UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
 
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, null, UserType.USER));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -191,27 +211,57 @@ class UserControllerTest {
     // email is null
     when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(eq(testId), isNull(), anyString(), isNull(), isNull()))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(eq(testId), anyString(), isNull(), isNull(), isNull()))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -219,10 +269,20 @@ class UserControllerTest {
     when(this.userService.updateUser(
             eq(testId), isNull(), isNull(), anyString(), any(UserType.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, "", UserType.USER));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -230,9 +290,19 @@ class UserControllerTest {
     // userType is null and email is not null
     when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
