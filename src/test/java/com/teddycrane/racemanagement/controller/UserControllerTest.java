@@ -102,10 +102,16 @@ class UserControllerTest {
             anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
         .thenReturn(expected);
 
-    User result =
+    var result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertNotNull(result);
-    assertEquals(expected, result);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(), result.getUsername(), "The usernames should be equal"),
+        () ->
+            assertEquals(
+                expected.getUserType(), result.getUserType(), "The user types should be equal"));
   }
 
   @Test
@@ -114,10 +120,10 @@ class UserControllerTest {
             anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
         .thenReturn(expected);
 
-    User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
+    var actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
 
     assertNotNull(actual);
-    assertEquals(expected, actual);
+    assertEquals(expected.getUsername(), actual.getUsername(), "The usernames should be equal");
   }
 
   @Test
