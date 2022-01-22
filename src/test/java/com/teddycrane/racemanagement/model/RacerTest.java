@@ -21,11 +21,14 @@ class RacerTest {
 
   @Test
   void shouldConstruct() {
-    Racer racer = new Racer();
-    assertNotNull(racer, "The default constructor should construct a valid racer");
+    Racer defaultRacer = new Racer();
+    assertNotNull(defaultRacer, "The default constructor should construct a valid racer");
 
-    racer = new Racer(this.racer);
-    Racer finalRacer = racer;
+    defaultRacer = new Racer(this.racer);
+    Racer finalRacer = defaultRacer;
+
+    Racer fullConstructor =
+        new Racer("first", "Last", Category.CAT1, "middle", "team", "123456789", "email", 1);
     assertAll(
         () -> assertNotNull(finalRacer, "The copy constructor should construct valid racers"),
         () -> assertEquals(this.racer, finalRacer),
@@ -33,6 +36,12 @@ class RacerTest {
             assertEquals(
                 Category.CAT1.toString(),
                 finalRacer.getCategory().toString(),
-                "The racer category should match"));
+                "The racer category should match"),
+        () -> assertNotNull(fullConstructor, "The full public constructor should not be null"));
+  }
+
+  @Test
+  void shouldRepresentAsString() {
+    assertNotNull(racer.toString(), "The toString representation should not be null");
   }
 }
