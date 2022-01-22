@@ -152,6 +152,16 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
+  public boolean changePassword(UUID id, String oldPassword, String newPassword)
+      throws NotFoundException {
+    logger.info("changePassword called");
+
+    Optional<User> user = this.userRepository.findById(id);
+
+    return false;
+  }
+
+  @Override
   public User deleteUser(UUID id) throws NotFoundException {
     logger.info("deleteUser called for {} by {}", id, "test");
 

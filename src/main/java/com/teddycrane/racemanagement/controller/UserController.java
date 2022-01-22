@@ -8,9 +8,11 @@ import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
@@ -122,8 +124,34 @@ public class UserController extends BaseController {
     }
   }
 
-  // todo update delete so that users a) can't delete themselves, and b) gate deletion to admins
-  // only
+  @PatchMapping("/{id}/change-password")
+  public ChangePasswordResponse changePassword(
+      @Valid @RequestBody ChangePasswordRequest request, @PathVariable String id)
+      throws NotFoundException, BadRequestException, InsufficientPermissionsException {
+    logger.info("changePassword called");
+    UserAuditData audit = this.getUserAuditData();
+
+    try {
+      UUID userId = UUID.fromString(id);
+      logger.info("Password change requested for {}", userId);
+
+      if (!audit.getUserId().equals(userId)) {
+        logger.error(
+            "User {} does not have the permissions to change another user's password",
+            audit.getUserId());
+        throw new InsufficientPermissionsException();
+      }
+
+      return new ChangePasswordResponse(
+          this.userService.changePassword(
+              userId, request.getOldPassword(), request.getNewPassword()),
+          userId);
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id");
+      throw new BadRequestException("Unable to parse the provided id!");
+    }
+  }
+
   @DeleteMapping("/{id}")
   public User deleteUser(@PathVariable String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
