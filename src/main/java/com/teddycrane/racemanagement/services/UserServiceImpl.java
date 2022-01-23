@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -156,9 +157,19 @@ public class UserServiceImpl extends BaseService implements UserService {
       throws NotFoundException {
     logger.info("changePassword called");
 
-    Optional<User> user = this.userRepository.findById(id);
+    User user =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
 
-    return false;
+    String encodedPassword = this.encodePassword(oldPassword);
+    if (encodedPassword.equals(user.getPassword())) {
+      user.setPassword(this.encodePassword(newPassword));
+      return true;
+    } else {
+      logger.error("Incorrect old password. Please try again");
+      throw new BadRequestException("Previous password provided was incorrect.  Please try again.");
+    }
   }
 
   @Override

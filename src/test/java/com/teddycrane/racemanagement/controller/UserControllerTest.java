@@ -13,6 +13,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -385,5 +386,20 @@ class UserControllerTest {
         BadRequestException.class,
         () -> this.userController.deleteUser(expected.getId().toString()),
         "Users should not be able to delete themselves");
+  }
+
+  @Test
+  void changePasswordShouldChangePassword() {
+    UUID id = expected.getId();
+    String idString = expected.getId().toString();
+
+    when(this.userService.changePassword(id, expected.getPassword(), "new password"))
+        .thenReturn(true);
+
+    var result =
+        this.userController.changePassword(
+            new ChangePasswordRequest(expected.getPassword(), "new password"), id.toString());
+
+    assertAll(() -> assertNotNull(result, "The result should not be null"));
   }
 }
