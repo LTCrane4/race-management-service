@@ -11,6 +11,7 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -37,6 +38,9 @@ class UserServiceTest {
   @Mock private TokenManager tokenManager;
   @Mock private AuthenticationManager authenticationManager;
 
+  // Mock handlers
+  @Mock private Handler<UUID, User> getUserHandler;
+
   private UUID testId;
 
   private UserService userService;
@@ -49,7 +53,11 @@ class UserServiceTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
     this.userService =
-        new UserServiceImpl(this.userRepository, this.tokenManager, this.authenticationManager);
+        new UserServiceImpl(
+            this.userRepository,
+            this.tokenManager,
+            this.authenticationManager,
+            this.getUserHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -61,20 +69,17 @@ class UserServiceTest {
 
   @Test
   void getUserShouldReturnUser() {
-    User expected = TestResourceGenerator.generateUser();
-    when(this.userRepository.findById(any(UUID.class))).thenReturn(Optional.of(expected));
+    when(this.getUserHandler.resolve(testId)).thenReturn(existing);
 
-    var result = this.userService.getUser(UUID.randomUUID());
+    var result = this.userService.getUser(testId);
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
-        () -> assertEquals(expected, result, "The actual value should equal the expected one"));
+        () -> assertEquals(existing, result, "The actual value should equal the expected one"));
   }
 
   @Test
   void getUserShouldThrowErrorIfNotFound() {
-    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
-
     assertThrows(
         NotFoundException.class,
         () -> this.userService.getUser(testId),

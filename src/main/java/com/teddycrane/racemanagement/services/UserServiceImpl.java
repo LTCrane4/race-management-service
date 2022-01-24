@@ -5,6 +5,7 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -30,14 +31,18 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
+  private final Handler<UUID, User> getUserHandler;
+
   public UserServiceImpl(
       UserRepository userRepository,
       TokenManager tokenManager,
-      AuthenticationManager authenticationManager) {
+      AuthenticationManager authenticationManager,
+      Handler<UUID, User> getUserHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
+    this.getUserHandler = getUserHandler;
   }
 
   @Override
@@ -49,9 +54,14 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public User getUser(UUID id) throws NotFoundException {
     logger.info("getUser called");
-    return this.userRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+    User u = this.getUserHandler.resolve(id);
+
+    if (u == null) {
+      logger.error("No user found for the id {}", id);
+      throw new NotFoundException("No user found for the provided id!");
+    }
+
+    return u;
   }
 
   @Override
