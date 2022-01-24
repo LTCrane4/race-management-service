@@ -42,6 +42,7 @@ class UserServiceTest {
 
   // Mock handlers
   @Mock private Handler<UUID, User> getUserHandler;
+  @Mock private Handler<String, Collection<User>> getUsersHandler;
 
   private UUID testId;
 
@@ -58,14 +59,10 @@ class UserServiceTest {
             this.userRepository,
             this.tokenManager,
             this.authenticationManager,
-            this.getUserHandler);
+            this.getUserHandler,
+            this.getUsersHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
-  }
-
-  @Test
-  void userServiceShouldConstruct() {
-    assertNotNull(this.userService);
   }
 
   @Test
@@ -135,11 +132,15 @@ class UserServiceTest {
   @Test
   public void getAllUsersShouldReturnListOfUsers() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
-    when(this.userRepository.findAll()).thenReturn((List<User>) expectedList);
+    when(this.getUsersHandler.resolve(anyString())).thenReturn(expectedList);
 
     Collection<User> result = this.userService.getAllUsers();
 
-    assertNotNull(result);
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                expectedList.size(), result.size(), "The result should have the expected length"));
   }
 
   @Test

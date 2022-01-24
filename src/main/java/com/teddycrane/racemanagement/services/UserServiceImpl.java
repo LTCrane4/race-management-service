@@ -11,7 +11,6 @@ import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,23 +31,26 @@ public class UserServiceImpl extends BaseService implements UserService {
   private final AuthenticationManager authenticationManager;
 
   private final Handler<UUID, User> getUserHandler;
+  private final Handler<String, Collection<User>> getUsersHandler;
 
   public UserServiceImpl(
       UserRepository userRepository,
       TokenManager tokenManager,
       AuthenticationManager authenticationManager,
-      Handler<UUID, User> getUserHandler) {
+      Handler<UUID, User> getUserHandler,
+      Handler<String, Collection<User>> getUsersHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
     this.getUserHandler = getUserHandler;
+    this.getUsersHandler = getUsersHandler;
   }
 
   @Override
   public Collection<User> getAllUsers() {
     logger.info("getAllUsers called");
-    return new ArrayList<>(this.userRepository.findAll());
+    return this.getUsersHandler.resolve("");
   }
 
   @Override
