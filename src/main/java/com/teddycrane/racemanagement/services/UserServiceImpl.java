@@ -9,6 +9,8 @@ import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
+import com.teddycrane.racemanagement.model.user.request.UpdateUserHandlerRequest;
+import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
@@ -34,6 +36,7 @@ public class UserServiceImpl extends BaseService implements UserService {
   private final Handler<UUID, User> getUserHandler;
   private final Handler<String, Collection<User>> getUsersHandler;
   private final Handler<CreateUserRequest, User> createUserHandler;
+  private final Handler<UpdateUserHandlerRequest, User> updateUserHandler;
 
   public UserServiceImpl(
       UserRepository userRepository,
@@ -41,7 +44,8 @@ public class UserServiceImpl extends BaseService implements UserService {
       AuthenticationManager authenticationManager,
       Handler<UUID, User> getUserHandler,
       Handler<String, Collection<User>> getUsersHandler,
-      Handler<CreateUserRequest, User> createUserHandler) {
+      Handler<CreateUserRequest, User> createUserHandler,
+      Handler<UpdateUserHandlerRequest, User> updateUserHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
@@ -49,6 +53,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.getUserHandler = getUserHandler;
     this.getUsersHandler = getUsersHandler;
     this.createUserHandler = createUserHandler;
+    this.updateUserHandler = updateUserHandler;
   }
 
   @Override
@@ -96,33 +101,12 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
-  public User updateUser(
-      UUID id, String firstName, String lastName, String email, UserType userType)
-      throws NotFoundException {
+  public User updateUser(UUID id, UpdateUserRequest updateRequest) throws NotFoundException {
     logger.info("updateUser called");
-    Optional<User> existing = this.userRepository.findById(id);
 
-    if (existing.isPresent()) {
-      User user = existing.get();
-      if (firstName != null) {
-        user.setFirstName(firstName);
-      }
-      if (lastName != null) {
-        user.setLastName(lastName);
-      }
-      if (email != null) {
-        user.setEmail(email);
-      }
-      // todo update so that non-admin/root users can't update the user type
-      if (userType != null) {
-        user.setUserType(userType);
-      }
+    UpdateUserHandlerRequest request = new UpdateUserHandlerRequest(updateRequest, id);
 
-      return this.userRepository.save(user);
-    } else {
-      logger.error("No user found for the id {}", id);
-      throw new NotFoundException("No user found for the provided id");
-    }
+    return this.updateUserHandler.resolve(request);
   }
 
   @Override
