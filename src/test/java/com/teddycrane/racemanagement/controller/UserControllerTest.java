@@ -98,9 +98,7 @@ class UserControllerTest {
   @Test
   void createUserShouldCreateAUser() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userService.createUser(
-            anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
-        .thenReturn(expected);
+    when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     User result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
@@ -110,9 +108,7 @@ class UserControllerTest {
 
   @Test
   void createUserShouldCreateUserWithouType() {
-    when(this.userService.createUser(
-            anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
-        .thenReturn(expected);
+    when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
 

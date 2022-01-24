@@ -68,13 +68,7 @@ public class UserController extends BaseController {
   public User createUser(@Valid @RequestBody CreateUserRequest request) {
     logger.info("createUser called");
 
-    return this.userService.createUser(
-        request.getUsername(),
-        request.getPassword(),
-        request.getFirstName(),
-        request.getLastName(),
-        request.getEmail(),
-        request.getUserType());
+    return this.userService.createUser(request);
   }
 
   @PostMapping("/login")

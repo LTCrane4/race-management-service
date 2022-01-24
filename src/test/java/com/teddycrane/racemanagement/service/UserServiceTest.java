@@ -8,12 +8,12 @@ import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
+import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
@@ -43,6 +43,7 @@ class UserServiceTest {
   // Mock handlers
   @Mock private Handler<UUID, User> getUserHandler;
   @Mock private Handler<String, Collection<User>> getUsersHandler;
+  @Mock private Handler<CreateUserRequest, User> createUserHandler;
 
   private UUID testId;
 
@@ -60,7 +61,8 @@ class UserServiceTest {
             this.tokenManager,
             this.authenticationManager,
             this.getUserHandler,
-            this.getUsersHandler);
+            this.getUsersHandler,
+            this.createUserHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -87,30 +89,21 @@ class UserServiceTest {
   @Test
   void createUserShouldCreate() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userRepository.save(any(User.class))).thenReturn(expected);
+    when(this.createUserHandler.resolve(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User actual = this.userService.createUser("", "", "", "", "", UserType.USER);
+    User actual =
+        this.userService.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertEquals(expected, actual);
   }
 
   @Test
   public void createUserShouldCreateWithNoType() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userRepository.save(any(User.class))).thenReturn(expected);
+    when(this.createUserHandler.resolve(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User actual = this.userService.createUser("", "", "", "", "", null);
+    User actual = this.userService.createUser(new CreateUserRequest("", "", "", "", "", null));
     assertEquals(expected, actual);
     assertEquals("user", actual.getUserType().toString());
-  }
-
-  @Test
-  void createUserShouldHandleDuplicates() {
-    User existing = TestResourceGenerator.generateUser();
-    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(existing));
-
-    assertThrows(
-        DuplicateItemException.class,
-        () -> this.userService.createUser("", "", "", "", "", UserType.USER));
   }
 
   @Test
