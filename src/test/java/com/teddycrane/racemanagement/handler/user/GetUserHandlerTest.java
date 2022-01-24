@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.handler;
+package com.teddycrane.racemanagement.handler.user;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-import com.teddycrane.racemanagement.handler.user.GetUserHandler;
+import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.repositories.UserRepository;
