@@ -119,8 +119,6 @@ public class UserController extends BaseController {
     }
   }
 
-  // todo update delete so that users a) can't delete themselves, and b) gate deletion to admins
-  // only
   @DeleteMapping("/{id}")
   public User deleteUser(@PathVariable String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
@@ -128,6 +126,7 @@ public class UserController extends BaseController {
 
     UserAuditData data = this.getUserAuditData();
 
+    // verify the user has a role allowed to delete
     if (data.getUserType().equals(UserType.USER)) {
       logger.error("The user has insufficient permissions to perform this action");
       throw new InsufficientPermissionsException();

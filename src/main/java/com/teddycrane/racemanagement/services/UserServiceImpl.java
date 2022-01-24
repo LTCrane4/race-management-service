@@ -116,7 +116,6 @@ public class UserServiceImpl extends BaseService implements UserService {
       if (email != null) {
         user.setEmail(email);
       }
-      // todo update so that non-admin/root users can't update the user type
       if (userType != null) {
         user.setUserType(userType);
       }
