@@ -6,10 +6,11 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
+import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
+import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
@@ -37,6 +38,7 @@ public class UserServiceImpl extends BaseService implements UserService {
   private final Handler<String, Collection<User>> getUsersHandler;
   private final Handler<CreateUserRequest, User> createUserHandler;
   private final Handler<UpdateUserHandlerRequest, User> updateUserHandler;
+  private final Handler<DeleteUserRequest, User> deleteUserHandler;
 
   public UserServiceImpl(
       UserRepository userRepository,
@@ -45,7 +47,8 @@ public class UserServiceImpl extends BaseService implements UserService {
       Handler<UUID, User> getUserHandler,
       Handler<String, Collection<User>> getUsersHandler,
       Handler<CreateUserRequest, User> createUserHandler,
-      Handler<UpdateUserHandlerRequest, User> updateUserHandler) {
+      Handler<UpdateUserHandlerRequest, User> updateUserHandler,
+      Handler<DeleteUserRequest, User> deleteUserHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
@@ -54,6 +57,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.getUsersHandler = getUsersHandler;
     this.createUserHandler = createUserHandler;
     this.updateUserHandler = updateUserHandler;
+    this.deleteUserHandler = deleteUserHandler;
   }
 
   @Override
@@ -136,14 +140,6 @@ public class UserServiceImpl extends BaseService implements UserService {
   public User deleteUser(UUID id) throws NotFoundException {
     logger.info("deleteUser called for {} by {}", id, "test");
 
-    User u = this.userRepository.findById(id).orElse(null);
-
-    if (u != null) {
-      this.userRepository.delete(u);
-      return u;
-    } else {
-      logger.error("No user found with the id {}", id);
-      throw new NotFoundException("No user found to delete with the specified id");
-    }
+    return this.deleteUserHandler.resolve(new DeleteUserRequest(id));
   }
 }

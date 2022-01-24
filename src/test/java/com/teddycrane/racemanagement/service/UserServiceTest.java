@@ -3,7 +3,6 @@ package com.teddycrane.racemanagement.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.SearchType;
@@ -11,10 +10,11 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
+import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
+import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +47,7 @@ class UserServiceTest {
   @Mock private Handler<String, Collection<User>> getUsersHandler;
   @Mock private Handler<CreateUserRequest, User> createUserHandler;
   @Mock private Handler<UpdateUserHandlerRequest, User> updateUserHandler;
+  @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
 
   private UUID testId;
 
@@ -67,7 +67,8 @@ class UserServiceTest {
             this.getUserHandler,
             this.getUsersHandler,
             this.createUserHandler,
-            this.updateUserHandler);
+            this.updateUserHandler,
+            this.deleteUserHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -156,31 +157,6 @@ class UserServiceTest {
   }
 
   @Test
-  @Disabled
-  void updateUserWithNoParams() {
-    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
-    when(this.userRepository.save(any(User.class))).thenAnswer((input) -> input.getArguments()[0]);
-
-    var actual = this.userService.updateUser(testId, new UpdateUserRequest(null, null, null, null));
-    verify(this.userRepository).save(user.capture());
-
-    assertAll(
-        () -> assertNotNull(actual, "The result should not be null"),
-        () -> assertEquals(existing, user.getValue(), "The user should not be updated"),
-        () -> assertEquals(existing, actual, "The result should not have been updated"));
-  }
-
-  @Test
-  @Disabled
-  void updateUserWithoutExistingUser() {
-    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
-
-    assertThrows(
-        NotFoundException.class,
-        () -> this.userService.updateUser(testId, new UpdateUserRequest(null, null, null, null)));
-  }
-
-  @Test
   void shouldReturnUsersFromTypeSearch() {
     List<User> expectedList = new ArrayList<>(TestResourceGenerator.generateUserList(3));
     when(this.userRepository.findAllByUserType(UserType.USER)).thenReturn(expectedList);
@@ -212,20 +188,12 @@ class UserServiceTest {
 
   @Test
   void shouldDeleteUser() {
-    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.deleteUserHandler.resolve(any(DeleteUserRequest.class))).thenReturn(existing);
 
     var result = this.userService.deleteUser(testId);
-    verify(this.userRepository).delete(user.capture());
 
     assertAll(
         () -> assertNotNull(result, "The returned user should not be null"),
         () -> assertEquals(existing, result, "The result should equal the expected value"));
-  }
-
-  @Test
-  void deleteUserShouldThrowWhenUserIsNotFound() {
-    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
-
-    assertThrows(NotFoundException.class, () -> this.userService.deleteUser(testId));
   }
 }

@@ -1,5 +1,6 @@
-package com.teddycrane.racemanagement.model.user.request;
+package com.teddycrane.racemanagement.handler.user.request;
 
+import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

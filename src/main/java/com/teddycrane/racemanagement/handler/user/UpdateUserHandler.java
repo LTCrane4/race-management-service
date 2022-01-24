@@ -2,8 +2,8 @@ package com.teddycrane.racemanagement.handler.user;
 
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
+import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.User;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
