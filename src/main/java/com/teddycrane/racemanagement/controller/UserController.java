@@ -6,11 +6,12 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
@@ -68,10 +69,10 @@ public class UserController extends BaseController {
   }
 
   @PostMapping("/user/new")
-  public User createUser(@Valid @RequestBody CreateUserRequest request) {
+  public UserResponse createUser(@Valid @RequestBody CreateUserRequest request) {
     logger.info("createUser called");
 
-    return this.userService.createUser(request);
+    return new UserResponse(this.userService.createUser(request));
   }
 
   @PostMapping("/login")
@@ -82,7 +83,8 @@ public class UserController extends BaseController {
   }
 
   @PatchMapping("/user/{id}")
-  public User updateUser(@PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
+  public UserResponse updateUser(
+      @PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, InsufficientPermissionsException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
@@ -100,7 +102,7 @@ public class UserController extends BaseController {
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return this.userService.updateUser(userId, request);
+        return new UserResponse(this.userService.updateUser(userId, request));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         throw new BadRequestException("Not enough parameters supplied to update a user");
@@ -108,6 +110,34 @@ public class UserController extends BaseController {
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
       throw new BadRequestException("Unable to parse the provided id");
+    }
+  }
+
+  @PatchMapping("/{id}/change-password")
+  public ChangePasswordResponse changePassword(
+      @Valid @RequestBody ChangePasswordRequest request, @PathVariable String id)
+      throws NotFoundException, BadRequestException, InsufficientPermissionsException {
+    logger.info("changePassword called");
+    UserAuditData audit = this.getUserAuditData();
+
+    try {
+      UUID userId = UUID.fromString(id);
+      logger.info("Password change requested for {}", userId);
+
+      if (!audit.getUserId().equals(userId)) {
+        logger.error(
+            "User {} does not have the permissions to change another user's password",
+            audit.getUserId());
+        throw new InsufficientPermissionsException();
+      }
+
+      return new ChangePasswordResponse(
+          this.userService.changePassword(
+              userId, request.getOldPassword(), request.getNewPassword()),
+          userId);
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id");
+      throw new BadRequestException("Unable to parse the provided id!");
     }
   }
 

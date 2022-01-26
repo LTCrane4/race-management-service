@@ -13,6 +13,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -116,20 +117,26 @@ class UserControllerTest {
     User expected = TestResourceGenerator.generateUser();
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User result =
+    var result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
     assertNotNull(result);
-    assertEquals(expected, result);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(), result.getUsername(), "The usernames should be equal"),
+        () ->
+            assertEquals(
+                expected.getUserType(), result.getUserType(), "The user types should be equal"));
   }
 
   @Test
   void createUserShouldCreateUserWithouType() {
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
+    var actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
 
     assertNotNull(actual);
-    assertEquals(expected, actual);
+    assertEquals(expected.getUsername(), actual.getUsername(), "The usernames should be equal");
   }
 
   @Test
@@ -168,21 +175,41 @@ class UserControllerTest {
     when(this.userService.updateUser(any(UUID.class), any(UpdateUserRequest.class)))
         .thenReturn(expected);
 
-    User actual =
+    var actual =
         this.userController.updateUser(
             UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
 
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, null, UserType.USER));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -190,37 +217,77 @@ class UserControllerTest {
     // email is null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, "", UserType.USER));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -228,9 +295,19 @@ class UserControllerTest {
     // userType is null and email is not null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    assertAll(
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
@@ -315,5 +392,20 @@ class UserControllerTest {
         BadRequestException.class,
         () -> this.userController.deleteUser(expected.getId().toString()),
         "Users should not be able to delete themselves");
+  }
+
+  @Test
+  void changePasswordShouldChangePassword() {
+    UUID id = expected.getId();
+    String idString = expected.getId().toString();
+
+    when(this.userService.changePassword(id, expected.getPassword(), "new password"))
+        .thenReturn(true);
+
+    var result =
+        this.userController.changePassword(
+            new ChangePasswordRequest(expected.getPassword(), "new password"), id.toString());
+
+    assertAll(() -> assertNotNull(result, "The result should not be null"));
   }
 }
