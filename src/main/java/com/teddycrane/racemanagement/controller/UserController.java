@@ -68,13 +68,7 @@ public class UserController extends BaseController {
   public User createUser(@Valid @RequestBody CreateUserRequest request) {
     logger.info("createUser called");
 
-    return this.userService.createUser(
-        request.getUsername(),
-        request.getPassword(),
-        request.getFirstName(),
-        request.getLastName(),
-        request.getEmail(),
-        request.getUserType());
+    return this.userService.createUser(request);
   }
 
   @PostMapping("/login")
@@ -103,12 +97,7 @@ public class UserController extends BaseController {
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return this.userService.updateUser(
-            userId,
-            request.getFirstName(),
-            request.getLastName(),
-            request.getEmail(),
-            request.getUserType());
+        return this.userService.updateUser(userId, request);
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         throw new BadRequestException("Not enough parameters supplied to update a user");
@@ -119,7 +108,7 @@ public class UserController extends BaseController {
     }
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/user/{id}")
   public User deleteUser(@PathVariable String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
     logger.info("deleteUser called");

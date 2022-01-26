@@ -1,7 +1,6 @@
 package com.teddycrane.racemanagement.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -10,12 +9,15 @@ import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.services.AuthenticationService;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Profile;
 
+@ExtendWith(MockitoExtension.class)
+@Profile("local")
 class AuthenticationServiceTest {
 
   @Mock private UserRepository userRepository;
@@ -24,7 +26,6 @@ class AuthenticationServiceTest {
 
   @BeforeEach
   void init() {
-    MockitoAnnotations.openMocks(this);
     this.authenticationService = new AuthenticationService(this.userRepository);
   }
 
@@ -40,15 +41,6 @@ class AuthenticationServiceTest {
 
   @Test
   void initializeShouldCallMethods() {
-    when(this.userRepository.save(any(User.class))).thenReturn(new User());
-
-    this.authenticationService.initialize();
-  }
-
-  @Test
-  void initializeShouldDoNothingIfDataExists() {
-    when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User()));
-
     this.authenticationService.initialize();
   }
 }

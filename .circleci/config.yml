@@ -9,6 +9,11 @@ jobs:
       - run:
           name: Gradle Build
           command: ./gradlew build -x test
+      # Cache build deps until build.gradle changes
+      - save_cache:
+          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          paths:
+            - ~/.gradle/caches/modules-2/files-2.1
       - store_artifacts:
           path: build/libs/*.jar
           name: app.jar
@@ -17,6 +22,9 @@ jobs:
       - image: cimg/openjdk:17.0
     steps:
       - checkout
+#      - restore_cache:
+#          keys:
+#            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Test Application
           command: ./gradlew test -i
@@ -35,6 +43,9 @@ jobs:
       image: ubuntu-2004:202008-01
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
@@ -51,6 +62,9 @@ jobs:
         - image: cimg/openjdk:17.0
       steps:
         - checkout
+        - restore_cache:
+            keys:
+              - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
         - run:
             name: Build Application
             command: ./gradlew jar
