@@ -197,11 +197,15 @@ class UserControllerTest {
     when(this.userService.updateUser(any(UUID.class), any(UpdateUserRequest.class)))
         .thenReturn(expected);
 
-    var actual =
+    var result =
         this.userController.updateUser(
             UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
+    var actual = result.getBody();
 
     assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(actual, "The body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -218,20 +222,24 @@ class UserControllerTest {
   void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, null, UserType.USER));
+    var body = response.getBody();
     assertAll(
+        () -> assertNotNull(response, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
@@ -239,77 +247,93 @@ class UserControllerTest {
     // email is null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
+    var body = response.getBody();
+
     assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
+    var body = response.getBody();
+
     assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
+    var body = response.getBody();
+
     assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, "", UserType.USER));
+    var body = response.getBody();
+
     assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
@@ -317,32 +341,42 @@ class UserControllerTest {
     // userType is null and email is not null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    var actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
+    var body = response.getBody();
+
     assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
         () ->
             assertEquals(
                 expected.getUsername(),
-                actual.getUsername(),
+                body.getUsername(),
                 "The username should match the expected one"),
         () ->
             assertEquals(
-                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
-        () -> assertEquals(expected.getLastName(), actual.getLastName()),
-        () -> assertEquals(expected.getUserType(), actual.getUserType()));
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
-  void updateUserShouldHandleBadRequest() {
-    assertThrows(
-        BadRequestException.class,
-        () ->
-            this.userController.updateUser(
-                testString, new UpdateUserRequest(null, null, null, null)));
+  void updateUserShouldHandleBadUserId() {
+    var response = this.userController.updateUser("bad id", new UpdateUserRequest());
 
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.updateUser("bad id", new UpdateUserRequest()));
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
+  }
+
+  @Test
+  void updateUserShouldHandleEmptyParamsUpdate() {
+    var response =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
   }
 
   @Test
@@ -350,12 +384,14 @@ class UserControllerTest {
     this.expected = TestResourceGenerator.generateUser(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    assertThrows(
-        InsufficientPermissionsException.class,
-        () ->
-            this.userController.updateUser(
-                testString, new UpdateUserRequest(null, null, null, null)),
-        "Users with the user type of USER should not be able to update other users");
+    var response =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()));
   }
 
   @Test

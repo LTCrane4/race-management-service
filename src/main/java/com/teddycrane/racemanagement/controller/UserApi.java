@@ -39,7 +39,7 @@ public interface UserApi {
   ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request);
 
   @PatchMapping("/user/{id}")
-  UserResponse updateUser(
+  ResponseEntity<UserResponse> updateUser(
       @RequestParam("id") String id, @Valid @RequestBody UpdateUserRequest request);
 
   @PatchMapping("/user/{id}/change-password")

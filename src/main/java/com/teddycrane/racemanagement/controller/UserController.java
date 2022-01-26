@@ -84,7 +84,7 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public UserResponse updateUser(
+  public ResponseEntity<UserResponse> updateUser(
       @RequestParam String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, InsufficientPermissionsException {
     logger.info("updateUser called");
@@ -93,7 +93,7 @@ public class UserController extends BaseController implements UserApi {
 
     if (auditData.getUserType().equals(UserType.USER)) {
       logger.error("This user does not have the proper permissions to update other users");
-      throw new InsufficientPermissionsException();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     try {
@@ -103,14 +103,14 @@ public class UserController extends BaseController implements UserApi {
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return new UserResponse(this.userService.updateUser(userId, request));
+        return ResponseEntity.ok(new UserResponse(this.userService.updateUser(userId, request)));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
-        throw new BadRequestException("Not enough parameters supplied to update a user");
+        return ResponseEntity.badRequest().build();
       }
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
-      throw new BadRequestException("Unable to parse the provided id");
+      return ResponseEntity.badRequest().build();
     }
   }
 
