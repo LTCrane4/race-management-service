@@ -404,7 +404,7 @@ class UserControllerTest {
 
     var result =
         this.userController.changePassword(
-            new ChangePasswordRequest(expected.getPassword(), "new password"), id.toString());
+            id.toString(), new ChangePasswordRequest(expected.getPassword(), "new password"));
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
   }

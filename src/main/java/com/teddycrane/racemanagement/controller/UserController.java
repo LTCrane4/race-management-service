@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class UserController extends BaseController {
+public class UserController extends BaseController implements UserApi {
 
   private final UserService userService;
 
@@ -31,15 +31,13 @@ public class UserController extends BaseController {
     this.userService = userService;
   }
 
-  @GetMapping("/user")
   public ResponseEntity<UserCollectionResponse> getAllUsers() {
     logger.info("getAllUsers called");
 
     return ResponseEntity.ok(new UserCollectionResponse(this.userService.getAllUsers()));
   }
 
-  @GetMapping("/user/{id}")
-  public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
+  public ResponseEntity<UserResponse> getUser(@RequestParam String id) {
     logger.info("getUser called");
 
     try {
@@ -54,17 +52,16 @@ public class UserController extends BaseController {
     }
   }
 
-  @GetMapping("/user/search")
-  public UserCollectionResponse searchUsers(
-      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue)
-      throws BadRequestException {
+  public ResponseEntity<UserCollectionResponse> searchUsers(
+      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue) {
     logger.info("searchUsers called");
 
     try {
-      return new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue));
+      return ResponseEntity.ok(
+          new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue)));
     } catch (IllegalArgumentException e) {
       logger.error("Mismatch: Unable to map search type {}, to value", searchType);
-      throw new BadRequestException("Unable to map the search type to the search value");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
@@ -84,7 +81,7 @@ public class UserController extends BaseController {
 
   @PatchMapping("/user/{id}")
   public UserResponse updateUser(
-      @PathVariable String id, @Valid @RequestBody UpdateUserRequest request)
+      @RequestParam String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, InsufficientPermissionsException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
@@ -113,9 +110,9 @@ public class UserController extends BaseController {
     }
   }
 
-  @PatchMapping("/{id}/change-password")
+  @PatchMapping("/user/{id}/change-password")
   public ChangePasswordResponse changePassword(
-      @Valid @RequestBody ChangePasswordRequest request, @PathVariable String id)
+      @PathVariable String id, @Valid @RequestBody ChangePasswordRequest request)
       throws NotFoundException, BadRequestException, InsufficientPermissionsException {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
@@ -142,7 +139,7 @@ public class UserController extends BaseController {
   }
 
   @DeleteMapping("/user/{id}")
-  public UserResponse deleteUser(@PathVariable String id)
+  public UserResponse deleteUser(@RequestParam String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
     logger.info("deleteUser called");
 
