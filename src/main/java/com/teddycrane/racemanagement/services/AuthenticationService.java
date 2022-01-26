@@ -72,7 +72,7 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
   public void initialize() {
     // get the current profile
     String profile = System.getProperty("spring.profiles.active");
-    if (profile.equals("local") || profile.equals("integration")) {
+    if (profile != null && (profile.equals("local") || profile.equals("integration"))) {
       this.createSeedUserData();
     }
   }
