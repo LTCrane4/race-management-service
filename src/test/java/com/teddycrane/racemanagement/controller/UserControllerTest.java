@@ -98,9 +98,7 @@ class UserControllerTest {
   @Test
   void createUserShouldCreateAUser() {
     User expected = TestResourceGenerator.generateUser();
-    when(this.userService.createUser(
-            anyString(), anyString(), anyString(), anyString(), anyString(), any(UserType.class)))
-        .thenReturn(expected);
+    when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     User result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
@@ -110,9 +108,7 @@ class UserControllerTest {
 
   @Test
   void createUserShouldCreateUserWithouType() {
-    when(this.userService.createUser(
-            anyString(), anyString(), anyString(), anyString(), anyString(), eq(UserType.USER)))
-        .thenReturn(expected);
+    when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
 
@@ -159,8 +155,7 @@ class UserControllerTest {
 
   @Test
   void updateUserShouldUpdateWithFullRequestBody() {
-    when(this.userService.updateUser(
-            any(UUID.class), anyString(), anyString(), anyString(), any(UserType.class)))
+    when(this.userService.updateUser(any(UUID.class), any(UpdateUserRequest.class)))
         .thenReturn(expected);
 
     User actual =
@@ -172,7 +167,7 @@ class UserControllerTest {
 
   @Test
   void updateUserWithType() {
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(), isNull(), any(UserType.class)))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(
@@ -183,7 +178,7 @@ class UserControllerTest {
   @Test
   void updateUserWithEmail() {
     // email is null
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
@@ -192,7 +187,7 @@ class UserControllerTest {
 
   @Test
   void updateUserWithLastName() {
-    when(this.userService.updateUser(eq(testId), isNull(), anyString(), isNull(), isNull()))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
@@ -201,7 +196,7 @@ class UserControllerTest {
 
   @Test
   void updateUserWithFirstName() {
-    when(this.userService.updateUser(eq(testId), anyString(), isNull(), isNull(), isNull()))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
@@ -210,8 +205,7 @@ class UserControllerTest {
 
   @Test
   void updateUserWithNoFirstOrLastName() {
-    when(this.userService.updateUser(
-            eq(testId), isNull(), isNull(), anyString(), any(UserType.class)))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(
@@ -222,7 +216,7 @@ class UserControllerTest {
   @Test
   void updateUserWithEmailOnly() {
     // userType is null and email is not null
-    when(this.userService.updateUser(eq(testId), isNull(), isNull(), anyString(), isNull()))
+    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
     User actual =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));

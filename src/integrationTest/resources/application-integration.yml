@@ -23,6 +23,8 @@ users:
   test-user:
     username: ${TEST_USER}
     password: ${TEST_USER_PW}
+    id: ${TEST_ADMIN_ID}
   test-admin:
     username: ${TEST_ADMIN}
     password: ${TEST_ADMIN_PW}
+    id: ${TEST_ADMIN_ID}

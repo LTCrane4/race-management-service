@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://docker-mysql:3306/SPRING
+    url: jdbc:mysql://docker-mysql:3306/${MYSQL_DATABASE}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -23,6 +23,8 @@ users:
   test-user:
     username: ${TEST_USER}
     password: ${TEST_USER_PW}
+    id: ${TEST_USER_ID}
   test-admin:
     username: ${TEST_ADMIN}
     password: ${TEST_ADMIN_PW}
+    id: ${TEST_ADMIN_ID}
