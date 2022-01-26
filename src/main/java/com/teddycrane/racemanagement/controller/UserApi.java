@@ -36,7 +36,7 @@ public interface UserApi {
   ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request);
 
   @PostMapping("/login")
-  AuthenticationResponse login(@Valid @RequestBody AuthenticationRequest request);
+  ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request);
 
   @PatchMapping("/user/{id}")
   UserResponse updateUser(

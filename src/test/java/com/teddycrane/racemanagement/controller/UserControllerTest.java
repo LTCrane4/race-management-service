@@ -159,18 +159,25 @@ class UserControllerTest {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
-    AuthenticationResponse actual =
-        this.userController.login(new AuthenticationRequest("test", "test"));
-    assertEquals(actual, expected);
+    var actual = this.userController.login(new AuthenticationRequest("test", "test"));
+    assertAll(
+        () -> assertNotNull(actual, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"));
   }
 
   @Test
-  void loginShouldHandleExceptions() throws Exception {
+  void loginShouldHandleExceptions() {
     when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
 
-    assertThrows(
-        NotAuthorizedException.class,
-        () -> this.userController.login(new AuthenticationRequest("", "")));
+    var result = this.userController.login(new AuthenticationRequest("", ""));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.UNAUTHORIZED, result.getStatusCode(), "The status should be 401"));
   }
 
   @Test

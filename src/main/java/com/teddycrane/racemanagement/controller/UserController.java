@@ -72,14 +72,18 @@ public class UserController extends BaseController implements UserApi {
     return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
   }
 
-  @PostMapping("/login")
-  public AuthenticationResponse login(@RequestBody @Valid AuthenticationRequest request)
-      throws NotAuthorizedException {
+  public ResponseEntity<AuthenticationResponse> login(
+      @RequestBody @Valid AuthenticationRequest request) {
     logger.info("login requested");
-    return this.userService.login(request.getUsername(), request.getPassword());
+    try {
+      return ResponseEntity.ok()
+          .body(this.userService.login(request.getUsername(), request.getPassword()));
+    } catch (NotAuthorizedException e) {
+      logger.error("User is not authorized");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
   }
 
-  @PatchMapping("/user/{id}")
   public UserResponse updateUser(
       @RequestParam String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, InsufficientPermissionsException {
@@ -110,7 +114,6 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  @PatchMapping("/user/{id}/change-password")
   public ChangePasswordResponse changePassword(
       @PathVariable String id, @Valid @RequestBody ChangePasswordRequest request)
       throws NotFoundException, BadRequestException, InsufficientPermissionsException {
@@ -138,7 +141,6 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  @DeleteMapping("/user/{id}")
   public UserResponse deleteUser(@RequestParam String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
     logger.info("deleteUser called");
