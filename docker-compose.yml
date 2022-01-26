@@ -33,7 +33,7 @@ services:
     volumes:
       - ./:/app
       - cache:/root/.gradle
-    command: ./gradlew bootRun --no-daemon
+    command: ./gradlew bootRun -Dspring.profiles.active=local --no-daemon
 
 volumes:
   db:

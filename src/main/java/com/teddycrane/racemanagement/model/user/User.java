@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
+@Builder
 @EqualsAndHashCode
 public class User {
   @Id
