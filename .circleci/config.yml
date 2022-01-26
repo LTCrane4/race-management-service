@@ -45,7 +45,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties }}
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
