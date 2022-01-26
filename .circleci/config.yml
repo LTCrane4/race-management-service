@@ -22,9 +22,9 @@ jobs:
       - image: cimg/openjdk:17.0
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+#      - restore_cache:
+#          keys:
+#            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Test Application
           command: ./gradlew test -i
