@@ -15,6 +15,11 @@ spring:
         dialect:
           storage_engine: innodb
     open-in-view: false
+  mvc:
+    converters:
+      preferred-json-mapper: gson
+  gson:
+    pretty-printing: true
 server:
   error:
     include-message: always

@@ -16,6 +16,8 @@ import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.*;
 import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,24 +31,25 @@ public class UserController extends BaseController {
   }
 
   @GetMapping("/user")
-  public UserCollectionResponse getAllUsers() {
+  public ResponseEntity<UserCollectionResponse> getAllUsers() {
     logger.info("getAllUsers called");
 
-    return new UserCollectionResponse(this.userService.getAllUsers());
+    return ResponseEntity.ok(new UserCollectionResponse(this.userService.getAllUsers()));
   }
 
   @GetMapping("/user/{id}")
-  public UserResponse getUser(@PathVariable String id)
-      throws BadRequestException, NotFoundException {
+  public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
     logger.info("getUser called");
 
     try {
       UUID userId = UUID.fromString(id);
-      User user = this.userService.getUser(userId);
-      return new UserResponse(user);
+      return ResponseEntity.ok(new UserResponse(this.userService.getUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id", id);
-      throw new BadRequestException("Invalid user id provided");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,10 +74,14 @@ class UserControllerTest {
 
   @Test
   void getUser_shouldReturnUser() {
-    when(this.userService.getUser(any(UUID.class))).thenReturn(new User());
+    when(this.userService.getUser(any(UUID.class))).thenReturn(expected);
     var result = this.userController.getUser(UUID.randomUUID().toString());
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"),
         () ->
             assertFalse(
                 result.toString().contains("password"),
@@ -84,16 +89,26 @@ class UserControllerTest {
   }
 
   @Test
-  void getUser_shouldThrowBadRequestErrorIfBadId() {
-    assertThrows(BadRequestException.class, () -> this.userController.getUser("test"));
+  void getUserShouldReturn400IfIdIsNotValid() {
+    var result = this.userController.getUser("not a uuid");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
   }
 
   @Test
-  void getUserShouldThrowNotFoundIfNoUserPresent() {
+  void getUserShouldReturn404IfUserNotFound() {
     when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
+    var result = this.userController.getUser(testString);
 
-    assertThrows(
-        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The response status should be 404"));
   }
 
   @Test
@@ -115,14 +130,6 @@ class UserControllerTest {
 
     assertNotNull(actual);
     assertEquals(expected, actual);
-  }
-
-  @Test
-  void createUserShouldHandleServiceErrors() {
-    when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
-
-    assertThrows(
-        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
   }
 
   @Test
@@ -149,9 +156,11 @@ class UserControllerTest {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userService.getAllUsers()).thenReturn(expectedList);
 
-    UserCollectionResponse actual = this.userController.getAllUsers();
+    UserCollectionResponse actual = this.userController.getAllUsers().getBody();
 
-    assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers());
+    assertAll(
+        () -> assertNotNull(actual, "The response entity body should not be null"),
+        () -> assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers()));
   }
 
   @Test
