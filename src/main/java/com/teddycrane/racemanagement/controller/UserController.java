@@ -110,7 +110,7 @@ public class UserController extends BaseController {
 
   // todo update delete so that users a) can't delete themselves, and b) gate deletion to admins
   // only
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/user/{id}")
   public User deleteUser(@PathVariable String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
     logger.info("deleteUser called");

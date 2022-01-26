@@ -8,10 +8,7 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,12 +17,11 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
-@Builder
 @EqualsAndHashCode
 public class User {
   @Id
   @Type(type = "uuid-char")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  //  @GeneratedValue(strategy = GenerationType.AUTO)
   private final UUID id;
 
   @Setter @NonNull private String firstName, lastName, email, username, password;
@@ -43,7 +39,7 @@ public class User {
     this.id = id;
   }
 
-  private User(
+  public User(
       UUID id,
       String firstName,
       String lastName,

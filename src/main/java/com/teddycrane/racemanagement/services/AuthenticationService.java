@@ -43,27 +43,29 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
 
   private void createSeedUserData() {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    this.userRepository.save(
-        User.builder()
-            .id(UUID.fromString(testUserId))
-            .username(testUsername)
-            .password(encoder.encode(testUserPassword))
-            .userType(UserType.USER)
-            .email("testuser@test.fake")
-            .firstName("Test")
-            .lastName("User")
-            .build());
+    User user =
+        new User(
+            UUID.fromString(testUserId),
+            "Test",
+            "User",
+            testUsername,
+            "testuser@test.fake",
+            encoder.encode(testUserPassword),
+            UserType.USER);
+    logger.warn("User: {}", user);
+    this.userRepository.save(user);
 
-    this.userRepository.save(
-        User.builder()
-            .id(UUID.fromString(testAdminId))
-            .username(testAdmin)
-            .password(encoder.encode(testAdminPassword))
-            .userType(UserType.ADMIN)
-            .email("testadmin@test.fake")
-            .firstName("Test")
-            .lastName("Admin")
-            .build());
+    User admin =
+        new User(
+            UUID.fromString(testAdminId),
+            "Test",
+            "Admin",
+            testAdmin,
+            "testadmin@test.fake",
+            encoder.encode(testAdminPassword),
+            UserType.ADMIN);
+    logger.warn("Admin: {}", admin);
+    this.userRepository.save(admin);
   }
 
   @PostConstruct
