@@ -10,7 +10,7 @@ jobs:
           name: Gradle Build
           command: ./gradlew build -x test
       # Cache build deps until build.gradle changes
-      - save-cache:
+      - save_cache:
           key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
           paths:
             - ~/.gradle/caches/modules-2/files-2.1
@@ -43,6 +43,9 @@ jobs:
       image: ubuntu-2004:202008-01
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties }}
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
