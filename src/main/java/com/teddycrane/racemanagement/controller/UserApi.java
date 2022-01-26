@@ -33,7 +33,7 @@ public interface UserApi {
       @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue);
 
   @PostMapping("/user/new")
-  UserResponse createUser(@Valid @RequestBody CreateUserRequest request);
+  ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request);
 
   @PostMapping("/login")
   AuthenticationResponse login(@Valid @RequestBody AuthenticationRequest request);

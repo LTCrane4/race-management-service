@@ -66,10 +66,10 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @PostMapping("/user/new")
-  public UserResponse createUser(@Valid @RequestBody CreateUserRequest request) {
+  public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
     logger.info("createUser called");
 
-    return new UserResponse(this.userService.createUser(request));
+    return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
   }
 
   @PostMapping("/login")

@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateUserHandlerTest {
+class UpdateUserHandlerTest {
 
   private final UUID testId = UUID.randomUUID();
   private final User existingUser = TestResourceGenerator.generateUser();

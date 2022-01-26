@@ -33,7 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 class UserControllerTest {
 
-  private UserController userController;
+  private UserApi userController;
 
   private User expected;
 
@@ -119,14 +119,21 @@ class UserControllerTest {
 
     var result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
-    assertNotNull(result);
+
+    var body = result.getBody();
+
     assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
-                expected.getUsername(), result.getUsername(), "The usernames should be equal"),
+                HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
-                expected.getUserType(), result.getUserType(), "The user types should be equal"));
+                expected.getUsername(), body.getUsername(), "The usernames should be equal"),
+        () ->
+            assertEquals(
+                expected.getUserType(), body.getUserType(), "The user types should be equal"));
   }
 
   @Test
@@ -134,9 +141,17 @@ class UserControllerTest {
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     var actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
+    var body = actual.getBody();
 
-    assertNotNull(actual);
-    assertEquals(expected.getUsername(), actual.getUsername(), "The usernames should be equal");
+    assertAll(
+        () -> assertNotNull(actual),
+        () ->
+            assertEquals(
+                HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
+        () ->
+            assertEquals(
+                expected.getUsername(), body.getUsername(), "The usernames should be equal"));
   }
 
   @Test
@@ -346,12 +361,17 @@ class UserControllerTest {
   }
 
   @Test
-  void shouldThrowErrorIfSearchTypeAndValueMismatched() {
+  void shouldReturn400IfSearchTypeAndValueMismatched() {
     when(this.userService.searchUsers(SearchType.TYPE, "not a type"))
         .thenThrow(IllegalArgumentException.class);
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
+
+    var result = this.userController.searchUsers(SearchType.TYPE, "not a type");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
   }
 
   @Test
