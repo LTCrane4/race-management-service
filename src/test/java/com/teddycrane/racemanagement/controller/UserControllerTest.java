@@ -17,6 +17,7 @@ import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
+import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Collection;
 import java.util.UUID;
@@ -275,7 +276,9 @@ class UserControllerTest {
 
     assertAll(
         () -> assertNotNull(actual, "The result should not be null"),
-        () -> assertEquals(expected, actual, "The result should match the expected value"));
+        () ->
+            assertEquals(
+                new UserResponse(expected), actual, "The result should match the expected value"));
   }
 
   @Test

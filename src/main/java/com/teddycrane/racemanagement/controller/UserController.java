@@ -109,7 +109,7 @@ public class UserController extends BaseController {
   }
 
   @DeleteMapping("/user/{id}")
-  public User deleteUser(@PathVariable String id)
+  public UserResponse deleteUser(@PathVariable String id)
       throws BadRequestException, InsufficientPermissionsException, NotFoundException {
     logger.info("deleteUser called");
 
@@ -129,7 +129,7 @@ public class UserController extends BaseController {
         throw new BadRequestException("Cannot delete the requesting user");
       }
 
-      return this.userService.deleteUser(userId);
+      return new UserResponse(this.userService.deleteUser(userId));
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
       throw new BadRequestException("Unable to parse the provided id");
