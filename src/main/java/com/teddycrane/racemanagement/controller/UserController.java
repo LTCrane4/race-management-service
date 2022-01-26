@@ -85,8 +85,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   public ResponseEntity<UserResponse> updateUser(
-      @RequestParam String id, @Valid @RequestBody UpdateUserRequest request)
-      throws BadRequestException, InsufficientPermissionsException {
+      @RequestParam String id, @Valid @RequestBody UpdateUserRequest request) {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
     this.printAuditLog(auditData.getUserName(), auditData.getUserId(), auditData.getUserType());
@@ -114,9 +113,8 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ChangePasswordResponse changePassword(
-      @PathVariable String id, @Valid @RequestBody ChangePasswordRequest request)
-      throws NotFoundException, BadRequestException, InsufficientPermissionsException {
+  public ResponseEntity<ChangePasswordResponse> changePassword(
+      @PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
 
@@ -128,16 +126,21 @@ public class UserController extends BaseController implements UserApi {
         logger.error(
             "User {} does not have the permissions to change another user's password",
             audit.getUserId());
-        throw new InsufficientPermissionsException();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
       }
 
-      return new ChangePasswordResponse(
-          this.userService.changePassword(
-              userId, request.getOldPassword(), request.getNewPassword()),
-          userId);
-    } catch (IllegalArgumentException e) {
+      return ResponseEntity.ok(
+          new ChangePasswordResponse(
+              this.userService.changePassword(
+                  userId, request.getOldPassword(), request.getNewPassword()),
+              userId));
+    } catch (IllegalArgumentException | BadRequestException e) {
       logger.error("Unable to parse the provided id");
-      throw new BadRequestException("Unable to parse the provided id!");
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.notFound().build();
     }
   }
 

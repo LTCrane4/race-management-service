@@ -20,6 +20,9 @@ spring:
       preferred-json-mapper: gson
   gson:
     pretty-printing: true
+logging:
+  file:
+    path: /logs
 server:
   error:
     include-message: always

@@ -199,4 +199,14 @@ class UserServiceTest {
         () -> assertNotNull(result, "The returned user should not be null"),
         () -> assertEquals(existing, result, "The result should equal the expected value"));
   }
+
+  @Test
+  void changePasswordShouldReturnSuccess() {
+    when(this.changePasswordHandler.resolve(any(ChangePasswordHandlerRequest.class)))
+        .thenReturn(true);
+
+    var result = this.userService.changePassword(testId, "oldPassword", "newPassword");
+
+    assertTrue(result);
+  }
 }

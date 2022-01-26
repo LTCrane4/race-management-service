@@ -43,7 +43,7 @@ public interface UserApi {
       @RequestParam("id") String id, @Valid @RequestBody UpdateUserRequest request);
 
   @PatchMapping("/user/{id}/change-password")
-  ChangePasswordResponse changePassword(
+  ResponseEntity<ChangePasswordResponse> changePassword(
       @RequestParam("id") String id, @Valid @RequestBody ChangePasswordRequest request);
 
   @DeleteMapping("/user/{id}")

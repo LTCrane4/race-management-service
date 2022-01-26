@@ -460,8 +460,6 @@ class UserControllerTest {
   @Test
   void changePasswordShouldChangePassword() {
     UUID id = expected.getId();
-    String idString = expected.getId().toString();
-
     when(this.userService.changePassword(id, expected.getPassword(), "new password"))
         .thenReturn(true);
 
@@ -470,5 +468,61 @@ class UserControllerTest {
             id.toString(), new ChangePasswordRequest(expected.getPassword(), "new password"));
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
+  }
+
+  @Test
+  void changePasswordShouldReturn403IfUserChangesOtherUsersPassword() {
+    var result =
+        this.userController.changePassword(
+            UUID.randomUUID().toString(), new ChangePasswordRequest("oldPassword", "newPassword"));
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.FORBIDDEN, result.getStatusCode(), "The status code should be 403"));
+  }
+
+  @Test
+  void changePasswordShouldHandleServiceErrors() {
+    when(this.userService.changePassword(eq(expected.getId()), anyString(), anyString()))
+        .thenThrow(BadRequestException.class);
+
+    ChangePasswordRequest request = new ChangePasswordRequest("old", "new");
+
+    var result1 =
+        this.userController.changePassword(
+            expected.getId().toString(), new ChangePasswordRequest("test", "Test"));
+
+    assertAll(
+        () -> assertNotNull(result1, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result1.getStatusCode(), "The status code should be 400"));
+
+    var result2 = this.userController.changePassword("not a uuid", request);
+
+    assertAll(
+        () -> assertNotNull(result2, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result2.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  void changePasswordShouldReturn404IfUserNotFound() {
+    when(this.userService.changePassword(eq(expected.getId()), anyString(), anyString()))
+        .thenThrow(NotFoundException.class);
+
+    var result =
+        this.userController.changePassword(
+            expected.getId().toString(), new ChangePasswordRequest("old", "new"));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
   }
 }
