@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
@@ -422,20 +421,24 @@ class UserControllerTest {
     when(this.userService.deleteUser(testId)).thenReturn(expected);
 
     var actual = this.userController.deleteUser(testString);
+    var body = actual.getBody();
 
     assertAll(
         () -> assertNotNull(actual, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, actual.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
-                new UserResponse(expected), actual, "The result should match the expected value"));
+                new UserResponse(expected), body, "The result should match the expected value"));
   }
 
   @Test
   void deleteUserShouldHandleBadId() {
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.deleteUser("not uuid"),
-        "Invalid UUID values should throw an exception");
+    var result = this.userController.deleteUser("not a valid id");
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
   }
 
   @Test
@@ -443,18 +446,23 @@ class UserControllerTest {
     this.expected.setUserType(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    assertThrows(
-        InsufficientPermissionsException.class,
-        () -> this.userController.deleteUser(testString),
-        "A user with the type of USER should not be able to delete users");
+    var result = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode(), "The status should be 403"));
   }
 
   @Test
   void deleteUserShouldNotAllowUsersToDeleteThemselves() {
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.deleteUser(expected.getId().toString()),
-        "Users should not be able to delete themselves");
+    var result = this.userController.deleteUser(expected.getId().toString());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
   }
 
   @Test

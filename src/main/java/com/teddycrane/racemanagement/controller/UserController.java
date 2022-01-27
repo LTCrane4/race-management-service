@@ -3,7 +3,6 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
@@ -144,8 +143,7 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public UserResponse deleteUser(@RequestParam String id)
-      throws BadRequestException, InsufficientPermissionsException, NotFoundException {
+  public ResponseEntity<UserResponse> deleteUser(@RequestParam String id) throws NotFoundException {
     logger.info("deleteUser called");
 
     UserAuditData data = this.getUserAuditData();
@@ -153,7 +151,7 @@ public class UserController extends BaseController implements UserApi {
     // verify the user has a role allowed to delete
     if (data.getUserType().equals(UserType.USER)) {
       logger.error("The user has insufficient permissions to perform this action");
-      throw new InsufficientPermissionsException();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     try {
@@ -161,13 +159,16 @@ public class UserController extends BaseController implements UserApi {
 
       if (userId.equals(data.getUserId())) {
         logger.error("Users are unable to self-delete");
-        throw new BadRequestException("Cannot delete the requesting user");
+        return ResponseEntity.badRequest().build();
       }
 
-      return new UserResponse(this.userService.deleteUser(userId));
+      return ResponseEntity.ok(new UserResponse(this.userService.deleteUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
-      throw new BadRequestException("Unable to parse the provided id");
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.notFound().build();
     }
   }
 }

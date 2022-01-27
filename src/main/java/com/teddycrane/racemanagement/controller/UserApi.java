@@ -47,5 +47,5 @@ public interface UserApi {
       @RequestParam("id") String id, @Valid @RequestBody ChangePasswordRequest request);
 
   @DeleteMapping("/user/{id}")
-  UserResponse deleteUser(@RequestParam("id") String id);
+  ResponseEntity<UserResponse> deleteUser(@RequestParam("id") String id);
 }
