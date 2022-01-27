@@ -6,6 +6,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,36 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     Racer r =
         new Racer(
             firstName, lastName, category, middleName, teamName, phoneNumber, email, bibNumber);
+
+    return this.racerRepository.save(r);
+  }
+
+  @Override
+  public Racer updateRacer(
+      UUID id,
+      String firstName,
+      String lastName,
+      String middleName,
+      String teamName,
+      String phoneNumber,
+      String email)
+      throws NotFoundException {
+    logger.info("updateRacer called");
+
+    Racer r =
+        this.racerRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No racer found for the provided id"));
+
+    if (firstName != null) r.setFirstName(firstName);
+    if (lastName != null) r.setLastName(lastName);
+    if (middleName != null) r.setMiddleName(middleName);
+    if (teamName != null) r.setTeamName(teamName);
+    if (phoneNumber != null) r.setPhoneNumber(phoneNumber);
+    // todo email validation
+    if (email != null) r.setEmail(email);
+
+    r.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
 
     return this.racerRepository.save(r);
   }

@@ -6,12 +6,14 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -37,12 +39,14 @@ public class RacerController extends BaseController implements RacerApi {
     }
   }
 
+  @Override
   public ResponseEntity<RacerCollectionResponse> getAllRacers() {
     logger.info("getAllRacers called");
 
     return ResponseEntity.ok(new RacerCollectionResponse(this.racerService.getAllRacers()));
   }
 
+  @Override
   public ResponseEntity<Racer> getRacer(String id) throws BadRequestException, NotFoundException {
     logger.info("getRacer called");
 
@@ -58,6 +62,7 @@ public class RacerController extends BaseController implements RacerApi {
     }
   }
 
+  @Override
   public ResponseEntity<Racer> createRacer(@NonNull CreateRacerRequest request) {
     logger.info("createRacer called");
 
@@ -80,6 +85,37 @@ public class RacerController extends BaseController implements RacerApi {
     } catch (IllegalArgumentException e) {
       logger.error("The provided value {} is not a valid category value", request.getCategory());
       return ResponseEntity.badRequest().build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<Racer> updateRacer(String id, @Valid UpdateRacerRequest request) {
+    logger.info("updateRacer called");
+
+    // validate parameters here
+    if (request.allParamsNull()) {
+      logger.error("Cannot update a user");
+      return ResponseEntity.badRequest().build();
+    }
+
+    try {
+      UUID userId = UUID.fromString(id);
+
+      return ResponseEntity.ok(
+          this.racerService.updateRacer(
+              userId,
+              request.getFirstName(),
+              request.getLastName(),
+              request.getMiddleName(),
+              request.getTeamName(),
+              request.getPhoneNumber(),
+              request.getEmail()));
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the id {}", id);
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error(e.getMessage());
+      return ResponseEntity.notFound().build();
     }
   }
 }

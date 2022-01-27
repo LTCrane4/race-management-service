@@ -41,7 +41,7 @@ public class Racer {
   @NonNull
   private Category category;
 
-  @NonNull private Date updatedTimestamp;
+  @Setter @NonNull private Date updatedTimestamp;
 
   @Setter private int bibNumber;
 

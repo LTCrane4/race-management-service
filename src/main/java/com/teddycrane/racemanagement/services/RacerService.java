@@ -25,4 +25,14 @@ public interface RacerService {
       String email,
       int bibNumber)
       throws DuplicateItemException;
+
+  Racer updateRacer(
+      UUID id,
+      String firstName,
+      String lastName,
+      String middleName,
+      String teamName,
+      String phoneNumber,
+      String email)
+      throws NotFoundException;
 }

@@ -14,16 +14,19 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+@ExtendWith(MockitoExtension.class)
 class RacerControllerTest {
 
   @Mock private RacerService racerService;
@@ -36,7 +39,6 @@ class RacerControllerTest {
 
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
     this.racerController = new RacerController(this.racerService);
     this.expected = TestResourceGenerator.generateRacer();
     this.testId = UUID.randomUUID();
@@ -185,5 +187,31 @@ class RacerControllerTest {
         () ->
             assertEquals(
                 HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+  }
+
+  @Test
+  void shouldUpdateRacer() {
+    when(this.racerService.updateRacer(
+            testId, "New", "Last", "Middle", "New Team Name", "123-456-789", "newemail@email.fake"))
+        .thenReturn(expected);
+
+    var request =
+        UpdateRacerRequest.builder()
+            .firstName("New")
+            .lastName("Last")
+            .middleName("Middle")
+            .teamName("New Team Name")
+            .phoneNumber("123-456-789")
+            .email("newemail@email.fake")
+            .build();
+
+    var result = this.racerController.updateRacer(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(body, "The body should not be null"),
+        () -> assertEquals(expected, body, "The body should match the expected value"));
   }
 }
