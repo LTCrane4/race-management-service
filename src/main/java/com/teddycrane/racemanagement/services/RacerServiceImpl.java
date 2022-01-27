@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
@@ -59,19 +60,26 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   @Override
   public Racer updateRacer(
       UUID id,
+      Date updatedTimestamp,
       String firstName,
       String lastName,
       String middleName,
       String teamName,
       String phoneNumber,
       String email)
-      throws NotFoundException {
+      throws ConflictException, NotFoundException {
     logger.info("updateRacer called");
 
     Racer r =
         this.racerRepository
             .findById(id)
             .orElseThrow(() -> new NotFoundException("No racer found for the provided id"));
+
+    // locking validation
+    if (!updatedTimestamp.equals(r.getUpdatedTimestamp())) {
+      throw new ConflictException(
+          "The updated timestamp is out of date.  Please re-fetch and try again");
+    }
 
     if (firstName != null) r.setFirstName(firstName);
     if (lastName != null) r.setLastName(lastName);

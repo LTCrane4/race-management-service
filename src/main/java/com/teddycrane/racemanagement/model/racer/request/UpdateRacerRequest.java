@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.model.racer.request;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class UpdateRacerRequest {
+
+  @NotBlank(message = "The racer's updated timestamp is required")
+  private long updatedTimestamp;
+
   private String firstName, lastName, middleName, teamName, phoneNumber;
 
   @Email private String email;

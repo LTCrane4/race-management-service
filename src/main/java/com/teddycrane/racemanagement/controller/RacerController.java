@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
@@ -9,6 +10,7 @@ import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,6 +106,7 @@ public class RacerController extends BaseController implements RacerApi {
       return ResponseEntity.ok(
           this.racerService.updateRacer(
               userId,
+              new Date(request.getUpdatedTimestamp()),
               request.getFirstName(),
               request.getLastName(),
               request.getMiddleName(),
@@ -111,11 +114,14 @@ public class RacerController extends BaseController implements RacerApi {
               request.getPhoneNumber(),
               request.getEmail()));
     } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the id {}", id);
+      logger.error("Unable to parse the id: {}", id);
       return ResponseEntity.badRequest().build();
     } catch (NotFoundException e) {
       logger.error(e.getMessage());
       return ResponseEntity.notFound().build();
+    } catch (ConflictException e) {
+      logger.error(e.getMessage());
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
 }
