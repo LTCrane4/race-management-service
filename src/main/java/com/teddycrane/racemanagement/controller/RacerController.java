@@ -8,17 +8,16 @@ import com.teddycrane.racemanagement.model.racer.response.RacerCollectionRespons
 import com.teddycrane.racemanagement.services.RacerService;
 import java.util.UUID;
 import javax.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/racer")
-public class RacerController extends BaseController {
+public class RacerController extends BaseController implements RacerApi {
 
   private final RacerService racerService;
 
@@ -28,10 +27,10 @@ public class RacerController extends BaseController {
   }
 
   @GetMapping
-  public RacerCollectionResponse getAllRacers() {
+  public ResponseEntity<RacerCollectionResponse> getAllRacers() {
     logger.info("getAllRacers called");
 
-    return new RacerCollectionResponse(this.racerService.getAllRacers());
+    return ResponseEntity.ok(new RacerCollectionResponse(this.racerService.getAllRacers()));
   }
 
   @GetMapping("/{id}")

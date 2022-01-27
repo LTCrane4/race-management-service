@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 
 class RacerControllerTest {
 
@@ -47,14 +48,17 @@ class RacerControllerTest {
     List<Racer> expectedList = (List<Racer>) TestResourceGenerator.generateRacerList(5);
     when(this.racerService.getAllRacers()).thenReturn(expectedList);
 
-    RacerCollectionResponse actual = this.racerController.getAllRacers();
+    var result = this.racerController.getAllRacers();
+    var body = result.getBody();
 
     assertAll(
-        () -> assertNotNull(actual, "The response should not be null"),
+        () -> assertNotNull(result, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 new RacerCollectionResponse(expectedList).getRacers(),
-                actual.getRacers(),
+                body.getRacers(),
                 "The lists should match the expected list"));
   }
 
