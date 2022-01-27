@@ -9,6 +9,7 @@ import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,12 +62,12 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   public Racer updateRacer(
       UUID id,
       Date updatedTimestamp,
-      String firstName,
-      String lastName,
-      String middleName,
-      String teamName,
-      String phoneNumber,
-      String email)
+      @Nullable String firstName,
+      @Nullable String lastName,
+      @Nullable String middleName,
+      @Nullable String teamName,
+      @Nullable String phoneNumber,
+      @Nullable String email)
       throws ConflictException, NotFoundException {
     logger.info("updateRacer called");
 
