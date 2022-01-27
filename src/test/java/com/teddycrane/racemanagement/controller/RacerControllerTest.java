@@ -3,14 +3,14 @@ package com.teddycrane.racemanagement.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
@@ -28,7 +28,7 @@ class RacerControllerTest {
 
   @Mock private RacerService racerService;
 
-  private RacerController racerController;
+  private RacerApi racerController;
 
   private Racer expected;
   private UUID testId;
@@ -66,18 +66,36 @@ class RacerControllerTest {
   void shouldGetRacer() {
     when(this.racerService.getRacer(testId)).thenReturn(expected);
 
-    Racer actual = this.racerController.getRacer(testString);
+    var result = this.racerController.getRacer(testString);
+    var body = result.getBody();
     assertAll(
-        () -> assertNotNull(actual, "The result should not be null"),
-        () -> assertEquals(expected, actual, "The expected and actual results should be equal"));
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
+        () -> assertEquals(expected, body, "The expected and actual results should be equal"));
   }
 
   @Test
   void getShouldHandleBadId() {
-    assertThrows(
-        BadRequestException.class,
-        () -> this.racerController.getRacer("bad id"),
-        "The controller should throw a bad request exception if an invalid id is provided");
+
+    var result = this.racerController.getRacer("not a valid id");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+  }
+
+  @Test
+  void shouldHandleNotFound() {
+    when(this.racerService.getRacer(any(UUID.class))).thenThrow(NotFoundException.class);
+
+    var result = this.racerController.getRacer(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
   }
 
   @Test
@@ -105,10 +123,45 @@ class RacerControllerTest {
             .bibNumber(2)
             .build();
 
-    var actual = this.racerController.createRacer(request);
+    var result = this.racerController.createRacer(request);
+    var body = result.getBody();
 
     assertAll(
-        () -> assertNotNull(actual, "The result should not be null"),
-        () -> assertEquals(expected, actual, "The result should match the expected value"));
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertEquals(expected, body, "The result should match the expected value"));
+  }
+
+  @Test
+  void shouldReturnConflictWhenExistingIsFound() {
+    when(this.racerService.createRacer(
+            anyString(),
+            anyString(),
+            any(Category.class),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt()))
+        .thenThrow(DuplicateItemException.class);
+
+    CreateRacerRequest request =
+        CreateRacerRequest.builder()
+            .firstName("Test")
+            .lastName("lname")
+            .category(Category.CAT2)
+            .middleName("mid")
+            .teamName("team")
+            .email("email@email.fake")
+            .phoneNumber("Phone Number")
+            .bibNumber(2)
+            .build();
+
+    var result = this.racerController.createRacer(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
   }
 }
