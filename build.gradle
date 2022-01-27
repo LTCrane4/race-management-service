@@ -1,9 +1,9 @@
 plugins {
-	id "org.springframework.boot" version "2.6.2"
-	id "io.spring.dependency-management" version "1.0.11.RELEASE"
-	id "java"
-	id "jacoco"
-	id "io.freefair.lombok" version "6.3.0"
+    id "org.springframework.boot" version "2.6.2"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+    id "jacoco"
+    id "io.freefair.lombok" version "6.3.0"
 }
 
 group = "com.teddycrane"
@@ -11,129 +11,132 @@ version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "11"
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation "org.springframework.boot:spring-boot-starter-actuator"
-	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-	implementation "org.springframework.boot:spring-boot-starter-jdbc"
-	implementation ("org.springframework.boot:spring-boot-starter-web") {
-		exclude group: 'com.fasterxml.jackson.core'
-		exclude group: 'com.fasterxml.jackson.datatype'
-		exclude group: 'com.fasterxml.jackson.module'
-	}
-	implementation "org.springframework.boot:spring-boot-starter-validation"
-  	implementation "com.google.code.gson:gson:$gson_version"
-  	implementation "org.springframework.boot:spring-boot-starter-security"
-	implementation "org.springframework.security:spring-security-test"
-	implementation "com.github.javafaker:javafaker:$java_faker_version"
-	implementation ("io.jsonwebtoken:jjwt:$jwt_version") {
-		exclude group: 'com.fasterxml.jackson.core'
-	}
-	implementation "io.jsonwebtoken:jjwt-gson:$jwt_gson_version"
-	implementation "mysql:mysql-connector-java"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation("org.springframework.boot:spring-boot-starter-web") {
+        exclude group: 'com.fasterxml.jackson.core'
+        exclude group: 'com.fasterxml.jackson.datatype'
+        exclude group: 'com.fasterxml.jackson.module'
+    }
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "com.google.code.gson:gson:$gson_version"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.security:spring-security-test"
+    implementation "com.github.javafaker:javafaker:$java_faker_version"
+    implementation("io.jsonwebtoken:jjwt:$jwt_version") {
+        exclude group: 'com.fasterxml.jackson.core'
+    }
+    implementation "io.jsonwebtoken:jjwt-gson:$jwt_gson_version"
+    implementation "mysql:mysql-connector-java"
 
-	testImplementation "org.springframework.boot:spring-boot-starter-test"
-	testImplementation "org.testcontainers:testcontainers:$testcontainers_version"
-	testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
-	testImplementation "org.testcontainers:mysql:$testcontainers_version"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.testcontainers:testcontainers:$testcontainers_version"
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
+    testImplementation "org.testcontainers:mysql:$testcontainers_version"
 
-	developmentOnly "org.springframework.boot:spring-boot-devtools"
-	compileOnly "org.projectlombok:lombok:$lombok_version"
-	annotationProcessor "org.projectlombok:lombok:$lombok_version"
-	testCompileOnly "org.projectlombok:lombok:$lombok_version"
-	testAnnotationProcessor "org.projectlombok:lombok:$lombok_version"
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+    testCompileOnly "org.projectlombok:lombok:$lombok_version"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombok_version"
 }
 
 bootRun {
-	String activeProfile = System.properties['spring.profiles.active']
-	jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5015"]
-	systemProperty "spring.profiles.active", activeProfile
+    String activeProfile = System.properties['spring.profiles.active']
+    jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5015"]
+    systemProperty "spring.profiles.active", activeProfile
 }
 
 sourceSets {
-	integrationTest {
-		java {
-			srcDir file('src/integrationTest/java')
-			compileClasspath += sourceSets.test.compileClasspath
-			runtimeClasspath += sourceSets.test.runtimeClasspath
-		}
-	}
+    integrationTest {
+        java {
+            srcDir file('src/integrationTest/java')
+            compileClasspath += sourceSets.test.compileClasspath
+            runtimeClasspath += sourceSets.test.runtimeClasspath
+        }
+    }
 }
 
 test {
-	useJUnitPlatform()
-	testLogging {
-		events "PASSED", "SKIPPED", "FAILED"
-	}
+    useJUnitPlatform()
+    testLogging {
+        events "PASSED", "SKIPPED", "FAILED"
+    }
 
-	finalizedBy jacocoTestReport // always generate test reports
+    finalizedBy jacocoTestReport // always generate test reports
 }
 
 task integrationTest(type: Test) {
-	useJUnitPlatform()
-	testLogging.showStandardStreams = true
-	environment('spring.profiles.active', 'integration')
+    useJUnitPlatform()
+    logging.captureStandardOutput LogLevel.INFO
+    testLogging {
+        events "PASSED", "SKIPPED", "FAILED"
+    }
+    environment('spring.profiles.active', 'integration')
 
-	group = 'integration'
-	description = 'run integration tests'
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	outputs.upToDateWhen { false }
-	mustRunAfter test
+    group = 'integration'
+    description = 'run integration tests'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
 }
 
 tasks.build.dependsOn(jacocoTestReport)
 
 jacocoTestReport {
-	dependsOn test // require test run before report generation 
-	executionData tasks.withType(Test).findAll { it.state.executed }
+    dependsOn test // require test run before report generation
+    executionData tasks.withType(Test).findAll { it.state.executed }
 
-	afterEvaluate {
-		classDirectories.setFrom(files(classDirectories.files.collect {
-			fileTree(dir: it, exclude: [
-					"com/teddycrane/racemanagement/Application.class",
-					"com/teddycrane/racemanagement/config/*.class",
-					"com/teddycrane/racemanagement/security/**/*.class"
-			])
-		}))
-	}
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/teddycrane/racemanagement/Application.class",
+                    "com/teddycrane/racemanagement/config/*.class",
+                    "com/teddycrane/racemanagement/security/**/*.class"
+            ])
+        }))
+    }
 
-	reports {
-		xml.enabled true
-		xml.destination(file("${jacoco.reportsDir}/all-tests/jacocoAllTests.xml"))
-		html.enabled true
-		html.destination(file("${jacoco.reportsDir}/html"))
-	}
+    reports {
+        xml.enabled true
+        xml.destination(file("${jacoco.reportsDir}/all-tests/jacocoAllTests.xml"))
+        html.enabled true
+        html.destination(file("${jacoco.reportsDir}/html"))
+    }
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			enabled = true
-			limit {
-				minimum = 0.70
-			}
-		}
-	}
+    violationRules {
+        rule {
+            enabled = true
+            limit {
+                minimum = 0.70
+            }
+        }
+    }
 }
 
 static void setConfiguration(configuration) {
-	if (configuration.canBeResolved) {
-		configuration.resolve()
-	}
+    if (configuration.canBeResolved) {
+        configuration.resolve()
+    }
 }
 
 task resolveDependencies {
-	doLast {
-		project.rootProject.allprojects.each { project ->
-			project.buildscript.configurations.each { configuration ->
-				setConfiguration(configuration)
-			}
-			project.configurations.each { configuration ->
-				setConfiguration(configuration)
-			}
-		}
-	}
+    doLast {
+        project.rootProject.allprojects.each { project ->
+            project.buildscript.configurations.each { configuration ->
+                setConfiguration(configuration)
+            }
+            project.configurations.each { configuration ->
+                setConfiguration(configuration)
+            }
+        }
+    }
 }

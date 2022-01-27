@@ -13,8 +13,10 @@ spring:
 logging:
   group:
     testImpl: com.teddycrane.racemanagement.test.integration.tests
+    testcontainers: org.testcontainers
   level:
     testImpl: info
+    testcontainers: error
 server:
   error:
     include-message: always
