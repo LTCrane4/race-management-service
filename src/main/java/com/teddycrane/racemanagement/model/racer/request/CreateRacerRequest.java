@@ -1,6 +1,5 @@
 package com.teddycrane.racemanagement.model.racer.request;
 
-import com.teddycrane.racemanagement.enums.Category;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -29,9 +28,7 @@ public class CreateRacerRequest {
   @NotBlank(message = "A last name must be provided")
   private String lastName;
 
-  @NonNull
-  @NotBlank(message = "A category must be provided")
-  private Category category;
+  @NonNull private String category;
 
   private String middleName, teamName, phoneNumber;
 

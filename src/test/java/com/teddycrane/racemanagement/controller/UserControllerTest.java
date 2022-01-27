@@ -466,6 +466,18 @@ class UserControllerTest {
   }
 
   @Test
+  void deleteUserShouldThrow404IfUserNotFound() {
+    when(this.userService.deleteUser(any(UUID.class))).thenThrow(NotFoundException.class);
+
+    var result = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
   void changePasswordShouldChangePassword() {
     UUID id = expected.getId();
     when(this.userService.changePassword(id, expected.getPassword(), "new password"))

@@ -115,7 +115,7 @@ class RacerControllerTest {
         CreateRacerRequest.builder()
             .firstName("Test")
             .lastName("lname")
-            .category(Category.CAT2)
+            .category(Category.CAT2.toString())
             .middleName("mid")
             .teamName("team")
             .email("email@email.fake")
@@ -149,7 +149,7 @@ class RacerControllerTest {
         CreateRacerRequest.builder()
             .firstName("Test")
             .lastName("lname")
-            .category(Category.CAT2)
+            .category(Category.CAT2.toString())
             .middleName("mid")
             .teamName("team")
             .email("email@email.fake")
@@ -163,5 +163,27 @@ class RacerControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+  }
+
+  @Test
+  void shouldReturn400WhenBadCategoryValueIsProvided() {
+    CreateRacerRequest request =
+        CreateRacerRequest.builder()
+            .firstName("Test")
+            .lastName("lname")
+            .category("invalid category")
+            .middleName("mid")
+            .teamName("team")
+            .email("email@email.fake")
+            .phoneNumber("Phone Number")
+            .bibNumber(2)
+            .build();
+    var result = this.racerController.createRacer(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
   }
 }

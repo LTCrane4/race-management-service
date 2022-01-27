@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.controller;
 
+import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -7,11 +8,13 @@ import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,13 +27,22 @@ public class RacerController extends BaseController implements RacerApi {
     this.racerService = racerService;
   }
 
+  private Category resolveCategory(String input) throws IllegalArgumentException {
+    Set<Category> values = new HashSet<>(List.of(Category.values()));
+
+    if (values.stream().anyMatch((value) -> input.equalsIgnoreCase(value.toString()))) {
+      return Category.valueOf(input.toUpperCase());
+    } else {
+      throw new IllegalArgumentException("The provided input is not a valid Category");
+    }
+  }
+
   public ResponseEntity<RacerCollectionResponse> getAllRacers() {
     logger.info("getAllRacers called");
 
     return ResponseEntity.ok(new RacerCollectionResponse(this.racerService.getAllRacers()));
   }
 
-  @GetMapping("/{id}")
   public ResponseEntity<Racer> getRacer(String id) throws BadRequestException, NotFoundException {
     logger.info("getRacer called");
 
@@ -50,11 +62,13 @@ public class RacerController extends BaseController implements RacerApi {
     logger.info("createRacer called");
 
     try {
+      Category c = this.resolveCategory(request.getCategory());
+
       return ResponseEntity.ok(
           this.racerService.createRacer(
               request.getFirstName(),
               request.getLastName(),
-              request.getCategory(),
+              c,
               request.getMiddleName(),
               request.getTeamName(),
               request.getPhoneNumber(),
@@ -63,6 +77,9 @@ public class RacerController extends BaseController implements RacerApi {
     } catch (DuplicateItemException e) {
       logger.error("Cannot create a duplicate of an existing item");
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (IllegalArgumentException e) {
+      logger.error("The provided value {} is not a valid category value", request.getCategory());
+      return ResponseEntity.badRequest().build();
     }
   }
 }
