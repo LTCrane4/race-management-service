@@ -2,10 +2,12 @@ package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
+import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
 import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.User;
@@ -39,6 +41,7 @@ public class UserServiceImpl extends BaseService implements UserService {
   private final Handler<CreateUserRequest, User> createUserHandler;
   private final Handler<UpdateUserHandlerRequest, User> updateUserHandler;
   private final Handler<DeleteUserRequest, User> deleteUserHandler;
+  private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
   public UserServiceImpl(
       UserRepository userRepository,
@@ -48,7 +51,8 @@ public class UserServiceImpl extends BaseService implements UserService {
       Handler<String, Collection<User>> getUsersHandler,
       Handler<CreateUserRequest, User> createUserHandler,
       Handler<UpdateUserHandlerRequest, User> updateUserHandler,
-      Handler<DeleteUserRequest, User> deleteUserHandler) {
+      Handler<DeleteUserRequest, User> deleteUserHandler,
+      Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
@@ -58,6 +62,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.createUserHandler = createUserHandler;
     this.updateUserHandler = updateUserHandler;
     this.deleteUserHandler = deleteUserHandler;
+    this.changePasswordHandler = changePasswordHandler;
   }
 
   @Override
@@ -134,6 +139,18 @@ public class UserServiceImpl extends BaseService implements UserService {
       logger.warn("Unable to authenticate with the provided credentials");
       throw new NotAuthorizedException("Unauthorized");
     }
+  }
+
+  @Override
+  public boolean changePassword(UUID id, String oldPassword, String newPassword)
+      throws BadRequestException, NotFoundException {
+    logger.info("changePassword called");
+    return this.changePasswordHandler.resolve(
+        ChangePasswordHandlerRequest.builder()
+            .id(id)
+            .oldPassword(oldPassword)
+            .newPassword(newPassword)
+            .build());
   }
 
   @Override

@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.model.racer;
 
 import com.google.gson.Gson;
 import com.teddycrane.racemanagement.enums.Category;
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,27 +24,33 @@ import org.springframework.lang.NonNull;
 @RequiredArgsConstructor
 public class Racer {
 
+  @NonNull private final Date createdTimestamp;
+
   @Id
   @Type(type = "uuid-char")
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID id;
 
   @Setter @NonNull private String firstName;
-
   @Setter private String middleName;
-
   @Setter @NonNull private String lastName;
-
-  @Setter private String teamName, phoneNumber, email;
+  @Setter private String teamName, phoneNumber;
+  @Setter @Email private String email;
 
   @Enumerated(EnumType.STRING)
   @NonNull
   private Category category;
 
+  @NonNull private Date updatedTimestamp;
+
   @Setter private int bibNumber;
 
   public Racer() {
     this.id = UUID.randomUUID();
+
+    long timestamp = System.currentTimeMillis();
+    this.createdTimestamp = new Date(timestamp);
+    this.updatedTimestamp = new Date(timestamp);
   }
 
   private Racer(
@@ -53,6 +61,8 @@ public class Racer {
       String teamName,
       String phoneNumber,
       String email,
+      @NonNull Date createdTimestamp,
+      @NonNull Date updatedTimestamp,
       int bibNumber,
       UUID id) {
     this.id = id;
@@ -64,6 +74,8 @@ public class Racer {
     this.phoneNumber = phoneNumber;
     // todo set up email validation
     this.email = email;
+    this.createdTimestamp = new Date(createdTimestamp.getTime());
+    this.updatedTimestamp = new Date(updatedTimestamp.getTime());
     this.bibNumber = bibNumber;
   }
 
@@ -95,7 +107,7 @@ public class Racer {
     this.bibNumber = bibNumber;
   }
 
-  public Racer(Racer other) {
+  public Racer(@NonNull Racer other) {
     this(
         other.firstName,
         other.lastName,
@@ -104,6 +116,8 @@ public class Racer {
         other.teamName,
         other.phoneNumber,
         other.email,
+        other.createdTimestamp,
+        other.updatedTimestamp,
         other.bibNumber,
         other.id);
   }

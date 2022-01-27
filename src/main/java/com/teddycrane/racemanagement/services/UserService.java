@@ -28,5 +28,7 @@ public interface UserService {
 
   AuthenticationResponse login(String username, String password) throws NotAuthorizedException;
 
+  boolean changePassword(UUID id, String oldPassword, String newPassword) throws NotFoundException;
+
   User deleteUser(UUID id) throws NotFoundException;
 }

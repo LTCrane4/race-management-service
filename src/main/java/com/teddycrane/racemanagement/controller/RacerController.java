@@ -1,24 +1,24 @@
 package com.teddycrane.racemanagement.controller;
 
+import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/racer")
-public class RacerController extends BaseController {
+public class RacerController extends BaseController implements RacerApi {
 
   private final RacerService racerService;
 
@@ -27,38 +27,59 @@ public class RacerController extends BaseController {
     this.racerService = racerService;
   }
 
-  @GetMapping
-  public RacerCollectionResponse getAllRacers() {
-    logger.info("getAllRacers called");
+  private Category resolveCategory(String input) throws IllegalArgumentException {
+    Set<Category> values = new HashSet<>(List.of(Category.values()));
 
-    return new RacerCollectionResponse(this.racerService.getAllRacers());
+    if (values.stream().anyMatch((value) -> input.equalsIgnoreCase(value.toString()))) {
+      return Category.valueOf(input.toUpperCase());
+    } else {
+      throw new IllegalArgumentException("The provided input is not a valid Category");
+    }
   }
 
-  @GetMapping("/{id}")
-  public Racer getRacer(@PathVariable String id) throws BadRequestException, NotFoundException {
+  public ResponseEntity<RacerCollectionResponse> getAllRacers() {
+    logger.info("getAllRacers called");
+
+    return ResponseEntity.ok(new RacerCollectionResponse(this.racerService.getAllRacers()));
+  }
+
+  public ResponseEntity<Racer> getRacer(String id) throws BadRequestException, NotFoundException {
     logger.info("getRacer called");
 
     try {
       UUID userId = UUID.fromString(id);
-      return this.racerService.getRacer(userId);
+      return ResponseEntity.ok(this.racerService.getRacer(userId));
     } catch (IllegalArgumentException e) {
       logger.error("Could not parse a valid UUID from the provided id");
-      throw new BadRequestException("Invalid user id provided");
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error("No racer found for the id {}", id);
+      return ResponseEntity.notFound().build();
     }
   }
 
-  @PostMapping
-  public Racer createRacer(@NonNull @RequestBody @Valid CreateRacerRequest request) {
+  public ResponseEntity<Racer> createRacer(@NonNull CreateRacerRequest request) {
     logger.info("createRacer called");
 
-    return this.racerService.createRacer(
-        request.getFirstName(),
-        request.getLastName(),
-        request.getCategory(),
-        request.getMiddleName(),
-        request.getTeamName(),
-        request.getPhoneNumber(),
-        request.getEmail(),
-        request.getBibNumber());
+    try {
+      Category c = this.resolveCategory(request.getCategory());
+
+      return ResponseEntity.ok(
+          this.racerService.createRacer(
+              request.getFirstName(),
+              request.getLastName(),
+              c,
+              request.getMiddleName(),
+              request.getTeamName(),
+              request.getPhoneNumber(),
+              request.getEmail(),
+              request.getBibNumber()));
+    } catch (DuplicateItemException e) {
+      logger.error("Cannot create a duplicate of an existing item");
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (IllegalArgumentException e) {
+      logger.error("The provided value {} is not a valid category value", request.getCategory());
+      return ResponseEntity.badRequest().build();
+    }
   }
 }

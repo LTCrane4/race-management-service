@@ -18,13 +18,20 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
 	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 	implementation "org.springframework.boot:spring-boot-starter-jdbc"
-	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation ("org.springframework.boot:spring-boot-starter-web") {
+		exclude group: 'com.fasterxml.jackson.core'
+		exclude group: 'com.fasterxml.jackson.datatype'
+		exclude group: 'com.fasterxml.jackson.module'
+	}
 	implementation "org.springframework.boot:spring-boot-starter-validation"
   	implementation "com.google.code.gson:gson:$gson_version"
   	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.security:spring-security-test"
 	implementation "com.github.javafaker:javafaker:$java_faker_version"
-	implementation "io.jsonwebtoken:jjwt:$jwt_version"
+	implementation ("io.jsonwebtoken:jjwt:$jwt_version") {
+		exclude group: 'com.fasterxml.jackson.core'
+	}
+	implementation "io.jsonwebtoken:jjwt-gson:$jwt_gson_version"
 	implementation "mysql:mysql-connector-java"
 
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
@@ -66,7 +73,7 @@ test {
 
 task integrationTest(type: Test) {
 	useJUnitPlatform()
-	testLogging.showStandardStreams = false
+	testLogging.showStandardStreams = true
 	environment('spring.profiles.active', 'integration')
 
 	group = 'integration'
@@ -106,7 +113,7 @@ jacocoTestCoverageVerification {
 		rule {
 			enabled = true
 			limit {
-				minimum = 0.85
+				minimum = 0.70
 			}
 		}
 	}

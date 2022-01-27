@@ -52,7 +52,6 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
             "testuser@test.fake",
             encoder.encode(testUserPassword),
             UserType.USER);
-    logger.warn("User: {}", user);
     this.userRepository.save(user);
 
     User admin =
@@ -64,7 +63,6 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
             "testadmin@test.fake",
             encoder.encode(testAdminPassword),
             UserType.ADMIN);
-    logger.warn("Admin: {}", admin);
     this.userRepository.save(admin);
   }
 

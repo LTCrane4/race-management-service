@@ -6,17 +6,18 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.InsufficientPermissionsException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
+import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.Collection;
 import java.util.UUID;
@@ -24,13 +25,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 class UserControllerTest {
 
-  private UserController userController;
+  private UserApi userController;
 
   private User expected;
 
@@ -72,10 +74,14 @@ class UserControllerTest {
 
   @Test
   void getUser_shouldReturnUser() {
-    when(this.userService.getUser(any(UUID.class))).thenReturn(new User());
+    when(this.userService.getUser(any(UUID.class))).thenReturn(expected);
     var result = this.userController.getUser(UUID.randomUUID().toString());
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"),
         () ->
             assertFalse(
                 result.toString().contains("password"),
@@ -83,16 +89,26 @@ class UserControllerTest {
   }
 
   @Test
-  void getUser_shouldThrowBadRequestErrorIfBadId() {
-    assertThrows(BadRequestException.class, () -> this.userController.getUser("test"));
+  void getUserShouldReturn400IfIdIsNotValid() {
+    var result = this.userController.getUser("not a uuid");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
   }
 
   @Test
-  void getUserShouldThrowNotFoundIfNoUserPresent() {
+  void getUserShouldReturn404IfUserNotFound() {
     when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
+    var result = this.userController.getUser(testString);
 
-    assertThrows(
-        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The response status should be 404"));
   }
 
   @Test
@@ -100,28 +116,41 @@ class UserControllerTest {
     User expected = TestResourceGenerator.generateUser();
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User result =
+    var result =
         this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
-    assertNotNull(result);
-    assertEquals(expected, result);
+
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
+        () ->
+            assertEquals(
+                expected.getUsername(), body.getUsername(), "The usernames should be equal"),
+        () ->
+            assertEquals(
+                expected.getUserType(), body.getUserType(), "The user types should be equal"));
   }
 
   @Test
   void createUserShouldCreateUserWithouType() {
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
-    User actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
+    var actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
+    var body = actual.getBody();
 
-    assertNotNull(actual);
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  void createUserShouldHandleServiceErrors() {
-    when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
-
-    assertThrows(
-        NotFoundException.class, () -> this.userController.getUser(UUID.randomUUID().toString()));
+    assertAll(
+        () -> assertNotNull(actual),
+        () ->
+            assertEquals(
+                HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
+        () ->
+            assertEquals(
+                expected.getUsername(), body.getUsername(), "The usernames should be equal"));
   }
 
   @Test
@@ -129,18 +158,25 @@ class UserControllerTest {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
-    AuthenticationResponse actual =
-        this.userController.login(new AuthenticationRequest("test", "test"));
-    assertEquals(actual, expected);
+    var actual = this.userController.login(new AuthenticationRequest("test", "test"));
+    assertAll(
+        () -> assertNotNull(actual, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"));
   }
 
   @Test
-  void loginShouldHandleExceptions() throws Exception {
+  void loginShouldHandleExceptions() {
     when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
 
-    assertThrows(
-        NotAuthorizedException.class,
-        () -> this.userController.login(new AuthenticationRequest("", "")));
+    var result = this.userController.login(new AuthenticationRequest("", ""));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.UNAUTHORIZED, result.getStatusCode(), "The status should be 401"));
   }
 
   @Test
@@ -148,9 +184,11 @@ class UserControllerTest {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userService.getAllUsers()).thenReturn(expectedList);
 
-    UserCollectionResponse actual = this.userController.getAllUsers();
+    UserCollectionResponse actual = this.userController.getAllUsers().getBody();
 
-    assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers());
+    assertAll(
+        () -> assertNotNull(actual, "The response entity body should not be null"),
+        () -> assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers()));
   }
 
   @Test
@@ -158,21 +196,49 @@ class UserControllerTest {
     when(this.userService.updateUser(any(UUID.class), any(UpdateUserRequest.class)))
         .thenReturn(expected);
 
-    User actual =
+    var result =
         this.userController.updateUser(
             UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
+    var actual = result.getBody();
 
-    assertEquals(expected, actual);
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(actual, "The body should not be null"),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                actual.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), actual.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), actual.getLastName()),
+        () -> assertEquals(expected.getUserType(), actual.getUserType()));
   }
 
   @Test
   void updateUserWithType() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, null, UserType.USER));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+    assertAll(
+        () -> assertNotNull(response, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
@@ -180,37 +246,93 @@ class UserControllerTest {
     // email is null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
   void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(
             testString, new UpdateUserRequest(null, null, "", UserType.USER));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
@@ -218,22 +340,42 @@ class UserControllerTest {
     // userType is null and email is not null
     when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
         .thenReturn(expected);
-    User actual =
+    var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
-    assertEquals(expected, actual);
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(
+                expected.getUsername(),
+                body.getUsername(),
+                "The username should match the expected one"),
+        () ->
+            assertEquals(
+                expected.getFirstName(), body.getFirstName(), "The first names should be equal"),
+        () -> assertEquals(expected.getLastName(), body.getLastName()),
+        () -> assertEquals(expected.getUserType(), body.getUserType()));
   }
 
   @Test
-  void updateUserShouldHandleBadRequest() {
-    assertThrows(
-        BadRequestException.class,
-        () ->
-            this.userController.updateUser(
-                testString, new UpdateUserRequest(null, null, null, null)));
+  void updateUserShouldHandleBadUserId() {
+    var response = this.userController.updateUser("bad id", new UpdateUserRequest());
 
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.updateUser("bad id", new UpdateUserRequest()));
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
+  }
+
+  @Test
+  void updateUserShouldHandleEmptyParamsUpdate() {
+    var response =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
   }
 
   @Test
@@ -241,12 +383,14 @@ class UserControllerTest {
     this.expected = TestResourceGenerator.generateUser(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    assertThrows(
-        InsufficientPermissionsException.class,
-        () ->
-            this.userController.updateUser(
-                testString, new UpdateUserRequest(null, null, null, null)),
-        "Users with the user type of USER should not be able to update other users");
+    var response =
+        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+
+    var body = response.getBody();
+
+    assertAll(
+        () -> assertNotNull(response),
+        () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()));
   }
 
   @Test
@@ -259,12 +403,17 @@ class UserControllerTest {
   }
 
   @Test
-  void shouldThrowErrorIfSearchTypeAndValueMismatched() {
+  void shouldReturn400IfSearchTypeAndValueMismatched() {
     when(this.userService.searchUsers(SearchType.TYPE, "not a type"))
         .thenThrow(IllegalArgumentException.class);
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.searchUsers(SearchType.TYPE, "not a type"));
+
+    var result = this.userController.searchUsers(SearchType.TYPE, "not a type");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
   }
 
   @Test
@@ -272,18 +421,24 @@ class UserControllerTest {
     when(this.userService.deleteUser(testId)).thenReturn(expected);
 
     var actual = this.userController.deleteUser(testString);
+    var body = actual.getBody();
 
     assertAll(
         () -> assertNotNull(actual, "The result should not be null"),
-        () -> assertEquals(expected, actual, "The result should match the expected value"));
+        () -> assertEquals(HttpStatus.OK, actual.getStatusCode(), "The status code should be 200"),
+        () ->
+            assertEquals(
+                new UserResponse(expected), body, "The result should match the expected value"));
   }
 
   @Test
   void deleteUserShouldHandleBadId() {
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.deleteUser("not uuid"),
-        "Invalid UUID values should throw an exception");
+    var result = this.userController.deleteUser("not a valid id");
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
   }
 
   @Test
@@ -291,17 +446,103 @@ class UserControllerTest {
     this.expected.setUserType(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    assertThrows(
-        InsufficientPermissionsException.class,
-        () -> this.userController.deleteUser(testString),
-        "A user with the type of USER should not be able to delete users");
+    var result = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode(), "The status should be 403"));
   }
 
   @Test
   void deleteUserShouldNotAllowUsersToDeleteThemselves() {
-    assertThrows(
-        BadRequestException.class,
-        () -> this.userController.deleteUser(expected.getId().toString()),
-        "Users should not be able to delete themselves");
+    var result = this.userController.deleteUser(expected.getId().toString());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+  }
+
+  @Test
+  void deleteUserShouldThrow404IfUserNotFound() {
+    when(this.userService.deleteUser(any(UUID.class))).thenThrow(NotFoundException.class);
+
+    var result = this.userController.deleteUser(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  void changePasswordShouldChangePassword() {
+    UUID id = expected.getId();
+    when(this.userService.changePassword(id, expected.getPassword(), "new password"))
+        .thenReturn(true);
+
+    var result =
+        this.userController.changePassword(
+            id.toString(), new ChangePasswordRequest(expected.getPassword(), "new password"));
+
+    assertAll(() -> assertNotNull(result, "The result should not be null"));
+  }
+
+  @Test
+  void changePasswordShouldReturn403IfUserChangesOtherUsersPassword() {
+    var result =
+        this.userController.changePassword(
+            UUID.randomUUID().toString(), new ChangePasswordRequest("oldPassword", "newPassword"));
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.FORBIDDEN, result.getStatusCode(), "The status code should be 403"));
+  }
+
+  @Test
+  void changePasswordShouldHandleServiceErrors() {
+    when(this.userService.changePassword(eq(expected.getId()), anyString(), anyString()))
+        .thenThrow(BadRequestException.class);
+
+    ChangePasswordRequest request = new ChangePasswordRequest("old", "new");
+
+    var result1 =
+        this.userController.changePassword(
+            expected.getId().toString(), new ChangePasswordRequest("test", "Test"));
+
+    assertAll(
+        () -> assertNotNull(result1, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result1.getStatusCode(), "The status code should be 400"));
+
+    var result2 = this.userController.changePassword("not a uuid", request);
+
+    assertAll(
+        () -> assertNotNull(result2, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result2.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  void changePasswordShouldReturn404IfUserNotFound() {
+    when(this.userService.changePassword(eq(expected.getId()), anyString(), anyString()))
+        .thenThrow(NotFoundException.class);
+
+    var result =
+        this.userController.changePassword(
+            expected.getId().toString(), new ChangePasswordRequest("old", "new"));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
   }
 }

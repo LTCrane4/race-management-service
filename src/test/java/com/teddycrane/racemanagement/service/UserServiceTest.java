@@ -10,6 +10,7 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
+import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
 import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
@@ -48,6 +49,7 @@ class UserServiceTest {
   @Mock private Handler<CreateUserRequest, User> createUserHandler;
   @Mock private Handler<UpdateUserHandlerRequest, User> updateUserHandler;
   @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
+  @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
   private UUID testId;
 
@@ -68,7 +70,8 @@ class UserServiceTest {
             this.getUsersHandler,
             this.createUserHandler,
             this.updateUserHandler,
-            this.deleteUserHandler);
+            this.deleteUserHandler,
+            this.changePasswordHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -195,5 +198,15 @@ class UserServiceTest {
     assertAll(
         () -> assertNotNull(result, "The returned user should not be null"),
         () -> assertEquals(existing, result, "The result should equal the expected value"));
+  }
+
+  @Test
+  void changePasswordShouldReturnSuccess() {
+    when(this.changePasswordHandler.resolve(any(ChangePasswordHandlerRequest.class)))
+        .thenReturn(true);
+
+    var result = this.userService.changePassword(testId, "oldPassword", "newPassword");
+
+    assertTrue(result);
   }
 }
