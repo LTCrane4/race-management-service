@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +27,7 @@ public interface UserApi {
   ResponseEntity<UserCollectionResponse> getAllUsers();
 
   @GetMapping("/user/{id}")
-  ResponseEntity<UserResponse> getUser(@RequestParam String id);
+  ResponseEntity<UserResponse> getUser(@PathVariable("id") String id);
 
   @GetMapping("/user/search")
   ResponseEntity<UserCollectionResponse> searchUsers(
@@ -40,12 +41,12 @@ public interface UserApi {
 
   @PatchMapping("/user/{id}")
   ResponseEntity<UserResponse> updateUser(
-      @RequestParam("id") String id, @Valid @RequestBody UpdateUserRequest request);
+      @PathVariable("id") String id, @Valid @RequestBody UpdateUserRequest request);
 
   @PatchMapping("/user/{id}/change-password")
   ResponseEntity<ChangePasswordResponse> changePassword(
-      @RequestParam("id") String id, @Valid @RequestBody ChangePasswordRequest request);
+      @PathVariable("id") String id, @Valid @RequestBody ChangePasswordRequest request);
 
   @DeleteMapping("/user/{id}")
-  ResponseEntity<UserResponse> deleteUser(@RequestParam("id") String id);
+  ResponseEntity<UserResponse> deleteUser(@PathVariable("id") String id);
 }

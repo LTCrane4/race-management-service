@@ -15,7 +15,6 @@ import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.util.*;
-import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +35,7 @@ public class UserController extends BaseController implements UserApi {
     return ResponseEntity.ok(new UserCollectionResponse(this.userService.getAllUsers()));
   }
 
-  public ResponseEntity<UserResponse> getUser(@RequestParam String id) {
+  public ResponseEntity<UserResponse> getUser(String id) {
     logger.info("getUser called");
 
     try {
@@ -52,7 +51,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   public ResponseEntity<UserCollectionResponse> searchUsers(
-      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue) {
+      SearchType searchType, String searchValue) {
     logger.info("searchUsers called");
 
     try {
@@ -65,14 +64,13 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @PostMapping("/user/new")
-  public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+  public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
     logger.info("createUser called");
 
     return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
   }
 
-  public ResponseEntity<AuthenticationResponse> login(
-      @RequestBody @Valid AuthenticationRequest request) {
+  public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
     logger.info("login requested");
     try {
       return ResponseEntity.ok()
@@ -83,8 +81,7 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<UserResponse> updateUser(
-      @RequestParam String id, @Valid @RequestBody UpdateUserRequest request) {
+  public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request) {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
     this.printAuditLog(auditData.getUserName(), auditData.getUserId(), auditData.getUserType());
@@ -113,7 +110,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   public ResponseEntity<ChangePasswordResponse> changePassword(
-      @PathVariable String id, @Valid @RequestBody ChangePasswordRequest request) {
+      String id, ChangePasswordRequest request) {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
 
@@ -143,7 +140,7 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<UserResponse> deleteUser(@RequestParam String id) throws NotFoundException {
+  public ResponseEntity<UserResponse> deleteUser(String id) throws NotFoundException {
     logger.info("deleteUser called");
 
     UserAuditData data = this.getUserAuditData();

@@ -1,7 +1,6 @@
 package com.teddycrane.racemanagement.test.integration.tests.users;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,7 +29,6 @@ class CreateUser extends UserBase {
                 .header(AUTHORIZATION_HEADER, USER_TOKEN))
         .andExpectAll(
             status().isOk(),
-            content().contentType(MediaType.APPLICATION_JSON),
             jsonPath("$").exists(),
             jsonPath(USERNAME_PATH).value("testcreate"),
             jsonPath(FIRST_NAME_PATH).value("Test"),
