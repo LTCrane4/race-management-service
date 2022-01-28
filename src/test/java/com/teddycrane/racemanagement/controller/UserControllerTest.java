@@ -386,8 +386,6 @@ class UserControllerTest {
     var response =
         this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
 
-    var body = response.getBody();
-
     assertAll(
         () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()));
@@ -495,7 +493,6 @@ class UserControllerTest {
     var result =
         this.userController.changePassword(
             UUID.randomUUID().toString(), new ChangePasswordRequest("oldPassword", "newPassword"));
-    var body = result.getBody();
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),

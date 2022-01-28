@@ -1,6 +1,5 @@
 package com.teddycrane.racemanagement.security.util;
 
-import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,7 +34,6 @@ public class TokenManager implements Serializable {
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) {
-    Gson gson = new Gson();
     String username = this.getUsernameFromToken(token);
     Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     boolean isTokenExpired = claims.getExpiration().before(new Date());
