@@ -33,6 +33,7 @@ dependencies {
     }
     implementation "io.jsonwebtoken:jjwt-gson:$jwt_gson_version"
     implementation "mysql:mysql-connector-java"
+    implementation "org.springdoc:springdoc-openapi-ui:$springdoc_version"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.testcontainers:testcontainers:$testcontainers_version"

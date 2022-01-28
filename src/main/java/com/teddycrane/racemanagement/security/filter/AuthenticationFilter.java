@@ -34,7 +34,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    logger.info("doFilterInternal called");
+    logger.debug("doFilterInternal called");
     String tokenHeader = request.getHeader("Authorization");
     String username = null;
     String token = null;
@@ -48,11 +48,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         logger.error("No username was found in the provided token!");
       }
     } else {
-      logger.warn("No authorization header provided");
+      logger.debug("No authorization header provided");
     }
 
     if (username != null) {
-      logger.info("Validating token data");
+      logger.debug("Validating token data");
       UserDetails userDetails = this.userService.loadUserByUsername(username);
 
       if (this.tokenManager.validateToken(token, userDetails)) {
