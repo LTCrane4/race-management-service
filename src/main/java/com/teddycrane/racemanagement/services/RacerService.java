@@ -39,4 +39,6 @@ public interface RacerService {
       @Nullable String phoneNumber,
       @Nullable String email)
       throws ConflictException, NotFoundException;
+
+  boolean deleteRacer(UUID id, Date updatedTimestamp) throws ConflictException, NotFoundException;
 }

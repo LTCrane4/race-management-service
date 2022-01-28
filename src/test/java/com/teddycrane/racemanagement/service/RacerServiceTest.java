@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
@@ -23,12 +25,16 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 class RacerServiceTest {
 
   @Mock private RacerRepository racerRepository;
+
+  @Captor private ArgumentCaptor<Racer> racer;
 
   private RacerService racerService;
 
@@ -152,8 +158,7 @@ class RacerServiceTest {
     assertThrows(
         ConflictException.class,
         () ->
-            this.racerService.updateRacer(
-                testId, new Date(System.currentTimeMillis()), null, null, null, null, null, null));
+            this.racerService.updateRacer(testId, new Date(0), null, null, null, null, null, null));
   }
 
   @Test
@@ -165,5 +170,42 @@ class RacerServiceTest {
         NotFoundException.class,
         () ->
             this.racerService.updateRacer(testId, new Date(), null, null, null, null, null, null));
+  }
+
+  @Test
+  @DisplayName("Delete Racer should return true if a racer is deleted")
+  void deleteRacerShouldReturnTrueWhenDeleted() {
+    when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
+    when(this.racerRepository.save(any(Racer.class)))
+        .thenAnswer((arguments) -> arguments.getArgument(0));
+
+    var result = this.racerService.deleteRacer(testId, expected.getUpdatedTimestamp());
+    verify(this.racerRepository).save(racer.capture());
+
+    assertAll(
+        () -> assertTrue(result, "The service should return true"),
+        () ->
+            assertTrue(
+                racer.getValue().isDeleted(),
+                "The racer sent to the database should have isDeleted set to true"));
+  }
+
+  @Test
+  @DisplayName(
+      "Delete Racer should throw a ConflictException if the updated timestamp is not valid")
+  void deleteRacerShouldThrowConflictException() {
+    when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.racerService.deleteRacer(testId, new Date(System.currentTimeMillis() + 1000)));
+  }
+
+  @Test
+  @DisplayName("Delete Racer should throw a NotFoundException if no racer can be found")
+  void deleteRacerShouldThrowNotFound() {
+    when(this.racerRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> this.racerService.deleteRacer(testId, new Date()));
   }
 }

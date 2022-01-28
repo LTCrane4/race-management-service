@@ -45,6 +45,8 @@ public class Racer {
 
   @Setter private int bibNumber;
 
+  @Setter private boolean isDeleted = false;
+
   public Racer() {
     this.id = UUID.randomUUID();
 
@@ -64,6 +66,7 @@ public class Racer {
       @NonNull Date createdTimestamp,
       @NonNull Date updatedTimestamp,
       int bibNumber,
+      boolean isDeleted,
       UUID id) {
     this.id = id;
     this.firstName = firstName;
@@ -77,6 +80,7 @@ public class Racer {
     this.createdTimestamp = new Date(createdTimestamp.getTime());
     this.updatedTimestamp = new Date(updatedTimestamp.getTime());
     this.bibNumber = bibNumber;
+    this.isDeleted = isDeleted;
   }
 
   public Racer(
@@ -119,6 +123,7 @@ public class Racer {
         other.createdTimestamp,
         other.updatedTimestamp,
         other.bibNumber,
+        other.isDeleted,
         other.id);
   }
 

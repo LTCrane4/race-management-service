@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
@@ -122,6 +123,29 @@ public class RacerController extends BaseController implements RacerApi {
     } catch (ConflictException e) {
       logger.error(e.getMessage());
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<Racer> deleteRacer(@Valid DeleteRacerRequest request) {
+    logger.info("deleteRacer called");
+
+    try {
+      UUID id = UUID.fromString(request.getId());
+      Date updatedTimestamp = new Date(request.getUpdatedTimestamp());
+
+      return this.racerService.deleteRacer(id, updatedTimestamp)
+          ? ResponseEntity.noContent().build()
+          : ResponseEntity.internalServerError().build();
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the id {}", request.getId());
+      return ResponseEntity.badRequest().build();
+    } catch (ConflictException e) {
+      logger.error("Cannot delete racer {}.  Please fetch data and try again", request.getId());
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (NotFoundException e) {
+      logger.error("No racer found with the id {}", request.getId());
+      return ResponseEntity.notFound().build();
     }
   }
 }

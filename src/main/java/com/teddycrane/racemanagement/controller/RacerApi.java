@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,4 +61,14 @@ public interface RacerApi {
   @PatchMapping("/{id}")
   ResponseEntity<Racer> updateRacer(
       @PathVariable("id") String id, @Valid @RequestBody UpdateRacerRequest request);
+
+  @DeleteMapping
+  @Operation(summary = "Soft delete a racer")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "Successfully deleted racer"),
+        @ApiResponse(responseCode = "404", description = "No racer found for id"),
+        @ApiResponse(responseCode = "409", description = "Updated timestamps do not match")
+      })
+  ResponseEntity<Racer> deleteRacer(@Valid @RequestBody DeleteRacerRequest request);
 }
