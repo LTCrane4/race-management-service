@@ -23,8 +23,8 @@ create table racer
     middle_name varchar(255) null,
     phone_number varchar(255) null,
     team_name varchar(255) null,
-    created_timestamp datetime(8) null,
-    updated_timestamp datetime(8) null
+    created_timestamp datetime(6) null,
+    updated_timestamp datetime(6) null
 );
 
 -- Seed User Data

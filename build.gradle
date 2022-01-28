@@ -73,7 +73,14 @@ test {
 
 task integrationTest(type: Test) {
     useJUnitPlatform()
-    logging.captureStandardOutput LogLevel.INFO
+
+    // Show message while test is running
+    beforeTest { descriptor ->
+     logger.lifecycle("Running test: " + descriptor)
+    }
+
+    testLogging.showStandardStreams = false // hide debug output
+
     testLogging {
         events "PASSED", "SKIPPED", "FAILED"
     }
