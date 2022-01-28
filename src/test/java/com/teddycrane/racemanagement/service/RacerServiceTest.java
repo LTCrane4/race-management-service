@@ -130,6 +130,21 @@ class RacerServiceTest {
   }
 
   @Test
+  @DisplayName("Should return successfully but make no changes if all update parameters are null")
+  void shouldDoNothingIfNoChangesAreRequested() {
+    when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
+    when(this.racerRepository.save(any(Racer.class))).thenReturn(expected);
+
+    var result =
+        this.racerService.updateRacer(
+            testId, expected.getUpdatedTimestamp(), null, null, null, null, null, null);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(expected, result, "The result should match the expected value"));
+  }
+
+  @Test
   @DisplayName("Should not update if the updated time stamps do not match")
   void shouldNotUpdateIfTimestampsDontMatch() {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
