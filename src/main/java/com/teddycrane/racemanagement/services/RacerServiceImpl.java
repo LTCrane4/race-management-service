@@ -69,7 +69,7 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       @Nullable String phoneNumber,
       @Nullable String email)
       throws ConflictException, NotFoundException {
-    logger.info("updateRacer called");
+    logger.info("updateRacer called for id {}", id);
 
     Racer r =
         this.racerRepository
@@ -93,5 +93,23 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     r.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
 
     return this.racerRepository.save(r);
+  }
+
+  @Override
+  public boolean deleteRacer(UUID id, Date updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    logger.info("deleteRacer called for id {}", id);
+    Racer r =
+        this.racerRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No racer found for the provided id"));
+
+    if (!updatedTimestamp.equals(r.getUpdatedTimestamp())) {
+      throw new ConflictException("The updated timestamp is not valid");
+    }
+
+    r.setDeleted(true);
+    this.racerRepository.save(r);
+    return true;
   }
 }

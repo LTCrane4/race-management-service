@@ -17,6 +17,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
@@ -454,5 +455,95 @@ class RacerControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+  }
+
+  @Test
+  @DisplayName("Delete racer should successfully delete a racer")
+  void deleteShouldBeSuccessful() {
+    when(this.racerService.deleteRacer(eq(testId), any(Date.class))).thenReturn(true);
+    DeleteRacerRequest request =
+        DeleteRacerRequest.builder()
+            .id(testString)
+            .updatedTimestamp(System.currentTimeMillis())
+            .build();
+
+    var result = this.racerController.deleteRacer(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NO_CONTENT, result.getStatusCode(), "The status should be 204"));
+  }
+
+  @Test
+  @DisplayName("Delete racer should return not found if no racer is found")
+  void deleteShouldReturn404IfNotFound() {
+    when(this.racerService.deleteRacer(eq(testId), any(Date.class)))
+        .thenThrow(NotFoundException.class);
+
+    var result =
+        this.racerController.deleteRacer(
+            DeleteRacerRequest.builder()
+                .id(testId.toString())
+                .updatedTimestamp(System.currentTimeMillis())
+                .build());
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName("Delete Racer should return 409 if the timestamp is not valid")
+  void deleteShouldReturn409() {
+    when(this.racerService.deleteRacer(eq(testId), any(Date.class)))
+        .thenThrow(ConflictException.class);
+
+    var result =
+        this.racerController.deleteRacer(
+            DeleteRacerRequest.builder()
+                .id(testString)
+                .updatedTimestamp(System.currentTimeMillis())
+                .build());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+  }
+
+  @Test
+  @DisplayName(
+      "Delete Racer should return a 500 if the service cannot delete a racer for any other reason")
+  void deleteShouldReturn500() {
+    when(this.racerService.deleteRacer(eq(testId), any(Date.class))).thenReturn(false);
+
+    var response =
+        this.racerController.deleteRacer(
+            DeleteRacerRequest.builder().id(testString).updatedTimestamp(0).build());
+
+    assertAll(
+        () -> assertNotNull(response, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                response.getStatusCode(),
+                "The response status should be 500"));
+  }
+
+  @Test
+  @DisplayName("Delete Racer should handle invalid UUIDs")
+  void deleteShouldHandleInvalidUUID() {
+    var response =
+        this.racerController.deleteRacer(
+            DeleteRacerRequest.builder().id("not valid").updatedTimestamp(0).build());
+
+    assertAll(
+        () -> assertNotNull(response, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, response.getStatusCode(), "The status code should be 400"));
   }
 }
