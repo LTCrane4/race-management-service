@@ -50,6 +50,7 @@ class RacerServiceTest {
   }
 
   @Test
+  @DisplayName("Should get all racers")
   void shouldReturnRacers() {
     Collection<Racer> expected = TestResourceGenerator.generateRacerList(5);
     when(this.racerRepository.findAll()).thenReturn((List<Racer>) expected);

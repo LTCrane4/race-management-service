@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.services.RaceService;
-import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,8 +11,10 @@ class RaceControllerTest {
 
   @Mock private RaceService raceService;
 
-  private RaceApi raceController;
+  // private RaceApi raceController;
 
-  @BeforeEach
-  void setUp() {}
+  // @BeforeEach
+  // void setUp() {
+  // this.raceController = new RaceController(this.raceService);
+  // }
 }

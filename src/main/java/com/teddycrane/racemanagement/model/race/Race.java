@@ -2,7 +2,7 @@ package com.teddycrane.racemanagement.model.race;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.model.racer.Racer;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -35,7 +35,7 @@ public class Race {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  @OneToMany private List<Racer> racers;
+  @OneToMany private Collection<Racer> racers;
 
   private Race() {
     this.id = UUID.randomUUID();
