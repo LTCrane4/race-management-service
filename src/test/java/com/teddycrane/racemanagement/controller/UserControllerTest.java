@@ -73,15 +73,17 @@ class UserControllerTest {
   }
 
   @Test
-  void getUser_shouldReturnUser() {
+  void getUserShouldReturnUser() {
     when(this.userService.getUser(any(UUID.class))).thenReturn(expected);
     var result = this.userController.getUser(UUID.randomUUID().toString());
+    var body = result.getBody();
+
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
                 HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
-        () -> assertNotNull(result.getBody(), "The response body should not be null"),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertFalse(
                 result.toString().contains("password"),

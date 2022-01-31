@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.model.racer;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.Category;
 import java.util.Date;
 import java.util.UUID;
@@ -129,7 +130,11 @@ public class Racer {
 
   @Override
   public String toString() {
-    Gson gson = new Gson();
-    return gson.toJson(this);
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return mapper.writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      return "";
+    }
   }
 }
