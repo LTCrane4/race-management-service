@@ -3,10 +3,13 @@ package com.teddycrane.racemanagement.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
@@ -22,12 +25,14 @@ import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.UserService;
 import com.teddycrane.racemanagement.services.UserServiceImpl;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -146,6 +151,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("The Deprecated user update should still return updated users (TODO DEPRECATE)")
   void updateUser() {
     User expected = TestResourceGenerator.generateUser();
     when(this.updateUserHandler.resolve(any(UpdateUserHandlerRequest.class))).thenReturn(expected);
@@ -163,6 +169,69 @@ class UserServiceTest {
         () -> assertNotNull(actual, "The result should not be null"),
         () ->
             assertEquals(expected, actual, "The expected result and actual results should match"));
+  }
+
+  @Test
+  @DisplayName("Update user should return the updated user")
+  void updateUserShouldReturnUpdatedValue() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.userRepository.save(any(User.class))).thenAnswer(argument -> argument.getArgument(0));
+
+    var actual =
+        this.userService.updateUser(
+            testId,
+            "firstName",
+            "lastName",
+            "email@email.com",
+            UserType.ADMIN,
+            existing.getUpdatedTimestamp());
+
+    verify(this.userRepository).save(user.capture());
+
+    var value = user.getValue();
+
+    assertAll(
+        () -> assertNotNull(actual, "The result should not be null"),
+        () ->
+            assertNotNull(
+                user.getValue(), "The value submitted to the database should not be null"),
+        () ->
+            assertEquals(
+                "firstName",
+                value.getFirstName(),
+                "The first name should match the supplied update value"));
+  }
+
+  @Test
+  @DisplayName("Update user should throw a Conflict Exception if the updatedTimestamp is incorrect")
+  void updateUserShouldThrowConflictException() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.userService.updateUser(testId, null, null, null, null, Instant.now()));
+  }
+
+  @Test
+  @DisplayName("Update user should throw an internal server error if no update fields are provided")
+  void updateUserShouldThrowInternalServerError() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+
+    assertThrows(
+        InternalServerError.class,
+        () ->
+            this.userService.updateUser(
+                testId, null, null, null, null, existing.getUpdatedTimestamp()));
+  }
+
+  @Test
+  @DisplayName("Update user should throw a Not Found Exception")
+  void updateUserShouldThrowNotFoundException() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userService.updateUser(testId, null, null, null, null, null));
   }
 
   @Test

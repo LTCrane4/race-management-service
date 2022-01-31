@@ -3,6 +3,8 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -68,7 +70,11 @@ public class UserController extends BaseController implements UserApi {
   public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
     logger.info("createUser called");
 
-    return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
+    try {
+      return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
+    } catch (DuplicateItemException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
@@ -98,6 +104,8 @@ public class UserController extends BaseController implements UserApi {
 
       if (request.getUpdatedTimestamp() != null) {
         updated = Instant.parse(request.getUpdatedTimestamp());
+      } else {
+        throw new IllegalArgumentException("The provided instant was not valid");
       }
 
       // validate that at least one of the request body parameters are not null
@@ -119,8 +127,17 @@ public class UserController extends BaseController implements UserApi {
         return ResponseEntity.badRequest().build();
       }
     } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the provided id {}", id);
+      logger.error(
+          "Unable to parse one of the required values id: {}, updatedTimestamp: {}",
+          id,
+          request.getUpdatedTimestamp());
       return ResponseEntity.badRequest().build();
+    } catch (ConflictException e) {
+      logger.error("The timestamp provided is not the most recent");
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.notFound().build();
     } catch (InternalServerError e) {
       logger.error("An internal server error occurred");
       return ResponseEntity.internalServerError().build();

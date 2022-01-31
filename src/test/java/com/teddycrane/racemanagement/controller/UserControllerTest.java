@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
@@ -23,6 +25,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -430,6 +433,92 @@ class UserControllerTest {
     assertAll(
         () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()));
+  }
+
+  @Test
+  @DisplayName("Update user should not update if timestamp cannot be converted")
+  void updateUserShouldNotUpdateIfBadTimestamp() {
+    var response =
+        this.userController.updateUser(
+            testString, new UpdateUserRequest(null, null, null, null, null));
+
+    assertAll(
+        () -> assertNotNull(response, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, response.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName(
+      "Update user should return a Conflict status code if the updated timestamp is out of date")
+  void updateUserShouldReturn409IfTheTimeIsOutOfDate() {
+    when(this.userService.updateUser(
+            eq(testId),
+            anyString(),
+            anyString(),
+            anyString(),
+            any(UserType.class),
+            any(Instant.class)))
+        .thenThrow(ConflictException.class);
+
+    var result =
+        this.userController.updateUser(
+            testString, new UpdateUserRequest("", "", "", UserType.USER, Instant.now().toString()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+  }
+
+  @Test
+  @DisplayName("Update user should handle Not Found exceptions")
+  void updateUserShouldHandleNotFound() {
+    when(this.userService.updateUser(
+            eq(testId),
+            anyString(),
+            anyString(),
+            anyString(),
+            any(UserType.class),
+            any(Instant.class)))
+        .thenThrow(NotFoundException.class);
+
+    var result =
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest("", "", "", UserType.ADMIN, Instant.now().toString()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  @DisplayName("Update user should handle internal server errors")
+  void updateUserShouldHandleInternalServerError() {
+    when(this.userService.updateUser(
+            eq(testId),
+            anyString(),
+            anyString(),
+            anyString(),
+            any(UserType.class),
+            any(Instant.class)))
+        .thenThrow(InternalServerError.class);
+
+    var result =
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest("", "", "", UserType.ADMIN, Instant.now().toString()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                result.getStatusCode(),
+                "The status should be 500"));
   }
 
   @Test

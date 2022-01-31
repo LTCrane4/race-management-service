@@ -28,6 +28,7 @@ public interface UserService {
 
   User createUser(CreateUserRequest request) throws DuplicateItemException;
 
+  @Deprecated
   User updateUser(UUID id, UpdateUserRequest updateRequest) throws NotFoundException;
 
   User updateUser(

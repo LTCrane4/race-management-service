@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Getter
 @AllArgsConstructor
@@ -17,7 +18,7 @@ public class UpdateUserRequest {
 
   @Email private String email;
 
-  private UserType userType;
+  @Nullable private UserType userType;
 
   // This is a string from the request and is validated in the controller
   @NotBlank(message = "The updated timestamp must be included in the request")
