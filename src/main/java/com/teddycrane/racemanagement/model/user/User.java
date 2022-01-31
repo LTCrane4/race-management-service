@@ -1,9 +1,7 @@
 package com.teddycrane.racemanagement.model.user;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.teddycrane.racemanagement.config.FieldExclusionStrategy;
 import com.teddycrane.racemanagement.enums.UserType;
+import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,17 +10,22 @@ import javax.persistence.Id;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
 @EqualsAndHashCode
+@ToString
 public class User {
+
   @Id
   @Type(type = "uuid-char")
   //  @GeneratedValue(strategy = GenerationType.AUTO)
   private final UUID id;
+
+  private final Instant createdTimestamp;
 
   @Setter @NonNull private String firstName, lastName, email, username, password;
 
@@ -31,12 +34,43 @@ public class User {
   @NonNull
   private UserType userType;
 
+  @Setter @NonNull private Instant updatedTimestamp;
+
   public User() {
     this.id = UUID.randomUUID();
+    var instant = Instant.now();
+
+    this.createdTimestamp = instant;
+    this.updatedTimestamp = instant;
   }
 
   private User(UUID id) {
     this.id = id;
+
+    var instant = Instant.now();
+    this.createdTimestamp = instant;
+    this.updatedTimestamp = instant;
+  }
+
+  private User(
+      UUID id,
+      String firstName,
+      String lastName,
+      String username,
+      String email,
+      String password,
+      UserType userType,
+      Instant createdTimestamp,
+      Instant updatedTimestamp) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.userType = userType;
+    this.createdTimestamp = createdTimestamp;
+    this.updatedTimestamp = updatedTimestamp;
   }
 
   public User(
@@ -84,7 +118,7 @@ public class User {
   //    this.status = status;
   //  }
 
-  public User(User other) {
+  public User(@NonNull User other) {
     this(
         other.id,
         other.firstName,
@@ -92,12 +126,8 @@ public class User {
         other.username,
         other.email,
         other.password,
-        other.userType);
-  }
-
-  @Override
-  public String toString() {
-    Gson gson = new GsonBuilder().setExclusionStrategies(new FieldExclusionStrategy()).create();
-    return gson.toJson(this);
+        other.userType,
+        other.createdTimestamp,
+        other.updatedTimestamp);
   }
 }

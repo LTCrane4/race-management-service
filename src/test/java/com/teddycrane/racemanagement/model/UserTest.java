@@ -8,17 +8,17 @@ import com.teddycrane.racemanagement.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UserTest {
+class UserTest {
 
   private User user;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     user = new User();
   }
 
   @Test
-  public void user_shouldConstruct() {
+  void user_shouldConstruct() {
     assertNotNull(user);
 
     user = new User("name", "name", "name", "name", "name");
@@ -35,7 +35,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldEqual() {
+  void shouldEqual() {
     User expected = TestResourceGenerator.generateUser();
     User result = new User(expected);
 
@@ -43,12 +43,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldRepresentString() {
-    assertNotNull(TestResourceGenerator.generateUser().toString());
-  }
-
-  @Test
-  public void shouldCaptureAllEqualsBranches() {
+  void shouldCaptureAllEqualsBranches() {
     User expected = TestResourceGenerator.generateUser();
     User actual = new User(expected);
 
@@ -76,7 +71,7 @@ public class UserTest {
 
   // TODO get email validation working again
   @Test
-  public void setEmailShouldValidateEmail() {
+  void setEmailShouldValidateEmail() {
     user.setEmail("test@test.fake");
     assertEquals("test@test.fake", user.getEmail());
   }
