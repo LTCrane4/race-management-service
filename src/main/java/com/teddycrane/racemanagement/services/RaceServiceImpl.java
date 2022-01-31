@@ -1,8 +1,10 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,5 +22,14 @@ public class RaceServiceImpl extends BaseService implements RaceService {
     logger.info("getAllRaces called");
 
     return this.raceRepository.findAll();
+  }
+
+  @Override
+  public Race getRace(UUID id) {
+    logger.info("getRace called with id {}", id);
+
+    return this.raceRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
   }
 }
