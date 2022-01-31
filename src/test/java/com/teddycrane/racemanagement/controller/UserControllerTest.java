@@ -19,6 +19,7 @@ import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -195,12 +196,20 @@ class UserControllerTest {
 
   @Test
   void updateUserShouldUpdateWithFullRequestBody() {
-    when(this.userService.updateUser(any(UUID.class), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class),
+            anyString(),
+            anyString(),
+            anyString(),
+            any(UserType.class),
+            any(Instant.class)))
         .thenReturn(expected);
 
     var result =
         this.userController.updateUser(
-            UUID.randomUUID().toString(), new UpdateUserRequest("", "", "", UserType.ADMIN));
+            UUID.randomUUID().toString(),
+            new UpdateUserRequest(
+                "", "", "", UserType.ADMIN, expected.getUpdatedTimestamp().toString()));
     var actual = result.getBody();
 
     assertAll(
@@ -221,11 +230,15 @@ class UserControllerTest {
 
   @Test
   void updateUserWithType() {
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), isNull(), isNull(), isNull(), any(UserType.class), any(Instant.class)))
         .thenReturn(expected);
+
     var response =
         this.userController.updateUser(
-            testString, new UpdateUserRequest(null, null, null, UserType.USER));
+            testString,
+            new UpdateUserRequest(
+                null, null, null, UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
     assertAll(
         () -> assertNotNull(response, "The response should not be null"),
@@ -245,11 +258,14 @@ class UserControllerTest {
 
   @Test
   void updateUserWithEmail() {
-    // email is null
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
         .thenReturn(expected);
+
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
     assertAll(
@@ -269,10 +285,14 @@ class UserControllerTest {
 
   @Test
   void updateUserWithLastName() {
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), isNull(), anyString(), isNull(), isNull(), any(Instant.class)))
         .thenReturn(expected);
+
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest(null, "", null, null));
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest(null, "", null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
     assertAll(
@@ -292,10 +312,14 @@ class UserControllerTest {
 
   @Test
   void updateUserWithFirstName() {
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), anyString(), isNull(), isNull(), isNull(), any(Instant.class)))
         .thenReturn(expected);
+
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest("", null, null, null));
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest("", null, null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
     assertAll(
@@ -315,11 +339,20 @@ class UserControllerTest {
 
   @Test
   void updateUserWithNoFirstOrLastName() {
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class),
+            isNull(),
+            isNull(),
+            anyString(),
+            any(UserType.class),
+            any(Instant.class)))
         .thenReturn(expected);
+
     var response =
         this.userController.updateUser(
-            testString, new UpdateUserRequest(null, null, "", UserType.USER));
+            testString,
+            new UpdateUserRequest(
+                null, null, "", UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
     assertAll(
@@ -340,10 +373,14 @@ class UserControllerTest {
   @Test
   void updateUserWithEmailOnly() {
     // userType is null and email is not null
-    when(this.userService.updateUser(eq(testId), any(UpdateUserRequest.class)))
+    when(this.userService.updateUser(
+            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
         .thenReturn(expected);
+
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest(null, null, "", null));
+        this.userController.updateUser(
+            testString,
+            new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
     assertAll(
@@ -373,7 +410,8 @@ class UserControllerTest {
   @Test
   void updateUserShouldHandleEmptyParamsUpdate() {
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+        this.userController.updateUser(
+            testString, new UpdateUserRequest(null, null, null, null, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(response),
@@ -386,7 +424,8 @@ class UserControllerTest {
     this.setUpSecurityContext(this.expected);
 
     var response =
-        this.userController.updateUser(testString, new UpdateUserRequest(null, null, null, null));
+        this.userController.updateUser(
+            testString, new UpdateUserRequest(null, null, null, null, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(response),

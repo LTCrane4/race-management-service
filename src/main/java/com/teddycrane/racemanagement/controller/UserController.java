@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
@@ -14,6 +15,7 @@ import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.time.Instant;
 import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,12 +94,26 @@ public class UserController extends BaseController implements UserApi {
 
     try {
       UUID userId = UUID.fromString(id);
+      Instant updated = null;
+
+      if (request.getUpdatedTimestamp() != null) {
+        updated = Instant.parse(request.getUpdatedTimestamp());
+      }
+
       // validate that at least one of the request body parameters are not null
       if (request.getFirstName() != null
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return ResponseEntity.ok(new UserResponse(this.userService.updateUser(userId, request)));
+        return ResponseEntity.ok(
+            new UserResponse(
+                this.userService.updateUser(
+                    userId,
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getEmail(),
+                    request.getUserType(),
+                    updated)));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         return ResponseEntity.badRequest().build();
@@ -105,6 +121,9 @@ public class UserController extends BaseController implements UserApi {
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
       return ResponseEntity.badRequest().build();
+    } catch (InternalServerError e) {
+      logger.error("An internal server error occurred");
+      return ResponseEntity.internalServerError().build();
     }
   }
 

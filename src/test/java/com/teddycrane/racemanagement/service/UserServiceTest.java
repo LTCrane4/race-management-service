@@ -152,7 +152,13 @@ class UserServiceTest {
 
     var actual =
         this.userService.updateUser(
-            testId, new UpdateUserRequest("firstName", "lastName", "email", UserType.USER));
+            testId,
+            new UpdateUserRequest(
+                "firstName",
+                "lastName",
+                "email",
+                UserType.USER,
+                expected.getUpdatedTimestamp().toString()));
     assertAll(
         () -> assertNotNull(actual, "The result should not be null"),
         () ->

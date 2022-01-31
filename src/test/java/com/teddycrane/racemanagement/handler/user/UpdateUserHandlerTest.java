@@ -48,7 +48,13 @@ class UpdateUserHandlerTest {
 
     UpdateUserHandlerRequest request =
         new UpdateUserHandlerRequest(
-            new UpdateUserRequest("fname", "lname", "email@email.test", UserType.ADMIN), testId);
+            new UpdateUserRequest(
+                "fname",
+                "lname",
+                "email@email.test",
+                UserType.ADMIN,
+                existingUser.getUpdatedTimestamp().toString()),
+            testId);
 
     var actual = this.updateUserHandler.resolve(request);
     verify(this.userRepository).save(userCaptor.capture());
@@ -68,7 +74,7 @@ class UpdateUserHandlerTest {
     when(this.userRepository.save(any(User.class)))
         .thenAnswer((arguments) -> arguments.getArgument(0));
     UpdateUserHandlerRequest request =
-        new UpdateUserHandlerRequest(new UpdateUserRequest(null, null, null, null), testId);
+        new UpdateUserHandlerRequest(new UpdateUserRequest(null, null, null, null, null), testId);
 
     var result = this.updateUserHandler.resolve(request);
     verify(this.userRepository).save(userCaptor.capture());
