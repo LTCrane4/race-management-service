@@ -11,11 +11,9 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
-import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
@@ -42,7 +40,6 @@ public class UserServiceImpl extends BaseService implements UserService {
   private final Handler<UUID, User> getUserHandler;
   private final Handler<String, Collection<User>> getUsersHandler;
   private final Handler<CreateUserRequest, User> createUserHandler;
-  private final Handler<UpdateUserHandlerRequest, User> updateUserHandler;
   private final Handler<DeleteUserRequest, User> deleteUserHandler;
   private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
@@ -53,7 +50,6 @@ public class UserServiceImpl extends BaseService implements UserService {
       Handler<UUID, User> getUserHandler,
       Handler<String, Collection<User>> getUsersHandler,
       Handler<CreateUserRequest, User> createUserHandler,
-      Handler<UpdateUserHandlerRequest, User> updateUserHandler,
       Handler<DeleteUserRequest, User> deleteUserHandler,
       Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
     super();
@@ -63,7 +59,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.getUserHandler = getUserHandler;
     this.getUsersHandler = getUsersHandler;
     this.createUserHandler = createUserHandler;
-    this.updateUserHandler = updateUserHandler;
     this.deleteUserHandler = deleteUserHandler;
     this.changePasswordHandler = changePasswordHandler;
   }
@@ -110,14 +105,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     request.setUserType(type);
 
     return this.createUserHandler.resolve(request);
-  }
-
-  @Override
-  public User updateUser(UUID id, UpdateUserRequest updateRequest) throws NotFoundException {
-    logger.info("updateUser (deprecated) called");
-
-    UpdateUserHandlerRequest request = new UpdateUserHandlerRequest(updateRequest, id);
-    return this.updateUserHandler.resolve(request);
   }
 
   @Override

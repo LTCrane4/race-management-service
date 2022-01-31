@@ -15,11 +15,9 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
-import com.teddycrane.racemanagement.handler.user.request.UpdateUserHandlerRequest;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
@@ -52,7 +50,6 @@ class UserServiceTest {
   @Mock private Handler<UUID, User> getUserHandler;
   @Mock private Handler<String, Collection<User>> getUsersHandler;
   @Mock private Handler<CreateUserRequest, User> createUserHandler;
-  @Mock private Handler<UpdateUserHandlerRequest, User> updateUserHandler;
   @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
   @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
@@ -74,7 +71,6 @@ class UserServiceTest {
             this.getUserHandler,
             this.getUsersHandler,
             this.createUserHandler,
-            this.updateUserHandler,
             this.deleteUserHandler,
             this.changePasswordHandler);
     this.existing = TestResourceGenerator.generateUser();
@@ -148,27 +144,6 @@ class UserServiceTest {
         () ->
             assertEquals(
                 expectedList.size(), result.size(), "The result should have the expected length"));
-  }
-
-  @Test
-  @DisplayName("The Deprecated user update should still return updated users (TODO DEPRECATE)")
-  void updateUser() {
-    User expected = TestResourceGenerator.generateUser();
-    when(this.updateUserHandler.resolve(any(UpdateUserHandlerRequest.class))).thenReturn(expected);
-
-    var actual =
-        this.userService.updateUser(
-            testId,
-            new UpdateUserRequest(
-                "firstName",
-                "lastName",
-                "email",
-                UserType.USER,
-                expected.getUpdatedTimestamp().toString()));
-    assertAll(
-        () -> assertNotNull(actual, "The result should not be null"),
-        () ->
-            assertEquals(expected, actual, "The expected result and actual results should match"));
   }
 
   @Test

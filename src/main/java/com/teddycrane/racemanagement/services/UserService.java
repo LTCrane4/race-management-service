@@ -9,7 +9,6 @@ import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import java.time.Instant;
 import java.util.Collection;
@@ -27,9 +26,6 @@ public interface UserService {
       throws IllegalArgumentException;
 
   User createUser(CreateUserRequest request) throws DuplicateItemException;
-
-  @Deprecated
-  User updateUser(UUID id, UpdateUserRequest updateRequest) throws NotFoundException;
 
   User updateUser(
       UUID id,
