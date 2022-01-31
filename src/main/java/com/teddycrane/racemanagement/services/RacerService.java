@@ -5,6 +5,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public interface RacerService {
       int bibNumber)
       throws DuplicateItemException;
 
+  @Deprecated
   Racer updateRacer(
       UUID id,
       Date updatedTimestamp,
@@ -40,5 +42,20 @@ public interface RacerService {
       @Nullable String email)
       throws ConflictException, NotFoundException;
 
+  Racer updateRacer(
+      UUID id,
+      Instant updatedTimestamp,
+      @Nullable String firstName,
+      @Nullable String lastName,
+      @Nullable String middleName,
+      @Nullable String teamName,
+      @Nullable String phoneNumber,
+      @Nullable String email)
+      throws ConflictException, NotFoundException;
+
+  @Deprecated
   boolean deleteRacer(UUID id, Date updatedTimestamp) throws ConflictException, NotFoundException;
+
+  boolean deleteRacer(UUID id, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException;
 }

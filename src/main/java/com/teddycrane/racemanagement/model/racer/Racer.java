@@ -3,7 +3,7 @@ package com.teddycrane.racemanagement.model.racer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.Category;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,7 +25,7 @@ import org.springframework.lang.NonNull;
 @RequiredArgsConstructor
 public class Racer {
 
-  @NonNull private final Date createdTimestamp;
+  @NonNull private final Instant createdTimestamp;
 
   @Id
   @Type(type = "uuid-char")
@@ -42,7 +42,7 @@ public class Racer {
   @NonNull
   private Category category;
 
-  @Setter @NonNull private Date updatedTimestamp;
+  @Setter @NonNull private Instant updatedTimestamp;
 
   @Setter private int bibNumber;
 
@@ -51,9 +51,9 @@ public class Racer {
   public Racer() {
     this.id = UUID.randomUUID();
 
-    long timestamp = System.currentTimeMillis();
-    this.createdTimestamp = new Date(timestamp);
-    this.updatedTimestamp = new Date(timestamp);
+    Instant now = Instant.now();
+    this.createdTimestamp = now;
+    this.updatedTimestamp = now;
   }
 
   private Racer(
@@ -64,8 +64,8 @@ public class Racer {
       String teamName,
       String phoneNumber,
       String email,
-      @NonNull Date createdTimestamp,
-      @NonNull Date updatedTimestamp,
+      @NonNull Instant createdTimestamp,
+      @NonNull Instant updatedTimestamp,
       int bibNumber,
       boolean isDeleted,
       UUID id) {
@@ -78,8 +78,8 @@ public class Racer {
     this.phoneNumber = phoneNumber;
     // todo set up email validation
     this.email = email;
-    this.createdTimestamp = new Date(createdTimestamp.getTime());
-    this.updatedTimestamp = new Date(updatedTimestamp.getTime());
+    this.createdTimestamp = createdTimestamp;
+    this.updatedTimestamp = updatedTimestamp;
     this.bibNumber = bibNumber;
     this.isDeleted = isDeleted;
   }

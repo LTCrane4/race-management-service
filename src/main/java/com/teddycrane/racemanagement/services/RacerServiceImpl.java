@@ -6,9 +6,11 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -90,13 +92,68 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     // todo email validation
     if (email != null) r.setEmail(email);
 
-    r.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+    r.setUpdatedTimestamp(Instant.now());
+
+    return this.racerRepository.save(r);
+  }
+
+  @Override
+  public Racer updateRacer(
+      UUID id,
+      @NonNull Instant updatedTimestamp,
+      @Nullable String firstName,
+      @Nullable String lastName,
+      @Nullable String middleName,
+      @Nullable String teamName,
+      @Nullable String phoneNumber,
+      @Nullable String email)
+      throws ConflictException, NotFoundException {
+    logger.info("updateRacer called for id {}", id);
+
+    Racer r =
+        this.racerRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No racer found for the provided id"));
+
+    // locking validation
+    if (!updatedTimestamp.equals(r.getUpdatedTimestamp())) {
+      throw new ConflictException(
+          "The updated timestamp is out of date.  Please re-fetch and try again");
+    }
+
+    if (firstName != null) r.setFirstName(firstName);
+    if (lastName != null) r.setLastName(lastName);
+    if (middleName != null) r.setMiddleName(middleName);
+    if (teamName != null) r.setTeamName(teamName);
+    if (phoneNumber != null) r.setPhoneNumber(phoneNumber);
+    // todo email validation
+    if (email != null) r.setEmail(email);
+
+    r.setUpdatedTimestamp(Instant.now());
 
     return this.racerRepository.save(r);
   }
 
   @Override
   public boolean deleteRacer(UUID id, Date updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    logger.info("deleteRacer called for id {}", id);
+    Racer r =
+        this.racerRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No racer found for the provided id"));
+
+    if (!updatedTimestamp.equals(r.getUpdatedTimestamp())) {
+      throw new ConflictException("The updated timestamp is not valid");
+    }
+
+    r.setDeleted(true);
+    this.racerRepository.save(r);
+    return true;
+  }
+
+  @Override
+  public boolean deleteRacer(UUID id, @NonNull Instant updatedTimestamp)
       throws ConflictException, NotFoundException {
     logger.info("deleteRacer called for id {}", id);
     Racer r =

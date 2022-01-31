@@ -21,6 +21,7 @@ import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -397,7 +398,7 @@ class RacerControllerTest {
   void shouldHandleServiceErrors() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             anyString(),
             isNull(),
             isNull(),
@@ -408,7 +409,7 @@ class RacerControllerTest {
 
     UpdateRacerRequest request =
         UpdateRacerRequest.builder()
-            .updatedTimestamp(System.currentTimeMillis())
+            .updatedTimestamp(Instant.now().toString())
             .firstName("test")
             .build();
     var result1 = this.racerController.updateRacer(testString, request);
@@ -434,7 +435,7 @@ class RacerControllerTest {
   void shouldReturnConflictWhenTimestampsDoNotMatch() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             anyString(),
             isNull(),
             isNull(),
@@ -445,7 +446,7 @@ class RacerControllerTest {
 
     var request =
         UpdateRacerRequest.builder()
-            .updatedTimestamp(System.currentTimeMillis())
+            .updatedTimestamp(Instant.now().toString())
             .firstName("test")
             .build();
 

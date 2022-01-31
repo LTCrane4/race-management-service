@@ -18,7 +18,7 @@ import lombok.ToString;
 public class UpdateRacerRequest {
 
   @NotBlank(message = "The racer's updated timestamp is required")
-  private long updatedTimestamp;
+  private String updatedTimestamp;
 
   private String firstName, lastName, middleName, teamName, phoneNumber;
 
