@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.test.integration.tests;
 
+import static com.teddycrane.racemanagement.test.integration.constants.Constants.BEARER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -31,24 +32,24 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 @ActiveProfiles("integration")
 @WithMockUser("testuser")
-public class IntegrationBase {
+public abstract class IntegrationBase {
 
-  @Container
-  public static final MySQLContainer<?> CONTAINER =
-      new MySQLContainer<>("mysql:8.0.20")
-          .withReuse(true)
-          .withDatabaseName("test")
-          .withUsername("tester")
-          .withPassword("password")
-          .waitingFor(Wait.defaultWaitStrategy());
-
-  protected final Gson gson = new Gson();
-
-  protected static final String AUTHORIZATION_HEADER = "Authorization";
-  protected static final String BEARER = "Bearer";
+  @Container public static final MySQLContainer<?> CONTAINER;
   protected static final String USER_TOKEN =
       String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
 
+  static {
+    CONTAINER =
+        new MySQLContainer<>("mysql:8.0.20")
+            .withReuse(true)
+            .withDatabaseName("test")
+            .withUsername("tester")
+            .withPassword("password")
+            .waitingFor(Wait.forLogMessage("mysqld: ready for connections", 1));
+    CONTAINER.start();
+  }
+
+  protected final Gson gson = new Gson();
   protected Logger logger = LogManager.getLogger(this.getClass());
 
   @Autowired protected UserRepository userRepository;
@@ -60,9 +61,16 @@ public class IntegrationBase {
 
   @MockBean private TokenManager tokenManager;
 
-  @BeforeAll
   public static void setUpDatabase() {
     CONTAINER.start();
+  }
+
+  @BeforeAll
+  public static void setUpTestSuite() {
+    // only start new container if it isn't already running
+    if (!CONTAINER.isRunning()) {
+      setUpDatabase();
+    }
   }
 
   private void setUpMockTokenManager() {

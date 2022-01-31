@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.test.integration.tests.racer;
 
+import static com.teddycrane.racemanagement.test.integration.constants.Constants.AUTHORIZATION_HEADER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
