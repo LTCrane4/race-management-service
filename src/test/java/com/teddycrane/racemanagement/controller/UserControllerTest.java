@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -142,7 +143,7 @@ class UserControllerTest {
   }
 
   @Test
-  void createUserShouldCreateUserWithouType() {
+  void createUserShouldCreateUserWithoutType() {
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     var actual = this.userController.createUser(new CreateUserRequest("", "", "", "", ""));
@@ -157,6 +158,21 @@ class UserControllerTest {
         () ->
             assertEquals(
                 expected.getUsername(), body.getUsername(), "The usernames should be equal"));
+  }
+
+  @Test
+  @DisplayName("Create user should return a 409 when another user exists")
+  void createUserShouldReturnConflict() {
+    when(this.userService.createUser(any(CreateUserRequest.class)))
+        .thenThrow(DuplicateItemException.class);
+
+    var result = this.userController.createUser(new CreateUserRequest());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
   }
 
   @Test
