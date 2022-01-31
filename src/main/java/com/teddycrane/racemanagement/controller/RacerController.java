@@ -12,7 +12,6 @@ import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,7 +134,7 @@ public class RacerController extends BaseController implements RacerApi {
 
     try {
       UUID id = UUID.fromString(request.getId());
-      Date updatedTimestamp = new Date(request.getUpdatedTimestamp());
+      Instant updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
 
       return this.racerService.deleteRacer(id, updatedTimestamp)
           ? ResponseEntity.noContent().build()

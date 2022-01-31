@@ -22,7 +22,6 @@ import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -201,7 +200,7 @@ class RacerControllerTest {
   void shouldUpdateRacer() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             eq("New"),
             eq("Last"),
             eq("Middle"),
@@ -218,6 +217,7 @@ class RacerControllerTest {
             .teamName("New Team Name")
             .phoneNumber("123-456-789")
             .email("newemail@email.fake")
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
@@ -235,7 +235,7 @@ class RacerControllerTest {
   void shouldUpdateIfOnlyEmailProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             isNull(),
@@ -244,7 +244,11 @@ class RacerControllerTest {
             eq("newemail@email.fake")))
         .thenReturn(expected);
 
-    UpdateRacerRequest request = UpdateRacerRequest.builder().email("newemail@email.fake").build();
+    UpdateRacerRequest request =
+        UpdateRacerRequest.builder()
+            .email("newemail@email.fake")
+            .updatedTimestamp(Instant.now().toString())
+            .build();
 
     var result = this.racerController.updateRacer(testString, request);
     var body = result.getBody();
@@ -261,7 +265,7 @@ class RacerControllerTest {
   void shouldUpdateIfPhoneNumberProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             isNull(),
@@ -274,6 +278,7 @@ class RacerControllerTest {
         UpdateRacerRequest.builder()
             .email("newemail@email.fake")
             .phoneNumber("123-456-789")
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
@@ -291,7 +296,7 @@ class RacerControllerTest {
   void shouldUpdateWhenTeamNameIsProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             isNull(),
@@ -305,6 +310,7 @@ class RacerControllerTest {
             .email("newemail@email.fake")
             .phoneNumber("123-456-789")
             .teamName("New Team Name")
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
@@ -322,7 +328,7 @@ class RacerControllerTest {
   void shouldUpdateWhenMiddleNameIsProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             eq("Middle"),
@@ -337,6 +343,7 @@ class RacerControllerTest {
             .phoneNumber("123-456-789")
             .teamName("New Team Name")
             .middleName("Middle")
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
@@ -354,7 +361,7 @@ class RacerControllerTest {
   void shouldUpdateWhenLastNameIsProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
-            any(Date.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             eq("Middle"),
@@ -369,6 +376,7 @@ class RacerControllerTest {
             .phoneNumber("123-456-789")
             .teamName("New Team Name")
             .middleName("Middle")
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
@@ -461,11 +469,11 @@ class RacerControllerTest {
   @Test
   @DisplayName("Delete racer should successfully delete a racer")
   void deleteShouldBeSuccessful() {
-    when(this.racerService.deleteRacer(eq(testId), any(Date.class))).thenReturn(true);
+    when(this.racerService.deleteRacer(eq(testId), any(Instant.class))).thenReturn(true);
     DeleteRacerRequest request =
         DeleteRacerRequest.builder()
             .id(testString)
-            .updatedTimestamp(System.currentTimeMillis())
+            .updatedTimestamp(Instant.now().toString())
             .build();
 
     var result = this.racerController.deleteRacer(request);
@@ -480,14 +488,14 @@ class RacerControllerTest {
   @Test
   @DisplayName("Delete racer should return not found if no racer is found")
   void deleteShouldReturn404IfNotFound() {
-    when(this.racerService.deleteRacer(eq(testId), any(Date.class)))
+    when(this.racerService.deleteRacer(eq(testId), any(Instant.class)))
         .thenThrow(NotFoundException.class);
 
     var result =
         this.racerController.deleteRacer(
             DeleteRacerRequest.builder()
                 .id(testId.toString())
-                .updatedTimestamp(System.currentTimeMillis())
+                .updatedTimestamp(Instant.now().toString())
                 .build());
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -499,14 +507,14 @@ class RacerControllerTest {
   @Test
   @DisplayName("Delete Racer should return 409 if the timestamp is not valid")
   void deleteShouldReturn409() {
-    when(this.racerService.deleteRacer(eq(testId), any(Date.class)))
+    when(this.racerService.deleteRacer(eq(testId), any(Instant.class)))
         .thenThrow(ConflictException.class);
 
     var result =
         this.racerController.deleteRacer(
             DeleteRacerRequest.builder()
                 .id(testString)
-                .updatedTimestamp(System.currentTimeMillis())
+                .updatedTimestamp(Instant.now().toString())
                 .build());
 
     assertAll(
@@ -519,11 +527,14 @@ class RacerControllerTest {
   @DisplayName(
       "Delete Racer should return a 500 if the service cannot delete a racer for any other reason")
   void deleteShouldReturn500() {
-    when(this.racerService.deleteRacer(eq(testId), any(Date.class))).thenReturn(false);
+    when(this.racerService.deleteRacer(eq(testId), any(Instant.class))).thenReturn(false);
 
     var response =
         this.racerController.deleteRacer(
-            DeleteRacerRequest.builder().id(testString).updatedTimestamp(0).build());
+            DeleteRacerRequest.builder()
+                .id(testString)
+                .updatedTimestamp(Instant.now().toString())
+                .build());
 
     assertAll(
         () -> assertNotNull(response, "The response should not be null"),
@@ -539,7 +550,10 @@ class RacerControllerTest {
   void deleteShouldHandleInvalidUUID() {
     var response =
         this.racerController.deleteRacer(
-            DeleteRacerRequest.builder().id("not valid").updatedTimestamp(0).build());
+            DeleteRacerRequest.builder()
+                .id("not valid")
+                .updatedTimestamp(Instant.now().toString())
+                .build());
 
     assertAll(
         () -> assertNotNull(response, "The response should not be null"),
