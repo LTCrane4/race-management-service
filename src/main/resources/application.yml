@@ -16,10 +16,6 @@ spring:
           storage_engine: innodb
     open-in-view: false
   mvc:
-    converters:
-      preferred-json-mapper: gson
-  gson:
-    pretty-printing: true
 logging:
   file:
     path: /logs

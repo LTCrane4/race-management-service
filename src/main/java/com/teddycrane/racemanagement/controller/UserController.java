@@ -3,6 +3,9 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
@@ -14,6 +17,7 @@ import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.time.Instant;
 import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,11 +67,14 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  @PostMapping("/user/new")
   public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
     logger.info("createUser called");
 
-    return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
+    try {
+      return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
+    } catch (DuplicateItemException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
@@ -93,19 +100,47 @@ public class UserController extends BaseController implements UserApi {
 
     try {
       UUID userId = UUID.fromString(id);
+      Instant updated = null;
+
+      if (request.getUpdatedTimestamp() != null) {
+        updated = Instant.parse(request.getUpdatedTimestamp());
+      } else {
+        throw new IllegalArgumentException("The provided instant was not valid");
+      }
+
       // validate that at least one of the request body parameters are not null
       if (request.getFirstName() != null
           || request.getLastName() != null
           || request.getEmail() != null
           || request.getUserType() != null) {
-        return ResponseEntity.ok(new UserResponse(this.userService.updateUser(userId, request)));
+        return ResponseEntity.ok(
+            new UserResponse(
+                this.userService.updateUser(
+                    userId,
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getEmail(),
+                    request.getUserType(),
+                    updated)));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         return ResponseEntity.badRequest().build();
       }
     } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the provided id {}", id);
+      logger.error(
+          "Unable to parse one of the required values id: {}, updatedTimestamp: {}",
+          id,
+          request.getUpdatedTimestamp());
       return ResponseEntity.badRequest().build();
+    } catch (ConflictException e) {
+      logger.error("The timestamp provided is not the most recent");
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.notFound().build();
+    } catch (InternalServerError e) {
+      logger.error("An internal server error occurred");
+      return ResponseEntity.internalServerError().build();
     }
   }
 

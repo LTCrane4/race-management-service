@@ -5,8 +5,8 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.UUID;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public interface RacerService {
 
   Racer updateRacer(
       UUID id,
-      Date updatedTimestamp,
+      Instant updatedTimestamp,
       @Nullable String firstName,
       @Nullable String lastName,
       @Nullable String middleName,
@@ -40,5 +40,6 @@ public interface RacerService {
       @Nullable String email)
       throws ConflictException, NotFoundException;
 
-  boolean deleteRacer(UUID id, Date updatedTimestamp) throws ConflictException, NotFoundException;
+  boolean deleteRacer(UUID id, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException;
 }

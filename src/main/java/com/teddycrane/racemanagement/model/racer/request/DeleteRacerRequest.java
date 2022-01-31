@@ -17,5 +17,5 @@ public class DeleteRacerRequest {
   private String id;
 
   @NotBlank(message = "The updated timestamp cannot be blank")
-  private long updatedTimestamp;
+  private String updatedTimestamp;
 }

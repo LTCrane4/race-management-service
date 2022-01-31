@@ -1,11 +1,9 @@
 package com.teddycrane.racemanagement.test.integration.tests;
 
-import static com.teddycrane.racemanagement.test.integration.constants.Constants.BEARER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.Gson;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.AuthenticationService;
@@ -35,8 +33,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class IntegrationBase {
 
   @Container public static final MySQLContainer<?> CONTAINER;
-  protected static final String USER_TOKEN =
-      String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
 
   static {
     CONTAINER =
@@ -49,7 +45,11 @@ public abstract class IntegrationBase {
     CONTAINER.start();
   }
 
-  protected final Gson gson = new Gson();
+  protected static final String AUTHORIZATION_HEADER = "Authorization";
+  protected static final String BEARER = "Bearer";
+  protected static final String USER_TOKEN =
+      String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
+
   protected Logger logger = LogManager.getLogger(this.getClass());
 
   @Autowired protected UserRepository userRepository;

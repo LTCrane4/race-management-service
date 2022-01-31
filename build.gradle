@@ -18,20 +18,13 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude group: 'com.fasterxml.jackson.core'
-        exclude group: 'com.fasterxml.jackson.datatype'
-        exclude group: 'com.fasterxml.jackson.module'
-    }
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation "com.google.code.gson:gson:$gson_version"
+//    implementation "com.google.code.gson:gson:$gson_version"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.security:spring-security-test"
     implementation "com.github.javafaker:javafaker:$java_faker_version"
-    implementation("io.jsonwebtoken:jjwt:$jwt_version") {
-        exclude group: 'com.fasterxml.jackson.core'
-    }
-    implementation "io.jsonwebtoken:jjwt-gson:$jwt_gson_version"
+    implementation("io.jsonwebtoken:jjwt:$jwt_version")
     implementation "mysql:mysql-connector-java"
     implementation "org.springdoc:springdoc-openapi-ui:$springdoc_version"
 
@@ -77,7 +70,7 @@ task integrationTest(type: Test) {
 
     // Show message while test is running
     beforeTest { descriptor ->
-     logger.lifecycle("Running test: " + descriptor)
+        logger.lifecycle("Running test: " + descriptor)
     }
 
     testLogging.showStandardStreams = false // hide debug output

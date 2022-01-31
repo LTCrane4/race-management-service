@@ -17,8 +17,8 @@ import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import com.teddycrane.racemanagement.services.RacerService;
 import com.teddycrane.racemanagement.services.RacerServiceImpl;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -159,7 +159,8 @@ class RacerServiceTest {
     assertThrows(
         ConflictException.class,
         () ->
-            this.racerService.updateRacer(testId, new Date(0), null, null, null, null, null, null));
+            this.racerService.updateRacer(
+                testId, Instant.now(), null, null, null, null, null, null));
   }
 
   @Test
@@ -170,7 +171,8 @@ class RacerServiceTest {
     assertThrows(
         NotFoundException.class,
         () ->
-            this.racerService.updateRacer(testId, new Date(), null, null, null, null, null, null));
+            this.racerService.updateRacer(
+                testId, Instant.now(), null, null, null, null, null, null));
   }
 
   @Test
@@ -198,8 +200,7 @@ class RacerServiceTest {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
 
     assertThrows(
-        ConflictException.class,
-        () -> this.racerService.deleteRacer(testId, new Date(System.currentTimeMillis() + 1000)));
+        ConflictException.class, () -> this.racerService.deleteRacer(testId, Instant.now()));
   }
 
   @Test
@@ -207,6 +208,7 @@ class RacerServiceTest {
   void deleteRacerShouldThrowNotFound() {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.empty());
 
-    assertThrows(NotFoundException.class, () -> this.racerService.deleteRacer(testId, new Date()));
+    assertThrows(
+        NotFoundException.class, () -> this.racerService.deleteRacer(testId, Instant.now()));
   }
 }

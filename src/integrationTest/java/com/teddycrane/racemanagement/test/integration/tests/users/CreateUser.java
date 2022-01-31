@@ -5,7 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -15,12 +16,13 @@ class CreateUser extends UserBase {
 
   @Test
   void createUserShouldCreate() throws Exception {
-    JsonObject object = new JsonObject();
-    object.addProperty("username", "testcreate");
-    object.addProperty("password", "password");
-    object.addProperty("firstName", "Test");
-    object.addProperty("lastName", "User");
-    object.addProperty("email", "test@fake.fake");
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode object = mapper.createObjectNode();
+    object.put("username", "testcreate");
+    object.put("password", "password");
+    object.put("firstName", "Test");
+    object.put("lastName", "User");
+    object.put("email", "test@fake.fake");
 
     this.mockMvc
         .perform(
