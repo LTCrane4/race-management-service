@@ -37,11 +37,7 @@ public class User {
   @Setter @NonNull private Instant updatedTimestamp;
 
   public User() {
-    this.id = UUID.randomUUID();
-    var instant = Instant.now();
-
-    this.createdTimestamp = instant;
-    this.updatedTimestamp = instant;
+    this(UUID.randomUUID());
   }
 
   private User(UUID id) {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +27,9 @@ class UserTest {
 
     user = new User("name", "name", "name", "name", "name", UserType.ADMIN);
     assertNotNull(user);
+
+    user = new User(UUID.randomUUID(), "", "", "", "", "", UserType.ADMIN);
+    assertNotNull(user, "the user should not be null");
 
     User other = new User(user);
     assertEquals(user, other);
