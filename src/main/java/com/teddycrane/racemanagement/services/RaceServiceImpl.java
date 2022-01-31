@@ -6,7 +6,7 @@ import java.util.List;
 
 public class RaceServiceImpl extends BaseService implements RaceService {
 
-  private RaceRepository raceRepository;
+  private final RaceRepository raceRepository;
 
   public RaceServiceImpl(RaceRepository raceRepository) {
     super();
@@ -15,6 +15,8 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
   @Override
   public List<Race> getAllRaces() {
-    return null;
+    logger.info("getAllRaces called");
+
+    return this.raceRepository.findAll();
   }
 }
