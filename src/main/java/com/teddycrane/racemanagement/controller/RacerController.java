@@ -1,7 +1,6 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -11,7 +10,7 @@ import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class RacerController extends BaseController implements RacerApi {
   }
 
   @Override
-  public ResponseEntity<Racer> getRacer(String id) throws BadRequestException, NotFoundException {
+  public ResponseEntity<Racer> getRacer(String id) {
     logger.info("getRacer called");
 
     try {
@@ -104,10 +103,12 @@ public class RacerController extends BaseController implements RacerApi {
     try {
       UUID userId = UUID.fromString(id);
 
+      Instant instant = Instant.parse(request.getUpdatedTimestamp());
+
       return ResponseEntity.ok(
           this.racerService.updateRacer(
               userId,
-              new Date(request.getUpdatedTimestamp()),
+              instant,
               request.getFirstName(),
               request.getLastName(),
               request.getMiddleName(),
@@ -132,7 +133,7 @@ public class RacerController extends BaseController implements RacerApi {
 
     try {
       UUID id = UUID.fromString(request.getId());
-      Date updatedTimestamp = new Date(request.getUpdatedTimestamp());
+      Instant updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
 
       return this.racerService.deleteRacer(id, updatedTimestamp)
           ? ResponseEntity.noContent().build()

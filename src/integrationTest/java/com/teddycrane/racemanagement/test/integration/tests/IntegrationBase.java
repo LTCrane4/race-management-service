@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.Gson;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.AuthenticationService;
@@ -41,8 +40,6 @@ public class IntegrationBase {
           .withUsername("tester")
           .withPassword("password")
           .waitingFor(Wait.defaultWaitStrategy());
-
-  protected final Gson gson = new Gson();
 
   protected static final String AUTHORIZATION_HEADER = "Authorization";
   protected static final String BEARER = "Bearer";

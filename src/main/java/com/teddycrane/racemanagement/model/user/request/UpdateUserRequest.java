@@ -2,10 +2,12 @@ package com.teddycrane.racemanagement.model.user.request;
 
 import com.teddycrane.racemanagement.enums.UserType;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Getter
 @AllArgsConstructor
@@ -16,9 +18,13 @@ public class UpdateUserRequest {
 
   @Email private String email;
 
-  private UserType userType;
+  @Nullable private UserType userType;
+
+  // This is a string from the request and is validated in the controller
+  @NotBlank(message = "The updated timestamp must be included in the request")
+  private String updatedTimestamp;
 
   protected UpdateUserRequest(@NonNull UpdateUserRequest other) {
-    this(other.firstName, other.lastName, other.email, other.userType);
+    this(other.firstName, other.lastName, other.email, other.userType, other.updatedTimestamp);
   }
 }

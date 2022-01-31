@@ -6,9 +6,10 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +62,7 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   @Override
   public Racer updateRacer(
       UUID id,
-      Date updatedTimestamp,
+      @NonNull Instant updatedTimestamp,
       @Nullable String firstName,
       @Nullable String lastName,
       @Nullable String middleName,
@@ -90,13 +91,13 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     // todo email validation
     if (email != null) r.setEmail(email);
 
-    r.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+    r.setUpdatedTimestamp(Instant.now());
 
     return this.racerRepository.save(r);
   }
 
   @Override
-  public boolean deleteRacer(UUID id, Date updatedTimestamp)
+  public boolean deleteRacer(UUID id, @NonNull Instant updatedTimestamp)
       throws ConflictException, NotFoundException {
     logger.info("deleteRacer called for id {}", id);
     Racer r =
