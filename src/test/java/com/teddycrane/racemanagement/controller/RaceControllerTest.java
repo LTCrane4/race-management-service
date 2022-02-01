@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
@@ -98,6 +99,26 @@ class RaceControllerTest {
         .thenReturn(expected);
 
     var request = CreateRaceRequest.builder().name("Test Race").category(Category.CAT2).build();
+    var result = this.raceController.createRace(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"));
+  }
+
+  @Test
+  @DisplayName("Create race should successfully create a race with a pre-populated list of racers")
+  void createRaceShouldCreateWithRacers() {
+    when(this.raceService.createRace(eq("Test Race"), eq(Category.CAT2), anyList()))
+        .thenReturn(expected);
+
+    var request =
+        CreateRaceRequest.builder()
+            .name("Test Race")
+            .category(Category.CAT2)
+            .racerIds(List.of(UUID.randomUUID()))
+            .build();
+
     var result = this.raceController.createRace(request);
 
     assertAll(

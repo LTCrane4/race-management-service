@@ -17,7 +17,6 @@ public class CreateRaceRequest {
   @NotBlank(message = "The race name cannot be blank")
   private String name;
 
-  @NotBlank(message = "The category cannot be blank")
   private Category category;
 
   private List<UUID> racerIds;

@@ -62,6 +62,22 @@ class RacerServiceTest {
   }
 
   @Test
+  @DisplayName("Get all racers should filter out deleted racers")
+  void getAllRacersShouldFilterOutDeletedRacers() {
+    Collection<Racer> expected = TestResourceGenerator.generateRacerList(5);
+    var racer = TestResourceGenerator.generateRacer();
+    racer.setDeleted(true);
+    expected.add(racer);
+
+    when(this.racerRepository.findAll()).thenReturn((List<Racer>) expected);
+
+    var actual = this.racerService.getAllRacers();
+    assertAll(
+        () -> assertNotNull(actual, "The list should not be null"),
+        () -> assertEquals(5, actual.size(), "The array should filter out deleted entries"));
+  }
+
+  @Test
   void shouldReturnSingleRacer() {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
 

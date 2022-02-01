@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.model.race;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -39,5 +40,12 @@ public class Race {
 
   private Race() {
     this.id = UUID.randomUUID();
+  }
+
+  public Race(String name, Category category, Collection<Racer> racers) {
+    this();
+    this.name = name;
+    this.category = category;
+    this.racers = new ArrayList<>(racers);
   }
 }

@@ -9,6 +9,7 @@ import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,9 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   public Collection<Racer> getAllRacers() {
     logger.info("getAllRacers called");
 
-    return this.racerRepository.findAll();
+    return this.racerRepository.findAll().stream()
+        .filter(racer -> !racer.isDeleted())
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -83,13 +86,25 @@ public class RacerServiceImpl extends BaseService implements RacerService {
           "The updated timestamp is out of date.  Please re-fetch and try again");
     }
 
-    if (firstName != null) r.setFirstName(firstName);
-    if (lastName != null) r.setLastName(lastName);
-    if (middleName != null) r.setMiddleName(middleName);
-    if (teamName != null) r.setTeamName(teamName);
-    if (phoneNumber != null) r.setPhoneNumber(phoneNumber);
+    if (firstName != null) {
+      r.setFirstName(firstName);
+    }
+    if (lastName != null) {
+      r.setLastName(lastName);
+    }
+    if (middleName != null) {
+      r.setMiddleName(middleName);
+    }
+    if (teamName != null) {
+      r.setTeamName(teamName);
+    }
+    if (phoneNumber != null) {
+      r.setPhoneNumber(phoneNumber);
+    }
     // todo email validation
-    if (email != null) r.setEmail(email);
+    if (email != null) {
+      r.setEmail(email);
+    }
 
     r.setUpdatedTimestamp(Instant.now());
 

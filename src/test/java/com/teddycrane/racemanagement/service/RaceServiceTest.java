@@ -14,6 +14,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
+import com.teddycrane.racemanagement.repositories.RacerRepository;
 import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.services.RaceServiceImpl;
 import java.util.Collection;
@@ -33,12 +34,13 @@ class RaceServiceTest {
   private final Race expected = TestResourceGenerator.generateRace();
   private final UUID testId = UUID.randomUUID();
   @Mock private RaceRepository raceRepository;
+  @Mock private RacerRepository racerRepository;
   private RaceService raceService;
   private Collection<Race> expectedList;
 
   @BeforeEach
   void setUp() {
-    this.raceService = new RaceServiceImpl(raceRepository);
+    this.raceService = new RaceServiceImpl(raceRepository, racerRepository);
     this.expectedList = TestResourceGenerator.generateRaceList();
   }
 
@@ -102,12 +104,27 @@ class RaceServiceTest {
   }
 
   @Test
+  @DisplayName(
+      "Create race should create a race if there is a race with the same name but a different"
+          + " category")
+  void createRaceShouldCreateWithDuplicateName() {
+    expected.setCategory(Category.CAT1);
+    when(this.raceRepository.findByName(anyString())).thenReturn(Optional.of(expected));
+    when(this.raceRepository.save(any(Race.class)))
+        .thenAnswer((arguments) -> arguments.getArgument(0));
+
+    var result = this.raceService.createRace("Test", Category.CAT2, List.of());
+
+    assertNotNull(result, "The result should not be null");
+  }
+
+  @Test
   @DisplayName("Create race should throw a conflict exception")
   void createRaceShouldThrowConflictException() {
     when(this.raceRepository.findByName(anyString())).thenReturn(Optional.of(expected));
 
     assertThrows(
         ConflictException.class,
-        () -> this.raceService.createRace("Test", Category.CAT2, List.of()));
+        () -> this.raceService.createRace(expected.getName(), expected.getCategory(), List.of()));
   }
 }

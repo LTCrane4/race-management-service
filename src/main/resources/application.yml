@@ -14,7 +14,7 @@ spring:
         ddl-auto: create
         dialect:
           storage_engine: innodb
-    open-in-view: false
+    open-in-view: true
   mvc:
 logging:
   file:
