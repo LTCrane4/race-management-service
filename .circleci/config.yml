@@ -1,30 +1,53 @@
 # .circleci/config.yml
 version: 2.1
+orbs:
+  codecov: codecov/codecov@3.2.2
+
 jobs:
+  install-dependencies:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+      - run:
+          name: Resolve Dependencies
+          command: ./gradlew resolveDependencies
+      - save_cache:
+          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          paths:
+            - ~/.gradle/caches/modules-2/files-2.1
+
   build-application:
     docker:
       - image: cimg/openjdk:17.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Gradle Build
           command: ./gradlew build -x test
-      # Cache build deps until build.gradle changes
-      - save_cache:
-          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
-          paths:
-            - ~/.gradle/caches/modules-2/files-2.1
+#      # Cache build deps until build.gradle changes
+#      - save_cache:
+#          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+#          paths:
+#            - ~/.gradle/caches/modules-2/files-2.1
       - store_artifacts:
           path: build/libs/*.jar
           name: app.jar
+
   test:
     docker:
       - image: cimg/openjdk:17.0
     steps:
       - checkout
       - restore_cache:
-         keys:
-           - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Test Application
           command: ./gradlew test -i
@@ -35,9 +58,10 @@ jobs:
           path: build/test-results/test
       - store_artifacts:
           path: build/reports/jacoco/html
-      - run:
-          name: Upload Test Results
-          command: bash <(curl -s https://codecov.io/bash)
+  #      - run:
+  #          name: Upload Test Results
+  #          command: bash <(curl -s https://codecov.io/bash)
+
   integration-test:
     machine:
       image: ubuntu-2004:202008-01
@@ -57,26 +81,34 @@ jobs:
           command: ./gradlew integrationTest
       - store_test_results:
           path: build/test-results/integrationTest
+
   store-built-application:
-      docker:
-        - image: cimg/openjdk:17.0
-      steps:
-        - checkout
-        - restore_cache:
-            keys:
-              - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
-        - run:
-            name: Build Application
-            command: ./gradlew jar
-        - store_artifacts:
-            path: build/libs/*.jar
-            name: app.jar
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+      - run:
+          name: Build Application
+          command: ./gradlew jar
+      - store_artifacts:
+          path: build/libs/*.jar
+          name: app.jar
 
 workflows:
   build:
     jobs:
-      - build-application
-      - test
+      - install-dependencies
+      - build-application:
+          requires:
+            - install-dependencies
+      - test:
+          requires:
+            - install-dependencies
+          post-steps:
+            - codecov/upload
       - integration-test:
           requires:
             - build-application
