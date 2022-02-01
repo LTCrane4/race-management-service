@@ -107,7 +107,7 @@ workflows:
       - test:
           requires:
             - install-dependencies
-          post_steps:
+          post-steps:
             - codecov/upload
       - integration-test:
           requires:
