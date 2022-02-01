@@ -8,8 +8,6 @@ import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.AuthenticationService;
 import com.teddycrane.racemanagement.test.integration.utils.JwtTokenProviderMock;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +47,6 @@ public abstract class IntegrationBase {
   protected static final String BEARER = "Bearer";
   protected static final String USER_TOKEN =
       String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
-
-  protected Logger logger = LogManager.getLogger(this.getClass());
 
   @Autowired protected UserRepository userRepository;
 
