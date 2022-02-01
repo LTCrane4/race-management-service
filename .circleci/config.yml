@@ -102,10 +102,10 @@ workflows:
     jobs:
       - install-dependencies
       - build-application:
-          depends_on:
+          requires:
             - install-dependencies
       - test:
-          depends_on:
+          requires:
             - install-dependencies
           post_steps:
             - codecov/upload
