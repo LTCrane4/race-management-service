@@ -12,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,9 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
+@Builder
 @EqualsAndHashCode
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class Racer {
 
@@ -46,7 +50,7 @@ public class Racer {
 
   @Setter private int bibNumber;
 
-  @Setter private boolean isDeleted = false;
+  @Setter @Builder.Default private boolean isDeleted = false;
 
   public Racer() {
     this.id = UUID.randomUUID();

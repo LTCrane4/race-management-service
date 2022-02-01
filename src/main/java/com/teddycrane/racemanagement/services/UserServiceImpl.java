@@ -152,7 +152,7 @@ public class UserServiceImpl extends BaseService implements UserService {
       existing.setUpdatedTimestamp(Instant.now());
       return this.userRepository.save(existing);
     } else {
-      throw new InternalServerError("Internal Server Error");
+      throw new InternalServerError();
     }
   }
 

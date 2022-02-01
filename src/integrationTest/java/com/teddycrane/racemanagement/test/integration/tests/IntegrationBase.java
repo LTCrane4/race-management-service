@@ -8,8 +8,6 @@ import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
 import com.teddycrane.racemanagement.services.AuthenticationService;
 import com.teddycrane.racemanagement.test.integration.utils.JwtTokenProviderMock;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,23 +28,25 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 @ActiveProfiles("integration")
 @WithMockUser("testuser")
-public class IntegrationBase {
+public abstract class IntegrationBase {
 
-  @Container
-  public static final MySQLContainer<?> CONTAINER =
-      new MySQLContainer<>("mysql:8.0.20")
-          .withReuse(true)
-          .withDatabaseName("test")
-          .withUsername("tester")
-          .withPassword("password")
-          .waitingFor(Wait.defaultWaitStrategy());
+  @Container public static final MySQLContainer<?> CONTAINER;
+
+  static {
+    CONTAINER =
+        new MySQLContainer<>("mysql:8.0.20")
+            .withReuse(true)
+            .withDatabaseName("test")
+            .withUsername("tester")
+            .withPassword("password")
+            .waitingFor(Wait.forLogMessage("mysqld: ready for connections", 1));
+    CONTAINER.start();
+  }
 
   protected static final String AUTHORIZATION_HEADER = "Authorization";
   protected static final String BEARER = "Bearer";
   protected static final String USER_TOKEN =
       String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
-
-  protected Logger logger = LogManager.getLogger(this.getClass());
 
   @Autowired protected UserRepository userRepository;
 
@@ -57,9 +57,16 @@ public class IntegrationBase {
 
   @MockBean private TokenManager tokenManager;
 
-  @BeforeAll
   public static void setUpDatabase() {
     CONTAINER.start();
+  }
+
+  @BeforeAll
+  public static void setUpTestSuite() {
+    // only start new container if it isn't already running
+    if (!CONTAINER.isRunning()) {
+      setUpDatabase();
+    }
   }
 
   private void setUpMockTokenManager() {

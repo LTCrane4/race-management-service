@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class PasswordChangeHandlerTest {
+class PasswordChangeHandlerTest {
 
   private final String originalPassword = "Test"; // pragma: allowlist secret
   @Mock private UserRepository userRepository;
@@ -43,6 +44,7 @@ public class PasswordChangeHandlerTest {
   }
 
   @Test
+  @DisplayName("Should successfully change a user's password")
   @Disabled("Not sure why this is failing")
   void shouldChangePassword() {
     when(this.userRepository.findById(testId)).thenReturn(Optional.of(testUser));
