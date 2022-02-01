@@ -4,8 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
@@ -84,5 +88,26 @@ class RaceServiceTest {
     when(this.raceRepository.findById(testId)).thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class, () -> this.raceService.getRace(testId));
+  }
+
+  @Test
+  @DisplayName("Create Race should successfully create a race")
+  void shouldCreateRace() {
+    when(this.raceRepository.findByName(anyString())).thenReturn(Optional.empty());
+    when(this.raceRepository.save(any(Race.class))).thenReturn(expected);
+
+    var result = this.raceService.createRace("name", Category.CAT2, List.of());
+
+    assertNotNull(result, "The result should not be null");
+  }
+
+  @Test
+  @DisplayName("Create race should throw a conflict exception")
+  void createRaceShouldThrowConflictException() {
+    when(this.raceRepository.findByName(anyString())).thenReturn(Optional.of(expected));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.raceService.createRace("Test", Category.CAT2, List.of()));
   }
 }

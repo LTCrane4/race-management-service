@@ -1,5 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
@@ -31,5 +33,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
     return this.raceRepository
         .findById(id)
         .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+  }
+
+  @Override
+  public Race createRace(String name, Category category, List<UUID> racerIds)
+      throws ConflictException {
+    return null;
   }
 }

@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 // import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.services.RaceService;
@@ -40,5 +41,10 @@ public class RaceController extends BaseController implements RaceApi {
       logger.error("No race found for the id {}", id);
       return ResponseEntity.notFound().build();
     }
+  }
+
+  @Override
+  public ResponseEntity<Race> createRace(CreateRaceRequest request) {
+    return null;
   }
 }
