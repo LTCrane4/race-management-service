@@ -111,7 +111,7 @@ workflows:
             - codecov/upload
       - integration-test:
           requires:
-            - build-application
+            - install-dependencies
           filters:
             branches:
               only:
@@ -119,6 +119,7 @@ workflows:
       - store-built-application:
           requires:
             - test
+            - build-application
             - integration-test
           filters:
             branches:
