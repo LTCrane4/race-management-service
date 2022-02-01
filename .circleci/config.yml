@@ -10,7 +10,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Resolve Dependencies
           command: ./gradlew resolveDependencies
@@ -25,7 +26,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          keys:
+            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Gradle Build
           command: ./gradlew build -x test
