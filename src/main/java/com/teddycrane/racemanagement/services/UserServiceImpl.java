@@ -1,5 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
+import static com.teddycrane.racemanagement.utils.PasswordEncoder.encodePassword;
+
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
@@ -8,9 +10,6 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.handler.Handler;
-import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
-import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -37,49 +36,28 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
-  private final Handler<UUID, User> getUserHandler;
-  private final Handler<String, Collection<User>> getUsersHandler;
-  private final Handler<CreateUserRequest, User> createUserHandler;
-  private final Handler<DeleteUserRequest, User> deleteUserHandler;
-  private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
-
   public UserServiceImpl(
       UserRepository userRepository,
       TokenManager tokenManager,
-      AuthenticationManager authenticationManager,
-      Handler<UUID, User> getUserHandler,
-      Handler<String, Collection<User>> getUsersHandler,
-      Handler<CreateUserRequest, User> createUserHandler,
-      Handler<DeleteUserRequest, User> deleteUserHandler,
-      Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
+      AuthenticationManager authenticationManager) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
-    this.getUserHandler = getUserHandler;
-    this.getUsersHandler = getUsersHandler;
-    this.createUserHandler = createUserHandler;
-    this.deleteUserHandler = deleteUserHandler;
-    this.changePasswordHandler = changePasswordHandler;
   }
 
   @Override
   public Collection<User> getAllUsers() {
     logger.info("getAllUsers called");
-    return this.getUsersHandler.resolve("");
+    return this.userRepository.findAll();
   }
 
   @Override
   public User getUser(UUID id) throws NotFoundException {
     logger.info("getUser called");
-    User u = this.getUserHandler.resolve(id);
-
-    if (u == null) {
-      logger.error("No user found for the id {}", id);
-      throw new NotFoundException("No user found for the provided id!");
-    }
-
-    return u;
+    return this.userRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
   }
 
   @Override
@@ -101,10 +79,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     logger.info("createUser called");
 
     // set type to USER if there is no type provided
-    UserType type = request.getUserType() == null ? UserType.USER : request.getUserType();
-    request.setUserType(type);
+    Optional<User> existing = this.userRepository.findByUsername(request.getUsername());
 
-    return this.createUserHandler.resolve(request);
+    if (existing.isPresent()) {
+      throw new DuplicateItemException(
+          "This username is already taken.  Please try a different username");
+    }
+
+    return this.userRepository.save(
+        new User(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getUsername(),
+            request.getEmail(),
+            encodePassword(request.getPassword()),
+            request.getUserType()));
   }
 
   @Override
@@ -183,18 +172,31 @@ public class UserServiceImpl extends BaseService implements UserService {
   public boolean changePassword(UUID id, String oldPassword, String newPassword)
       throws BadRequestException, NotFoundException {
     logger.info("changePassword called");
-    return this.changePasswordHandler.resolve(
-        ChangePasswordHandlerRequest.builder()
-            .id(id)
-            .oldPassword(oldPassword)
-            .newPassword(newPassword)
-            .build());
+    User user =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+
+    String encodedPassword = encodePassword(oldPassword);
+    if (encodedPassword.equals(user.getPassword())) {
+      user.setPassword(encodePassword(newPassword));
+      this.userRepository.save(user);
+
+      return true;
+    } else {
+      throw new BadRequestException("Previous password provided was incorrect.  Please try again.");
+    }
   }
 
   @Override
   public User deleteUser(UUID id) throws NotFoundException {
     logger.info("deleteUser called for {} by {}", id, "test");
+    User u =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
 
-    return this.deleteUserHandler.resolve(new DeleteUserRequest(id));
+    this.userRepository.delete(u);
+    return u;
   }
 }
