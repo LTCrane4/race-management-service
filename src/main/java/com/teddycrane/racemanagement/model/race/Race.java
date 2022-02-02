@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.model.race;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -31,6 +32,9 @@ public class Race {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private final UUID id;
 
+  private final Instant createdTimestamp;
+  private Instant updatedTimestamp;
+
   private String name;
 
   @Enumerated(EnumType.STRING)
@@ -40,6 +44,10 @@ public class Race {
 
   private Race() {
     this.id = UUID.randomUUID();
+
+    var instant = Instant.now();
+    this.createdTimestamp = instant;
+    this.updatedTimestamp = instant;
   }
 
   public Race(String name, Category category, Collection<Racer> racers) {

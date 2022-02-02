@@ -6,6 +6,7 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.user.User;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -65,14 +66,16 @@ public class TestResourceGenerator {
   }
 
   public static Race generateRace(Category category) {
-    var race =
-        Race.builder()
-            .id(UUID.randomUUID())
-            .category(category)
-            .name(faker.name().name())
-            .racers(generateRacerList(5, category))
-            .build();
-    return race;
+    var now = Instant.now();
+
+    return Race.builder()
+        .createdTimestamp(now)
+        .updatedTimestamp(now)
+        .id(UUID.randomUUID())
+        .category(category)
+        .name(faker.name().name())
+        .racers(generateRacerList(5, category))
+        .build();
   }
 
   public static Race generateRace() {

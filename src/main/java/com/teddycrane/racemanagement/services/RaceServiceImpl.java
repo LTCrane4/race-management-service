@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -59,5 +60,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
     Race r = new Race(name, category, racers);
 
     return this.raceRepository.save(r);
+  }
+
+  @Override
+  public Race addRacersToRace(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp) {
+    logger.info("addRacersToRace called for race id {}", raceId);
+    return null;
   }
 }

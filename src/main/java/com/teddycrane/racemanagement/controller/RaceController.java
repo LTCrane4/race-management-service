@@ -4,10 +4,13 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 // import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.services.RaceService;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -66,6 +69,30 @@ public class RaceController extends BaseController implements RaceApi {
       return ResponseEntity.ok(this.raceService.createRace(name, category, racers));
     } catch (ConflictException e) {
       logger.error("Name Collision: Cannot create duplicate race");
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<Race> addRacersToRace(String raceId, @NonNull AddRacersRequest request) {
+    logger.info("addRacersToRace called");
+
+    try {
+      UUID id = UUID.fromString(raceId);
+      Instant updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
+
+      return ResponseEntity.ok(
+          this.raceService.addRacersToRace(id, request.getRacerIds(), updatedTimestamp));
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      logger.error("A provided parameter was not provided in a valid format");
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error(
+          "An error ocurred when attempting to resolve data for the following UUID: {}",
+          e.getMessage());
+      return ResponseEntity.notFound().build();
+    } catch (ConflictException e) {
+      logger.error("Newer data has been provided.");
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
   }
