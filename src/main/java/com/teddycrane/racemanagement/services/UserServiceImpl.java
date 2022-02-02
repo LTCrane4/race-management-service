@@ -78,13 +78,14 @@ public class UserServiceImpl extends BaseService implements UserService {
   public User createUser(@NonNull CreateUserRequest request) throws DuplicateItemException {
     logger.info("createUser called");
 
-    // set type to USER if there is no type provided
     Optional<User> existing = this.userRepository.findByUsername(request.getUsername());
 
     if (existing.isPresent()) {
       throw new DuplicateItemException(
           "This username is already taken.  Please try a different username");
     }
+
+    UserType type = request.getUserType() == null ? UserType.USER : request.getUserType();
 
     return this.userRepository.save(
         new User(
@@ -93,7 +94,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             request.getUsername(),
             request.getEmail(),
             encodePassword(request.getPassword()),
-            request.getUserType()));
+            type));
   }
 
   @Override
