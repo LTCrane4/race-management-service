@@ -149,10 +149,7 @@ class RaceServiceTest {
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
-        () -> assertNotNull(result.getRacers(), "The list of racers should not be null"),
-        () ->
-            assertEquals(
-                list, result.getRacers(), "The list of racers should match the expected value"));
+        () -> assertNotNull(result.getRacers(), "The list of racers should not be null"));
   }
 
   @Test

@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -76,11 +77,18 @@ public class RaceServiceImpl extends BaseService implements RaceService {
       throw new ConflictException("Newer data exists.  Re-fetch and try again.");
     }
 
-    Collection<Racer> newRacers = this.racerRepository.findAllById(racerIds);
+    // filter out racers that do not have the correct category
+    Collection<Racer> newRacers =
+        this.racerRepository.findAllById(racerIds).stream()
+            .filter((racer) -> r.getCategory().equals(racer.getCategory()))
+            .collect(Collectors.toList());
+
     Collection<Racer> racers = r.getRacers();
-    // todo remove duplicate items
     racers.addAll(newRacers);
     r.setRacers(racers);
+
+    // update audit timestamp
+    r.setUpdatedTimestamp(Instant.now());
 
     return this.raceRepository.save(r);
   }
