@@ -14,8 +14,10 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -136,5 +138,82 @@ class RaceControllerTest {
     var result = this.raceController.createRace(request);
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
+  }
+
+  @Test
+  @DisplayName("Add Racers should add racers to race")
+  void addRacersShouldAddRacersToRace() {
+    when(this.raceService.addRacersToRace(eq(testId), anyList(), any(Instant.class)))
+        .thenReturn(expected);
+
+    var request =
+        AddRacersRequest.builder()
+            .racerIds(List.of())
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.addRacersToRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"));
+  }
+
+  @Test
+  @DisplayName("Add Racers should not add racers if the service cannot parse the race id")
+  void addRacersShouldReturn400WhenIdIsInvalid() {
+    var request =
+        AddRacersRequest.builder()
+            .racerIds(List.of())
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.addRacersToRace("bad id", request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName("Add Racers should return 404 when the race service throws a NotFoundException")
+  void addRacersShouldThrow404() {
+    when(this.raceService.addRacersToRace(eq(testId), anyList(), any(Instant.class)))
+        .thenThrow(NotFoundException.class);
+
+    var request =
+        AddRacersRequest.builder()
+            .racerIds(List.of())
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.addRacersToRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  @DisplayName("Add Racers should handle out of date requests")
+  void addRacersShouldHandleBadTimestamp() {
+    when(this.raceService.addRacersToRace(eq(testId), anyList(), any(Instant.class)))
+        .thenThrow(ConflictException.class);
+
+    var request =
+        AddRacersRequest.builder()
+            .racerIds(List.of())
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.addRacersToRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
   }
 }

@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,4 +53,20 @@ public interface RaceApi {
             description = "Could not create race: A race with the same name already exists")
       })
   ResponseEntity<Race> createRace(@Valid @RequestBody CreateRaceRequest request);
+
+  @PostMapping("/{raceId}/add-racers")
+  @Operation(description = "Add racers to existing race")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully added Racers",
+            content = {@Content(schema = @Schema(implementation = Race.class))}),
+        @ApiResponse(responseCode = "404", description = "No race found for the id"),
+        @ApiResponse(
+            responseCode = "409",
+            description = "New edits are available, fetch data and retry")
+      })
+  ResponseEntity<Race> addRacersToRace(
+      @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 }

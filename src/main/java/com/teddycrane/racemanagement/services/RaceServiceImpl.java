@@ -7,9 +7,11 @@ import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,6 +59,36 @@ public class RaceServiceImpl extends BaseService implements RaceService {
     // resolve racers
     Collection<Racer> racers = this.racerRepository.findAllById(racerIds);
     Race r = new Race(name, category, racers);
+
+    return this.raceRepository.save(r);
+  }
+
+  @Override
+  public Race addRacersToRace(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    logger.info("addRacersToRace called for race id {}", raceId);
+
+    Race r =
+        this.raceRepository
+            .findById(raceId)
+            .orElseThrow(() -> new NotFoundException(raceId.toString()));
+
+    if (!r.getUpdatedTimestamp().equals(updatedTimestamp)) {
+      throw new ConflictException("Newer data exists.  Re-fetch and try again.");
+    }
+
+    // filter out racers that do not have the correct category
+    Collection<Racer> newRacers =
+        this.racerRepository.findAllById(racerIds).stream()
+            .filter((racer) -> r.getCategory().equals(racer.getCategory()))
+            .collect(Collectors.toList());
+
+    Collection<Racer> racers = r.getRacers();
+    racers.addAll(newRacers);
+    r.setRacers(racers);
+
+    // update audit timestamp
+    r.setUpdatedTimestamp(Instant.now());
 
     return this.raceRepository.save(r);
   }

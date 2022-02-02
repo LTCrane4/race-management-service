@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -13,14 +14,17 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.services.RaceServiceImpl;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -126,5 +130,47 @@ class RaceServiceTest {
     assertThrows(
         ConflictException.class,
         () -> this.raceService.createRace(expected.getName(), expected.getCategory(), List.of()));
+  }
+
+  @Test
+  @DisplayName("Add Racers to Race should add racers successfully")
+  void addRacersShouldAddRacers() {
+    var list = List.of(TestResourceGenerator.generateRacer());
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
+    when(this.racerRepository.findAllById(anyIterable())).thenReturn(list);
+    when(this.raceRepository.save(any(Race.class)))
+        .thenAnswer(arguments -> arguments.getArgument(0));
+
+    var result =
+        this.raceService.addRacersToRace(
+            testId,
+            list.stream().map(Racer::getId).collect(Collectors.toList()),
+            expected.getUpdatedTimestamp());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertNotNull(result.getRacers(), "The list of racers should not be null"));
+  }
+
+  @Test
+  @DisplayName("Add racers should throw a conflict exception")
+  void addRacersShouldThrowConflictException() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.raceService.addRacersToRace(testId, List.of(), Instant.now()),
+        "A ConflictException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Add racers should throw a NotFoundException when the Race is not found")
+  void addRacersShouldThrowNotFound() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.raceService.addRacersToRace(testId, List.of(), Instant.now()),
+        "A NotFoundException should be thrown if the race cannot be found");
   }
 }
