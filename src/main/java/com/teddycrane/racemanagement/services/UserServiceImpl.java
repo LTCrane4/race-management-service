@@ -1,5 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
+import static com.teddycrane.racemanagement.utils.PasswordEncoder.encodePassword;
+
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
@@ -39,7 +41,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final Handler<UUID, User> getUserHandler;
   private final Handler<String, Collection<User>> getUsersHandler;
-  private final Handler<CreateUserRequest, User> createUserHandler;
   private final Handler<DeleteUserRequest, User> deleteUserHandler;
   private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
@@ -49,7 +50,6 @@ public class UserServiceImpl extends BaseService implements UserService {
       AuthenticationManager authenticationManager,
       Handler<UUID, User> getUserHandler,
       Handler<String, Collection<User>> getUsersHandler,
-      Handler<CreateUserRequest, User> createUserHandler,
       Handler<DeleteUserRequest, User> deleteUserHandler,
       Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
     super();
@@ -58,7 +58,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.authenticationManager = authenticationManager;
     this.getUserHandler = getUserHandler;
     this.getUsersHandler = getUsersHandler;
-    this.createUserHandler = createUserHandler;
     this.deleteUserHandler = deleteUserHandler;
     this.changePasswordHandler = changePasswordHandler;
   }
@@ -101,10 +100,21 @@ public class UserServiceImpl extends BaseService implements UserService {
     logger.info("createUser called");
 
     // set type to USER if there is no type provided
-    UserType type = request.getUserType() == null ? UserType.USER : request.getUserType();
-    request.setUserType(type);
+    Optional<User> existing = this.userRepository.findByUsername(request.getUsername());
 
-    return this.createUserHandler.resolve(request);
+    if (existing.isPresent()) {
+      throw new DuplicateItemException(
+          "This username is already taken.  Please try a different username");
+    }
+
+    return this.userRepository.save(
+        new User(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getUsername(),
+            request.getEmail(),
+            encodePassword(request.getPassword()),
+            request.getUserType()));
   }
 
   @Override
