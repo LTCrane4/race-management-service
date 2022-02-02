@@ -48,7 +48,6 @@ class UserServiceTest {
   @Mock private AuthenticationManager authenticationManager;
 
   // Mock handlers
-  @Mock private Handler<String, Collection<User>> getUsersHandler;
   @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
   @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
@@ -69,7 +68,6 @@ class UserServiceTest {
             this.userRepository,
             this.tokenManager,
             this.authenticationManager,
-            this.getUsersHandler,
             this.deleteUserHandler,
             this.changePasswordHandler);
     this.existing = TestResourceGenerator.generateUser();
@@ -160,7 +158,7 @@ class UserServiceTest {
   @Test
   public void getAllUsersShouldReturnListOfUsers() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
-    when(this.getUsersHandler.resolve(anyString())).thenReturn(expectedList);
+    when(this.userRepository.findAll()).thenReturn((List<User>) expectedList);
 
     Collection<User> result = this.userService.getAllUsers();
 
