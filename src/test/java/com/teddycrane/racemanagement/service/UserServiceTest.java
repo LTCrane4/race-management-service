@@ -48,7 +48,6 @@ class UserServiceTest {
   @Mock private AuthenticationManager authenticationManager;
 
   // Mock handlers
-  @Mock private Handler<UUID, User> getUserHandler;
   @Mock private Handler<String, Collection<User>> getUsersHandler;
   @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
   @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
@@ -70,7 +69,6 @@ class UserServiceTest {
             this.userRepository,
             this.tokenManager,
             this.authenticationManager,
-            this.getUserHandler,
             this.getUsersHandler,
             this.deleteUserHandler,
             this.changePasswordHandler);
@@ -80,7 +78,7 @@ class UserServiceTest {
 
   @Test
   void getUserShouldReturnUser() {
-    when(this.getUserHandler.resolve(testId)).thenReturn(existing);
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
 
     var result = this.userService.getUser(testId);
 

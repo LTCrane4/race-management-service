@@ -39,7 +39,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
-  private final Handler<UUID, User> getUserHandler;
   private final Handler<String, Collection<User>> getUsersHandler;
   private final Handler<DeleteUserRequest, User> deleteUserHandler;
   private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
@@ -48,7 +47,6 @@ public class UserServiceImpl extends BaseService implements UserService {
       UserRepository userRepository,
       TokenManager tokenManager,
       AuthenticationManager authenticationManager,
-      Handler<UUID, User> getUserHandler,
       Handler<String, Collection<User>> getUsersHandler,
       Handler<DeleteUserRequest, User> deleteUserHandler,
       Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
@@ -56,7 +54,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
-    this.getUserHandler = getUserHandler;
     this.getUsersHandler = getUsersHandler;
     this.deleteUserHandler = deleteUserHandler;
     this.changePasswordHandler = changePasswordHandler;
@@ -71,14 +68,9 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public User getUser(UUID id) throws NotFoundException {
     logger.info("getUser called");
-    User u = this.getUserHandler.resolve(id);
-
-    if (u == null) {
-      logger.error("No user found for the id {}", id);
-      throw new NotFoundException("No user found for the provided id!");
-    }
-
-    return u;
+    return this.userRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
   }
 
   @Override
