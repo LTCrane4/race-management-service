@@ -63,8 +63,25 @@ public class RaceServiceImpl extends BaseService implements RaceService {
   }
 
   @Override
-  public Race addRacersToRace(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp) {
+  public Race addRacersToRace(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException {
     logger.info("addRacersToRace called for race id {}", raceId);
-    return null;
+
+    Race r =
+        this.raceRepository
+            .findById(raceId)
+            .orElseThrow(() -> new NotFoundException(raceId.toString()));
+
+    if (!r.getUpdatedTimestamp().equals(updatedTimestamp)) {
+      throw new ConflictException("Newer data exists.  Re-fetch and try again.");
+    }
+
+    Collection<Racer> newRacers = this.racerRepository.findAllById(racerIds);
+    Collection<Racer> racers = r.getRacers();
+    // todo remove duplicate items
+    racers.addAll(newRacers);
+    r.setRacers(racers);
+
+    return this.raceRepository.save(r);
   }
 }
