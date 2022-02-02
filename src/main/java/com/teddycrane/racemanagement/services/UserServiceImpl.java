@@ -12,7 +12,6 @@ import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
-import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -39,20 +38,17 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
-  private final Handler<DeleteUserRequest, User> deleteUserHandler;
   private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
   public UserServiceImpl(
       UserRepository userRepository,
       TokenManager tokenManager,
       AuthenticationManager authenticationManager,
-      Handler<DeleteUserRequest, User> deleteUserHandler,
       Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
-    this.deleteUserHandler = deleteUserHandler;
     this.changePasswordHandler = changePasswordHandler;
   }
 
@@ -193,7 +189,12 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public User deleteUser(UUID id) throws NotFoundException {
     logger.info("deleteUser called for {} by {}", id, "test");
+    User u =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
 
-    return this.deleteUserHandler.resolve(new DeleteUserRequest(id));
+    this.userRepository.delete(u);
+    return u;
   }
 }

@@ -15,7 +15,6 @@ import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.handler.Handler;
 import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
-import com.teddycrane.racemanagement.handler.user.request.DeleteUserRequest;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -48,7 +47,6 @@ class UserServiceTest {
   @Mock private AuthenticationManager authenticationManager;
 
   // Mock handlers
-  @Mock private Handler<DeleteUserRequest, User> deleteUserHandler;
   @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
 
   @Captor private ArgumentCaptor<User> userCaptor;
@@ -68,7 +66,6 @@ class UserServiceTest {
             this.userRepository,
             this.tokenManager,
             this.authenticationManager,
-            this.deleteUserHandler,
             this.changePasswordHandler);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
@@ -264,13 +261,19 @@ class UserServiceTest {
 
   @Test
   void shouldDeleteUser() {
-    when(this.deleteUserHandler.resolve(any(DeleteUserRequest.class))).thenReturn(existing);
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
 
     var result = this.userService.deleteUser(testId);
-
     assertAll(
-        () -> assertNotNull(result, "The returned user should not be null"),
-        () -> assertEquals(existing, result, "The result should equal the expected value"));
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(existing, result, "The result should match the expected value"));
+  }
+
+  @Test
+  void shouldNotDeleteIfNotFound() {
+    when(this.userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> this.userService.deleteUser(UUID.randomUUID()));
   }
 
   @Test
