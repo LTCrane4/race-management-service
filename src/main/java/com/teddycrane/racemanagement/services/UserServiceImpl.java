@@ -10,8 +10,6 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.handler.Handler;
-import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -38,18 +36,14 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   private final AuthenticationManager authenticationManager;
 
-  private final Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
-
   public UserServiceImpl(
       UserRepository userRepository,
       TokenManager tokenManager,
-      AuthenticationManager authenticationManager,
-      Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler) {
+      AuthenticationManager authenticationManager) {
     super();
     this.userRepository = userRepository;
     this.tokenManager = tokenManager;
     this.authenticationManager = authenticationManager;
-    this.changePasswordHandler = changePasswordHandler;
   }
 
   @Override
@@ -178,12 +172,20 @@ public class UserServiceImpl extends BaseService implements UserService {
   public boolean changePassword(UUID id, String oldPassword, String newPassword)
       throws BadRequestException, NotFoundException {
     logger.info("changePassword called");
-    return this.changePasswordHandler.resolve(
-        ChangePasswordHandlerRequest.builder()
-            .id(id)
-            .oldPassword(oldPassword)
-            .newPassword(newPassword)
-            .build());
+    User user =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+
+    String encodedPassword = encodePassword(oldPassword);
+    if (encodedPassword.equals(user.getPassword())) {
+      user.setPassword(encodePassword(newPassword));
+      this.userRepository.save(user);
+
+      return true;
+    } else {
+      throw new BadRequestException("Previous password provided was incorrect.  Please try again.");
+    }
   }
 
   @Override

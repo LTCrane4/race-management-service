@@ -8,13 +8,12 @@ import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.handler.Handler;
-import com.teddycrane.racemanagement.handler.user.request.ChangePasswordHandlerRequest;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -46,9 +45,6 @@ class UserServiceTest {
   @Mock private TokenManager tokenManager;
   @Mock private AuthenticationManager authenticationManager;
 
-  // Mock handlers
-  @Mock private Handler<ChangePasswordHandlerRequest, Boolean> changePasswordHandler;
-
   @Captor private ArgumentCaptor<User> userCaptor;
 
   private UUID testId;
@@ -57,16 +53,10 @@ class UserServiceTest {
 
   private User existing;
 
-  @Captor private ArgumentCaptor<User> user;
-
   @BeforeEach
   void setUp() {
     this.userService =
-        new UserServiceImpl(
-            this.userRepository,
-            this.tokenManager,
-            this.authenticationManager,
-            this.changePasswordHandler);
+        new UserServiceImpl(this.userRepository, this.tokenManager, this.authenticationManager);
     this.existing = TestResourceGenerator.generateUser();
     this.testId = UUID.randomUUID();
   }
@@ -181,15 +171,13 @@ class UserServiceTest {
             UserType.ADMIN,
             existing.getUpdatedTimestamp());
 
-    verify(this.userRepository).save(user.capture());
+    verify(this.userRepository).save(userCaptor.capture());
 
-    var value = user.getValue();
+    var value = userCaptor.getValue();
 
     assertAll(
         () -> assertNotNull(actual, "The result should not be null"),
-        () ->
-            assertNotNull(
-                user.getValue(), "The value submitted to the database should not be null"),
+        () -> assertNotNull(value, "The value submitted to the database should not be null"),
         () ->
             assertEquals(
                 "firstName",
@@ -277,12 +265,24 @@ class UserServiceTest {
   }
 
   @Test
-  void changePasswordShouldReturnSuccess() {
-    when(this.changePasswordHandler.resolve(any(ChangePasswordHandlerRequest.class)))
-        .thenReturn(true);
+  @DisplayName("Change password should throw BadRequestException if the old password is incorrect")
+  void changePasswordShouldThrowException() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
 
-    var result = this.userService.changePassword(testId, "oldPassword", "newPassword");
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userService.changePassword(testId, "test", "test2"),
+        "A BadRequestException should be thrown");
+  }
 
-    assertTrue(result);
+  @Test
+  @DisplayName("Change password should throw an exception if the user does not exist")
+  void changePasswordShouldThrowExceptionIfUserDoesNotExist() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userService.changePassword(testId, "", ""),
+        "A NotFoundException should be thrown");
   }
 }
