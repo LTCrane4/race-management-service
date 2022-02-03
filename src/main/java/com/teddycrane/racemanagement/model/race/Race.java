@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.model.race;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import org.hibernate.annotations.Type;
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
-public class Race {
+public class Race implements Response {
   @Id
   @Type(type = "uuid-char")
   @GeneratedValue(strategy = GenerationType.AUTO)
