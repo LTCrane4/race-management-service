@@ -201,6 +201,23 @@ class RaceServiceTest {
   }
 
   @Test
+  @DisplayName("Update race should do nothing if all update inputs are null")
+  void updateRaceShouldDoNothingIfInputsAreNotProvided() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
+    when(this.raceRepository.save(any(Race.class)))
+        .thenAnswer(arguments -> arguments.getArgument(0));
+
+    var oldTimestamp = expected.getUpdatedTimestamp();
+    var result = this.raceService.updateRace(testId, null, null, expected.getUpdatedTimestamp());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                oldTimestamp, result.getUpdatedTimestamp(), "The timestamp should not be updated"));
+  }
+
+  @Test
   @DisplayName("Update race should throw a NotFoundException if the race is not found")
   void updateRaceShouldThrowNotFound() {
     when(this.raceRepository.findById(testId)).thenReturn(Optional.empty());
