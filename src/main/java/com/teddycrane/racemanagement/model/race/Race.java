@@ -16,18 +16,18 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
 public class Race implements Response {
+
   @Id
   @Type(type = "uuid-char")
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -56,5 +56,15 @@ public class Race implements Response {
     this.name = name;
     this.category = category;
     this.racers = new ArrayList<>(racers);
+  }
+
+  public Race(@NonNull Race other) {
+    this(
+        other.id,
+        other.createdTimestamp,
+        other.updatedTimestamp,
+        other.name,
+        other.category,
+        other.racers);
   }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface RaceService {
+
   List<Race> getAllRaces();
 
   Race getRace(UUID id);
@@ -18,5 +19,8 @@ public interface RaceService {
   Race createRace(String name, Category category, List<UUID> racerIds) throws ConflictException;
 
   Race addRacersToRace(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException;
+
+  Race updateRace(UUID id, String name, Category category, Instant updatedTimestamp)
       throws ConflictException, NotFoundException;
 }

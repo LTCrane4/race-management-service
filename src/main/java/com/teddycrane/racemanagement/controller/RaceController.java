@@ -3,9 +3,11 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 // import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.services.RaceService;
@@ -95,5 +97,10 @@ public class RaceController extends BaseController implements RaceApi {
       logger.error("Newer data has been provided.");
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
+  }
+
+  @Override
+  public ResponseEntity<Response> updateRace(String id, UpdateRaceRequest request) {
+    return null;
   }
 }

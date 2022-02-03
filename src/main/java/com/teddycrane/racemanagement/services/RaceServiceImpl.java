@@ -92,4 +92,10 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
     return this.raceRepository.save(r);
   }
+
+  @Override
+  public Race updateRace(UUID id, String name, Category category, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    return null;
+  }
 }
