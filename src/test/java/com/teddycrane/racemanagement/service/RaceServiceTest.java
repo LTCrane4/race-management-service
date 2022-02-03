@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.service;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -172,5 +173,52 @@ class RaceServiceTest {
         NotFoundException.class,
         () -> this.raceService.addRacersToRace(testId, List.of(), Instant.now()),
         "A NotFoundException should be thrown if the race cannot be found");
+  }
+
+  @Test
+  @DisplayName("Update Race should update a race")
+  void updateRaceShouldUpdate() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
+    when(this.raceRepository.save(any(Race.class)))
+        .thenAnswer(arguments -> arguments.getArgument(0));
+
+    var oldTimestamp = expected.getUpdatedTimestamp();
+    var result = this.raceService.updateRace(testId, "New Name", Category.CAT2, oldTimestamp);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals("New Name", result.getName(), "The name should match the updated name"),
+        () ->
+            assertEquals(
+                Category.CAT2,
+                result.getCategory(),
+                "The category should match the updated category"),
+        () ->
+            assertNotEquals(
+                oldTimestamp,
+                result.getUpdatedTimestamp(),
+                "The audit timestamp should be changed with the update"));
+  }
+
+  @Test
+  @DisplayName("Update race should throw a NotFoundException if the race is not found")
+  void updateRaceShouldThrowNotFound() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.raceService.updateRace(testId, null, null, null),
+        "A NotFoundException should be thrown if no Race is found");
+  }
+
+  @Test
+  @DisplayName("Update race should throw a ConflictException if the timestamps do not match")
+  void updateRaceShouldThrowConflictException() {
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.raceService.updateRace(testId, null, null, Instant.now()),
+        "A ConflictException should be thrown if the timestamps do not match");
   }
 }
