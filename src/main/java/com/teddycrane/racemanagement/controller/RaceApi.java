@@ -95,6 +95,6 @@ public interface RaceApi {
             description = "Timestamp not up to date",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<Response> updateRace(
+  ResponseEntity<? extends Response> updateRace(
       @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request);
 }

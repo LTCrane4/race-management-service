@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
@@ -10,6 +11,7 @@ import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 // import com.teddycrane.racemanagement.services.RaceService;
+import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -30,6 +32,12 @@ public class RaceController extends BaseController implements RaceApi {
   public RaceController(RaceService raceService) {
     super();
     this.raceService = raceService;
+  }
+
+  @NonNull
+  private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
+    var body = ErrorResponse.builder().message(message).build();
+    return new ResponseEntity<ErrorResponse>(body, status);
   }
 
   @Override
@@ -100,7 +108,43 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<Response> updateRace(String id, UpdateRaceRequest request) {
-    return null;
+  public ResponseEntity<? extends Response> updateRace(String id, UpdateRaceRequest request) {
+    logger.info("updateRace called");
+
+    try {
+      UUID raceId = UUID.fromString(id);
+
+      // verify required parameters are present
+      if (request.getName() == null && request.getCategory() == null) {
+        throw new BadRequestException("Bad request!");
+      }
+
+      return new ResponseEntity<>(
+          this.raceService.updateRace(
+              raceId,
+              request.getName(),
+              request.getCategory(),
+              Instant.parse(request.getUpdatedTimestamp())),
+          HttpStatus.OK);
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      logger.error("One of the required metadata values is not valid");
+      return this.createErrorResponse(
+          String.format(
+              "One of the provided audit values is invalid: ID: %s, timestamp: %S",
+              id, request.getUpdatedTimestamp()),
+          HttpStatus.BAD_REQUEST);
+    } catch (BadRequestException e) {
+      logger.error("Update parameters not provided");
+      return this.createErrorResponse("Not enough parameters provided!", HttpStatus.BAD_REQUEST);
+    } catch (ConflictException e) {
+      logger.error("The updated timestamp is not the most recent");
+      return this.createErrorResponse(
+          "The updatedTimestamp is not the most recent.  Please re-fetch data and try again.",
+          HttpStatus.CONFLICT);
+    } catch (NotFoundException e) {
+      logger.error("No Race found for the id {}", id);
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    }
   }
 }

@@ -275,7 +275,7 @@ class RaceControllerTest {
   void updateRaceShouldHandleNotFound() {
     when(this.raceService.updateRace(
             eq(testId), anyString(), any(Category.class), any(Instant.class)))
-        .thenThrow(ConflictException.class);
+        .thenThrow(NotFoundException.class);
 
     var request =
         UpdateRaceRequest.builder()
@@ -289,8 +289,7 @@ class RaceControllerTest {
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 404"));
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
   }
 
   @Test
