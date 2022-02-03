@@ -92,4 +92,36 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
     return this.raceRepository.save(r);
   }
+
+  @Override
+  public Race updateRace(UUID id, String name, Category category, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    logger.info("updateRace called for race {}", id);
+    boolean isUpdated = false;
+
+    Race race =
+        this.raceRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No racer found!"));
+
+    if (!updatedTimestamp.equals(race.getUpdatedTimestamp())) {
+      throw new ConflictException("Updated timestamps do not match!");
+    }
+
+    if (name != null) {
+      race.setName(name);
+      isUpdated = true;
+    }
+    // todo ensure that racer list is empty
+    if (category != null) {
+      race.setCategory(category);
+      isUpdated = true;
+    }
+
+    if (isUpdated) {
+      race.setUpdatedTimestamp(Instant.now());
+    }
+
+    return this.raceRepository.save(race);
+  }
 }

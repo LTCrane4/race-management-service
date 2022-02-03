@@ -16,6 +16,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
 import java.util.Collection;
@@ -210,6 +211,102 @@ class RaceControllerTest {
             .build();
 
     var result = this.raceController.addRacersToRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+  }
+
+  @Test
+  @DisplayName("Update race should update a race with a valid request")
+  void updateRaceShouldUpdate() {
+    when(this.raceService.updateRace(
+            eq(testId), anyString(), any(Category.class), any(Instant.class)))
+        .thenReturn(expected);
+
+    var request =
+        UpdateRaceRequest.builder()
+            .name("New Name")
+            .category(Category.CAT1)
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.updateRace(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
+        () -> assertNotNull(body, "The body should not be null"),
+        () -> assertEquals(expected, body, "The body should match the expected value"));
+  }
+
+  @Test
+  @DisplayName("Update race should handle bad UUID")
+  void updateRaceShouldHandleBadId() {
+    var request =
+        UpdateRaceRequest.builder().name("test").updatedTimestamp(Instant.now().toString()).build();
+    var result = this.raceController.updateRace("not a uuid", request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName("Update race should handle no requested changes")
+  void updateRaceShouldHandleNoRequestedChanges() {
+    var request = UpdateRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+
+    var result = this.raceController.updateRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName("Update race should handle not found")
+  void updateRaceShouldHandleNotFound() {
+    when(this.raceService.updateRace(
+            eq(testId), anyString(), any(Category.class), any(Instant.class)))
+        .thenThrow(NotFoundException.class);
+
+    var request =
+        UpdateRaceRequest.builder()
+            .name("test")
+            .category(Category.CAT2)
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.updateRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  @DisplayName("Update Race should hande conflict exceptions")
+  void updateRaceShouldHandleConflictEx() {
+    when(this.raceService.updateRace(
+            eq(testId), anyString(), any(Category.class), any(Instant.class)))
+        .thenThrow(ConflictException.class);
+
+    var request =
+        UpdateRaceRequest.builder()
+            .name("test")
+            .category(Category.CAT1)
+            .updatedTimestamp(Instant.now().toString())
+            .build();
+
+    var result = this.raceController.updateRace(testString, request);
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),

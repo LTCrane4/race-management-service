@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.model.race;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -24,9 +24,9 @@ import org.hibernate.annotations.Type;
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
-public class Race {
+public class Race implements Response {
+
   @Id
   @Type(type = "uuid-char")
   @GeneratedValue(strategy = GenerationType.AUTO)
