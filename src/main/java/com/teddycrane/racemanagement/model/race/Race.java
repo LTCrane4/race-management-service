@@ -19,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
-import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
@@ -56,15 +55,5 @@ public class Race implements Response {
     this.name = name;
     this.category = category;
     this.racers = new ArrayList<>(racers);
-  }
-
-  public Race(@NonNull Race other) {
-    this(
-        other.id,
-        other.createdTimestamp,
-        other.updatedTimestamp,
-        other.name,
-        other.category,
-        other.racers);
   }
 }
