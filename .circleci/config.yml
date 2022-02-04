@@ -51,10 +51,10 @@ jobs:
             - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Split Tests
-          command: circleci tests glob "src/test/**/*.java" | circleci tests split --split-by-timings | xargs -n 1 echo
+          command: circleci tests glob "src/test/**/*.java" | circleci tests split --split-by=timings | xargs -n 1 echo
       - run:
           name: Test Application
-          command: ./gradlew test -i -PtestFilter="`circleci tests glob "src/test/**/*.java" | circleci tests split --split-by-timings`"
+          command: ./gradlew test -i -PtestFilter="`circleci tests glob "src/test/**/*.java" | circleci tests split --split-by=timings`"
       - run:
           name: Consolidate Test Results
           command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
