@@ -19,6 +19,7 @@ jobs:
           key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
           paths:
             - ~/.gradle/caches/modules-2/files-2.1
+            - .gradle
 
   build-application:
     docker:
