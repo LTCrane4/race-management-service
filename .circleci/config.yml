@@ -117,10 +117,10 @@ workflows:
       - integration-test:
           requires:
             - install-dependencies
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
       - store-built-application:
           requires:
             - test
