@@ -5,7 +5,6 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
@@ -48,7 +47,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<Race> getRace(String id) {
+  public ResponseEntity<? extends Response> getRace(String id) {
     logger.info("getRace called");
 
     try {
@@ -56,10 +55,11 @@ public class RaceController extends BaseController implements RaceApi {
       return ResponseEntity.ok(this.raceService.getRace(raceId));
     } catch (IllegalArgumentException e) {
       logger.error("Invalid UUID provided");
-      return ResponseEntity.badRequest().build();
+      return this.createErrorResponse("Invalid UUID provided!", HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error("No race found for the id {}", id);
-      return ResponseEntity.notFound().build();
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
     }
   }
 

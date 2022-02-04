@@ -39,10 +39,16 @@ public interface RaceApi {
             responseCode = "200",
             description = "Successfully found race",
             content = {@Content(schema = @Schema(implementation = Race.class))}),
-        @ApiResponse(responseCode = "404", description = "No race found"),
-        @ApiResponse(responseCode = "400", description = "Invalid id provided")
+        @ApiResponse(
+            responseCode = "404",
+            description = "No race found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid id provided",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<Race> getRace(@PathVariable("id") String id);
+  ResponseEntity<? extends Response> getRace(@PathVariable("id") String id);
 
   @PostMapping
   @Operation(description = "Create new race")
