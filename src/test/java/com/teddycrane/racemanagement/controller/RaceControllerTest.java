@@ -253,7 +253,8 @@ class RaceControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"));
   }
 
   @Test
@@ -267,7 +268,8 @@ class RaceControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"));
   }
 
   @Test
@@ -289,7 +291,8 @@ class RaceControllerTest {
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () ->
-            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"));
   }
 
   @Test
@@ -307,10 +310,11 @@ class RaceControllerTest {
             .build();
 
     var result = this.raceController.updateRace(testString, request);
+    var body = result.getBody();
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+        () -> assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"),
+        () -> assertNotNull(body, "The response body should not be null"));
   }
 }

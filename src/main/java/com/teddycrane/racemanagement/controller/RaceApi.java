@@ -39,10 +39,16 @@ public interface RaceApi {
             responseCode = "200",
             description = "Successfully found race",
             content = {@Content(schema = @Schema(implementation = Race.class))}),
-        @ApiResponse(responseCode = "404", description = "No race found"),
-        @ApiResponse(responseCode = "400", description = "Invalid id provided")
+        @ApiResponse(
+            responseCode = "404",
+            description = "No race found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid id provided",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<Race> getRace(@PathVariable("id") String id);
+  ResponseEntity<? extends Response> getRace(@PathVariable("id") String id);
 
   @PostMapping
   @Operation(description = "Create new race")
@@ -54,9 +60,10 @@ public interface RaceApi {
             content = {@Content(schema = @Schema(implementation = Race.class))}),
         @ApiResponse(
             responseCode = "409",
-            description = "Could not create race: A race with the same name already exists")
+            description = "Could not create race: A race with the same name already exists",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<Race> createRace(@Valid @RequestBody CreateRaceRequest request);
+  ResponseEntity<? extends Response> createRace(@Valid @RequestBody CreateRaceRequest request);
 
   @PostMapping("/{raceId}/add-racers")
   @Operation(description = "Add racers to existing race")
@@ -66,12 +73,16 @@ public interface RaceApi {
             responseCode = "200",
             description = "Successfully added Racers",
             content = {@Content(schema = @Schema(implementation = Race.class))}),
-        @ApiResponse(responseCode = "404", description = "No race found for the id"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No race found for the id",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
         @ApiResponse(
             responseCode = "409",
-            description = "New edits are available, fetch data and retry")
+            description = "New edits are available, fetch data and retry",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<Race> addRacersToRace(
+  ResponseEntity<? extends Response> addRacersToRace(
       @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 
   @PatchMapping("/{id}")

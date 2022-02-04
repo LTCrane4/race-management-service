@@ -1,11 +1,9 @@
 package com.teddycrane.racemanagement.test.integration.tests.users;
 
-import static com.teddycrane.racemanagement.test.integration.constants.Constants.AUTHORIZATION_HEADER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +14,7 @@ class CreateUser extends UserBase {
 
   @Test
   void createUserShouldCreate() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode object = mapper.createObjectNode();
+    ObjectNode object = this.mapper.createObjectNode();
     object.put("username", "testcreate");
     object.put("password", "password");
     object.put("firstName", "Test");

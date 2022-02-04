@@ -5,7 +5,6 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
@@ -37,7 +36,7 @@ public class RaceController extends BaseController implements RaceApi {
   @NonNull
   private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
     var body = ErrorResponse.builder().message(message).build();
-    return new ResponseEntity<ErrorResponse>(body, status);
+    return new ResponseEntity<>(body, status);
   }
 
   @Override
@@ -48,7 +47,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<Race> getRace(String id) {
+  public ResponseEntity<? extends Response> getRace(String id) {
     logger.info("getRace called");
 
     try {
@@ -56,22 +55,23 @@ public class RaceController extends BaseController implements RaceApi {
       return ResponseEntity.ok(this.raceService.getRace(raceId));
     } catch (IllegalArgumentException e) {
       logger.error("Invalid UUID provided");
-      return ResponseEntity.badRequest().build();
+      return this.createErrorResponse("Invalid UUID provided!", HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error("No race found for the id {}", id);
-      return ResponseEntity.notFound().build();
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
     }
   }
 
   @Override
-  public ResponseEntity<Race> createRace(@NonNull CreateRaceRequest request) {
+  public ResponseEntity<? extends Response> createRace(@NonNull CreateRaceRequest request) {
     logger.info("createRace called");
     String name = request.getName();
     Category category = request.getCategory();
     List<UUID> racers = List.of();
 
+    // filter out null elements
     if (request.getRacerIds() != null) {
-      // ensure list elements are not null
       racers = request.getRacerIds().stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -79,12 +79,14 @@ public class RaceController extends BaseController implements RaceApi {
       return ResponseEntity.ok(this.raceService.createRace(name, category, racers));
     } catch (ConflictException e) {
       logger.error("Name Collision: Cannot create duplicate race");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return this.createErrorResponse(
+          "Cannot create a duplicate of an existing race!", HttpStatus.CONFLICT);
     }
   }
 
   @Override
-  public ResponseEntity<Race> addRacersToRace(String raceId, @NonNull AddRacersRequest request) {
+  public ResponseEntity<? extends Response> addRacersToRace(
+      String raceId, @NonNull AddRacersRequest request) {
     logger.info("addRacersToRace called");
 
     try {
@@ -95,15 +97,19 @@ public class RaceController extends BaseController implements RaceApi {
           this.raceService.addRacersToRace(id, request.getRacerIds(), updatedTimestamp));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.error("A provided parameter was not provided in a valid format");
-      return ResponseEntity.badRequest().build();
+      return this.createErrorResponse(
+          "One of the required parameters was not provided in a valid format",
+          HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error(
           "An error ocurred when attempting to resolve data for the following UUID: {}",
           e.getMessage());
-      return ResponseEntity.notFound().build();
+      return this.createErrorResponse(
+          String.format("No entries found for the id %s", e.getMessage()), HttpStatus.NOT_FOUND);
     } catch (ConflictException e) {
       logger.error("Newer data has been provided.");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return this.createErrorResponse(
+          "Newer data exists.  Please re-fetch and try again.", HttpStatus.CONFLICT);
     }
   }
 
