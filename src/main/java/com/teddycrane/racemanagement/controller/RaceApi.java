@@ -66,12 +66,16 @@ public interface RaceApi {
             responseCode = "200",
             description = "Successfully added Racers",
             content = {@Content(schema = @Schema(implementation = Race.class))}),
-        @ApiResponse(responseCode = "404", description = "No race found for the id"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No race found for the id",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
         @ApiResponse(
             responseCode = "409",
-            description = "New edits are available, fetch data and retry")
+            description = "New edits are available, fetch data and retry",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<Race> addRacersToRace(
+  ResponseEntity<? extends Response> addRacersToRace(
       @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 
   @PatchMapping("/{id}")

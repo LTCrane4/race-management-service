@@ -84,7 +84,8 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<Race> addRacersToRace(String raceId, @NonNull AddRacersRequest request) {
+  public ResponseEntity<? extends Response> addRacersToRace(
+      String raceId, @NonNull AddRacersRequest request) {
     logger.info("addRacersToRace called");
 
     try {
@@ -95,15 +96,19 @@ public class RaceController extends BaseController implements RaceApi {
           this.raceService.addRacersToRace(id, request.getRacerIds(), updatedTimestamp));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.error("A provided parameter was not provided in a valid format");
-      return ResponseEntity.badRequest().build();
+      return this.createErrorResponse(
+          "One of the required parameters was not provided in a valid format",
+          HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error(
           "An error ocurred when attempting to resolve data for the following UUID: {}",
           e.getMessage());
-      return ResponseEntity.notFound().build();
+      return this.createErrorResponse(
+          String.format("No entries found for the id %s", e.getMessage()), HttpStatus.NOT_FOUND);
     } catch (ConflictException e) {
       logger.error("Newer data has been provided.");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return this.createErrorResponse(
+          "Newer data exists.  Please re-fetch and try again.", HttpStatus.CONFLICT);
     }
   }
 
