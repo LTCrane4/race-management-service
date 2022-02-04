@@ -126,7 +126,7 @@ workflows:
           requires:
             - test
             - build-application
-            - integration-test
+#            - integration-test
           filters:
             branches:
               only:
