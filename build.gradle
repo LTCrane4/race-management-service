@@ -80,6 +80,14 @@ task integrationTest(type: Test) {
         logger.lifecycle("Running test: " + descriptor)
     }
 
+    // split tests with filter
+    if (project.hasProperty("testFilter")) {
+        List<String> props = project.getProperties().get("testFilter").split("\\s+")
+        props.each {
+            include(it.replace("src/integrationTest/java/com/", "**/").replace(".java", ".class"))
+        }
+    }
+
     testLogging.showStandardStreams = true // show debug output
 
     testLogging {

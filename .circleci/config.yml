@@ -66,15 +66,15 @@ jobs:
   integration-test:
     machine:
       image: ubuntu-2004:202008-01
-#    parallelism: 2
+    parallelism: 2
     steps:
       - checkout
       - restore_cache:
           keys:
             - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
-#      - run:
-#          name: Split Tests by Runtime
-#          command: circleci tests glob "src/integrationTest/com/teddycrane/racemanagement/test/integration/tests/*.java" | circleci tests split --split-by-timings
+      - run:
+          name: Split Tests by Runtime
+          command: circleci tests glob "src/integrationTest/com/teddycrane/racemanagement/test/integration/tests/*.java" | circleci tests split --split-by-timings
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
@@ -83,7 +83,7 @@ jobs:
           command: java --version
       - run:
           name: Run Integration Tests
-          command: ./gradlew integrationTest
+          command: ./gradlew integrationTest -PtestFilter="`circleci tests glob "src/integrationTest/**/*.java" | circleci tests split --split-by=timings`"
       - store_test_results:
           path: build/test-results/integrationTest
 
@@ -117,10 +117,10 @@ workflows:
       - integration-test:
           requires:
             - install-dependencies
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
       - store-built-application:
           requires:
             - test
