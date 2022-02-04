@@ -36,7 +36,7 @@ public class RaceController extends BaseController implements RaceApi {
   @NonNull
   private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
     var body = ErrorResponse.builder().message(message).build();
-    return new ResponseEntity<ErrorResponse>(body, status);
+    return new ResponseEntity<>(body, status);
   }
 
   @Override
