@@ -72,7 +72,7 @@ task integrationTest(type: Test) {
         logger.lifecycle("Running test: " + descriptor)
     }
 
-    testLogging.showStandardStreams = false // hide debug output
+    testLogging.showStandardStreams = true // show debug output
 
     testLogging {
         events "PASSED", "SKIPPED", "FAILED"

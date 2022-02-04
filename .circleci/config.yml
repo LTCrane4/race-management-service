@@ -31,11 +31,11 @@ jobs:
       - run:
           name: Gradle Build
           command: ./gradlew build -x test
-#      # Cache build deps until build.gradle changes
-#      - save_cache:
-#          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
-#          paths:
-#            - ~/.gradle/caches/modules-2/files-2.1
+      #      # Cache build deps until build.gradle changes
+      #      - save_cache:
+      #          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+      #          paths:
+      #            - ~/.gradle/caches/modules-2/files-2.1
       - store_artifacts:
           path: build/libs/*.jar
           name: app.jar
@@ -43,14 +43,18 @@ jobs:
   test:
     docker:
       - image: cimg/openjdk:17.0
+    parallelism: 2
     steps:
       - checkout
       - restore_cache:
           keys:
             - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
+          name: Split Tests
+          command: circleci tests glob "src/test/**/*.java" | circleci tests split --split-by-timings | xargs -n 1 echo
+      - run:
           name: Test Application
-          command: ./gradlew test -i
+          command: ./gradlew test -i -PtestFilter="`circleci tests glob "src/test/**/*.java" | circleci tests split --split-by-timings`"
       - run:
           name: Consolidate Test Results
           command: cp build/reports/jacoco/all-tests/jacocoAllTests.xml build/test-results/test/jacocoAllTests.xml
@@ -58,18 +62,19 @@ jobs:
           path: build/test-results/test
       - store_artifacts:
           path: build/reports/jacoco/html
-  #      - run:
-  #          name: Upload Test Results
-  #          command: bash <(curl -s https://codecov.io/bash)
 
   integration-test:
     machine:
       image: ubuntu-2004:202008-01
+#    parallelism: 2
     steps:
       - checkout
       - restore_cache:
           keys:
             - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+#      - run:
+#          name: Split Tests by Runtime
+#          command: circleci tests glob "src/integrationTest/com/teddycrane/racemanagement/test/integration/tests/*.java" | circleci tests split --split-by-timings
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
