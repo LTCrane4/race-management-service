@@ -74,7 +74,7 @@ jobs:
             - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Split Tests by Runtime
-          command: circleci tests glob "src/integrationTest/com/teddycrane/racemanagement/test/integration/tests/*.java" | circleci tests split --split-by-timings
+          command: circleci tests glob "src/integrationTest/**/*.java" | circleci tests split --split-by=timings | xargs -n 1 echo
       - run:
           name: Start Docker Daemon
           command: sudo systemctl start docker
