@@ -61,6 +61,14 @@ test {
         events "PASSED", "SKIPPED", "FAILED"
     }
 
+    // split tests with filter
+    if (project.hasProperty("testFilter")) {
+        List<String> props = project.getProperties().get("testFilter").split("\\s+")
+        props.each {
+            include(it.replace("src/test/java/com/", "**/").replace(".java", ".class"))
+        }
+    }
+
     finalizedBy jacocoTestReport // always generate test reports
 }
 
