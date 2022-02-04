@@ -64,14 +64,14 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<Race> createRace(@NonNull CreateRaceRequest request) {
+  public ResponseEntity<? extends Response> createRace(@NonNull CreateRaceRequest request) {
     logger.info("createRace called");
     String name = request.getName();
     Category category = request.getCategory();
     List<UUID> racers = List.of();
 
+    // filter out null elements
     if (request.getRacerIds() != null) {
-      // ensure list elements are not null
       racers = request.getRacerIds().stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -79,7 +79,8 @@ public class RaceController extends BaseController implements RaceApi {
       return ResponseEntity.ok(this.raceService.createRace(name, category, racers));
     } catch (ConflictException e) {
       logger.error("Name Collision: Cannot create duplicate race");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      return this.createErrorResponse(
+          "Cannot create a duplicate of an existing race!", HttpStatus.CONFLICT);
     }
   }
 

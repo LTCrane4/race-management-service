@@ -54,9 +54,10 @@ public interface RaceApi {
             content = {@Content(schema = @Schema(implementation = Race.class))}),
         @ApiResponse(
             responseCode = "409",
-            description = "Could not create race: A race with the same name already exists")
+            description = "Could not create race: A race with the same name already exists",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<Race> createRace(@Valid @RequestBody CreateRaceRequest request);
+  ResponseEntity<? extends Response> createRace(@Valid @RequestBody CreateRaceRequest request);
 
   @PostMapping("/{raceId}/add-racers")
   @Operation(description = "Add racers to existing race")
