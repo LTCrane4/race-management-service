@@ -43,7 +43,7 @@ jobs:
   test:
     docker:
       - image: cimg/openjdk:17.0
-    parallelism: 2
+    parallelism: 8
     steps:
       - checkout
       - restore_cache:
