@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -127,5 +128,11 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     r.setDeleted(true);
     this.racerRepository.save(r);
     return true;
+  }
+
+  @Override
+  public Collection<Racer> searchRacers(SearchType searchType, String searchValue) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

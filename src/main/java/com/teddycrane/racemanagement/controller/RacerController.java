@@ -1,9 +1,11 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
@@ -148,5 +150,11 @@ public class RacerController extends BaseController implements RacerApi {
       logger.error("No racer found with the id {}", request.getId());
       return ResponseEntity.notFound().build();
     }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> searchRacers(
+      SearchType searchType, String searchValue) {
+    return null;
   }
 }

@@ -561,4 +561,11 @@ class RacerControllerTest {
             assertEquals(
                 HttpStatus.BAD_REQUEST, response.getStatusCode(), "The status code should be 400"));
   }
+
+  @Test
+  @DisplayName("Search Racers should return a 200")
+  void searchRacersShouldReturnA200() {
+    var expectedList = TestResourceGenerator.generateRacerList(5);
+    when(this.racerService.searchRacers(any(), any())).thenReturn(expectedList);
+  }
 }
