@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -566,6 +567,25 @@ class RacerControllerTest {
   @DisplayName("Search Racers should return a 200")
   void searchRacersShouldReturnA200() {
     var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(any(), any())).thenReturn(expectedList);
+    when(this.racerService.searchRacers(RacerSearchType.CATEGORY, "CAT1")).thenReturn(expectedList);
+
+    var result =
+        this.racerController.searchRacers(RacerSearchType.CATEGORY, Category.CAT1.toString());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  @DisplayName("Search Racers should return a 400 if the input is not valid")
+  void searchRacersShouldReturn400() {
+    var result = this.racerController.searchRacers(RacerSearchType.CATEGORY, "not a category");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
   }
 }

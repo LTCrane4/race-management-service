@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -154,7 +154,7 @@ public class RacerController extends BaseController implements RacerApi {
 
   @Override
   public ResponseEntity<? extends Response> searchRacers(
-      SearchType searchType, String searchValue) {
+      RacerSearchType searchType, String searchValue) {
     return null;
   }
 }

@@ -1,6 +1,6 @@
 package com.teddycrane.racemanagement.controller;
 
-import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
@@ -90,5 +90,5 @@ public interface RacerApi {
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
   ResponseEntity<? extends Response> searchRacers(
-      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue);
+      @RequestParam("type") RacerSearchType searchType, @RequestParam("value") String searchValue);
 }

@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.config;
 
+import com.teddycrane.racemanagement.config.converter.RacerSearchTypeConverter;
 import com.teddycrane.racemanagement.config.converter.SearchTypeConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -11,5 +12,6 @@ public class WebConfiguration implements WebMvcConfigurer {
   @Override
   public void addFormatters(FormatterRegistry registry) {
     registry.addConverter(new SearchTypeConverter());
+    registry.addConverter(new RacerSearchTypeConverter());
   }
 }
