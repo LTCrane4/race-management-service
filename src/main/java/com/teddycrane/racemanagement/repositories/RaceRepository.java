@@ -16,7 +16,7 @@ public interface RaceRepository extends JpaRepository<Race, UUID> {
       name = "Get Races With Racer Id",
       nativeQuery = true,
       value =
-          "SELECT race.id FROM race INNER JOIN race_racers ON race_racers.racers_id=(?1 or null)"
+          "SELECT race.id FROM race INNER JOIN race_racers ON race_racers.racers_id='?1'"
               + " AND race.id=race_racers.race_id")
-  List<String> findRacesByRacerId(UUID racerId);
+  List<String> findRacesByRacerId(String racerId);
 }

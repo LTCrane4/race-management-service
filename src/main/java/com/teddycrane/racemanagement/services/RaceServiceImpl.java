@@ -127,6 +127,7 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
   @Override
   public List<Race> getRacesForRacer(UUID racerId) throws NotFoundException {
+    logger.info("getRacesForRacer called for racer {}", racerId);
     Racer r =
         this.racerRepository
             .findById(racerId)
@@ -134,9 +135,17 @@ public class RaceServiceImpl extends BaseService implements RaceService {
                 () ->
                     new NotFoundException(String.format("No racer found for the id %s", racerId)));
 
-    return this.raceRepository.findRacesByRacerId(r.getId()).stream()
-        .map((id) -> this.raceRepository.getById(UUID.fromString(id)))
-        .filter(item -> item != null)
-        .toList();
+    List<Race> races =
+        this.raceRepository.findRacesByRacerId(r.getId().toString()).stream()
+            .map(
+                (id) -> {
+                  var racer = this.raceRepository.findById(UUID.fromString(id)).orElse(null);
+                  logger.info("race: {}", racer);
+                  return racer;
+                })
+            .filter(item -> item != null)
+            .toList();
+
+    return races;
   }
 }

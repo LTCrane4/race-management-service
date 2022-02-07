@@ -155,7 +155,20 @@ public class RaceController extends BaseController implements RaceApi {
 
   @Override
   public ResponseEntity<? extends Response> getRacesForRacer(String racerId) {
-    // TODO Auto-generated method stub
-    return null;
+    logger.info("getRacesForRacer called");
+
+    try {
+      UUID id = UUID.fromString(racerId);
+      return ResponseEntity.ok(
+          RaceCollectionResponse.builder().data(this.raceService.getRacesForRacer(id)).build());
+    } catch (IllegalArgumentException e) {
+      logger.error("The provided id is not a valid id!");
+      return this.createErrorResponse(
+          "The provided id was not a valid id!", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error("No racer found for the id {}", racerId);
+      return this.createErrorResponse(
+          String.format("No Racer found for the id %s", racerId), HttpStatus.NOT_FOUND);
+    }
   }
 }
