@@ -11,6 +11,7 @@ import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
+import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.time.Instant;
 import java.util.HashSet;
@@ -155,6 +156,30 @@ public class RacerController extends BaseController implements RacerApi {
   @Override
   public ResponseEntity<? extends Response> searchRacers(
       RacerSearchType searchType, String searchValue) {
-    return null;
+    logger.info("searchRacers called");
+
+    switch (searchType) {
+      case CATEGORY:
+        {
+          if (Category.hasValue(searchValue)) {
+            return new ResponseEntity<RacerCollectionResponse>(
+                new RacerCollectionResponse(
+                    this.racerService.searchRacers(searchType, searchValue)),
+                HttpStatus.OK);
+          }
+          return new ResponseEntity<ErrorResponse>(
+              new ErrorResponse(
+                  String.format("The category value %s is not a valid category!", searchValue)),
+              HttpStatus.BAD_REQUEST);
+        }
+      case FIRST_NAME:
+      case LAST_NAME:
+      default:
+        {
+          return new ResponseEntity<RacerCollectionResponse>(
+              new RacerCollectionResponse(this.racerService.searchRacers(searchType, searchValue)),
+              HttpStatus.OK);
+        }
+    }
   }
 }

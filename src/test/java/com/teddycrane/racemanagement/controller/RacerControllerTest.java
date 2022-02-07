@@ -567,7 +567,7 @@ class RacerControllerTest {
   @DisplayName("Search Racers should return a 200")
   void searchRacersShouldReturnA200() {
     var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(RacerSearchType.CATEGORY, "CAT1")).thenReturn(expectedList);
+    when(this.racerService.searchRacers(RacerSearchType.CATEGORY, "cat1")).thenReturn(expectedList);
 
     var result =
         this.racerController.searchRacers(RacerSearchType.CATEGORY, Category.CAT1.toString());
@@ -575,6 +575,20 @@ class RacerControllerTest {
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  @DisplayName("Search Racers should return a 200 when searching by name")
+  void searchRacersShouldReturn200WhenSearchingByName() {
+    var expectedList = TestResourceGenerator.generateRacerList(5);
+    when(this.racerService.searchRacers(RacerSearchType.FIRST_NAME, "Test"))
+        .thenReturn(expectedList);
+
+    var result = this.racerController.searchRacers(RacerSearchType.FIRST_NAME, "Test");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode()));
   }
 
   @Test

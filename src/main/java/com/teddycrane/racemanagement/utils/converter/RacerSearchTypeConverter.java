@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.config.converter;
+package com.teddycrane.racemanagement.utils.converter;
 
 import com.teddycrane.racemanagement.enums.RacerSearchType;
 

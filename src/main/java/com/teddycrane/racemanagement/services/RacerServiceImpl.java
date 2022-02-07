@@ -8,6 +8,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -132,7 +133,26 @@ public class RacerServiceImpl extends BaseService implements RacerService {
 
   @Override
   public Collection<Racer> searchRacers(RacerSearchType searchType, String searchValue) {
-    // TODO Auto-generated method stub
-    return null;
+    logger.info("searchRacers called with search type {} and value {}", searchType, searchValue);
+
+    switch (searchType) {
+      case CATEGORY:
+        {
+          return this.racerRepository.findAllByCategory(
+              Category.valueOf(searchValue.toUpperCase()));
+        }
+      case FIRST_NAME:
+        {
+          return this.racerRepository.findAllByFirstName(searchValue);
+        }
+      case LAST_NAME:
+        {
+          return this.racerRepository.findAllByLastName(searchValue);
+        }
+      default:
+        {
+          return new ArrayList<Racer>();
+        }
+    }
   }
 }
