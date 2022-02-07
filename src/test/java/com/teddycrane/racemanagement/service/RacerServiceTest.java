@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
@@ -226,5 +227,41 @@ class RacerServiceTest {
 
     assertThrows(
         NotFoundException.class, () -> this.racerService.deleteRacer(testId, Instant.now()));
+  }
+
+  @Test
+  @DisplayName("Search racer functions properly for Category searches")
+  void searchRacerFunctionsForCategory() {
+    var expectedList = TestResourceGenerator.generateRacerList(5, Category.CAT1);
+    when(this.racerRepository.findAllByCategory(any(Category.class)))
+        .thenReturn((List<Racer>) expectedList);
+
+    var result = this.racerService.searchRacers(RacerSearchType.CATEGORY, "cat1");
+
+    assertAll(
+        () -> assertNotNull(result, "The resulting list should not be null"),
+        () ->
+            assertEquals(
+                expectedList.size(), result.size(), "The sizes of the lists should match"));
+  }
+
+  @Test
+  @DisplayName("Search Racer functions properly for first name searches")
+  void searchRacerFunctionsForFirstName() {
+    var expectedList = TestResourceGenerator.generateRacerList(4);
+    when(this.racerRepository.findAllByFirstName(any())).thenReturn((List<Racer>) expectedList);
+
+    var result = this.racerService.searchRacers(RacerSearchType.FIRST_NAME, "Test value");
+
+    assertNotNull(result);
+  }
+
+  @Test
+  @DisplayName("Search Racer functions properly for last name searches")
+  void searchRacerFunctionsForLastName() {
+    var expectedList = TestResourceGenerator.generateRacerList(4);
+    when(this.racerRepository.findAllByLastName(any())).thenReturn((List<Racer>) expectedList);
+
+    assertNotNull(this.racerService.searchRacers(RacerSearchType.LAST_NAME, "test value"));
   }
 }

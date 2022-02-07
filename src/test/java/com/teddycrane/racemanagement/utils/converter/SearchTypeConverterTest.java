@@ -1,9 +1,8 @@
-package com.teddycrane.racemanagement.converter;
+package com.teddycrane.racemanagement.utils.converter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.teddycrane.racemanagement.config.converter.SearchTypeConverter;
 import com.teddycrane.racemanagement.enums.SearchType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

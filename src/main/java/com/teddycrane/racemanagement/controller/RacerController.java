@@ -1,14 +1,17 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
+import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.time.Instant;
 import java.util.HashSet;
@@ -147,6 +150,36 @@ public class RacerController extends BaseController implements RacerApi {
     } catch (NotFoundException e) {
       logger.error("No racer found with the id {}", request.getId());
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> searchRacers(
+      RacerSearchType searchType, String searchValue) {
+    logger.info("searchRacers called");
+
+    switch (searchType) {
+      case CATEGORY:
+        {
+          if (Category.hasValue(searchValue)) {
+            return new ResponseEntity<RacerCollectionResponse>(
+                new RacerCollectionResponse(
+                    this.racerService.searchRacers(searchType, searchValue)),
+                HttpStatus.OK);
+          }
+          return new ResponseEntity<ErrorResponse>(
+              new ErrorResponse(
+                  String.format("The category value %s is not a valid category!", searchValue)),
+              HttpStatus.BAD_REQUEST);
+        }
+      case FIRST_NAME:
+      case LAST_NAME:
+      default:
+        {
+          return new ResponseEntity<RacerCollectionResponse>(
+              new RacerCollectionResponse(this.racerService.searchRacers(searchType, searchValue)),
+              HttpStatus.OK);
+        }
     }
   }
 }

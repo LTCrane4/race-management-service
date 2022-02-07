@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.Category;
+import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -42,4 +43,6 @@ public interface RacerService {
 
   boolean deleteRacer(UUID id, Instant updatedTimestamp)
       throws ConflictException, NotFoundException;
+
+  Collection<Racer> searchRacers(RacerSearchType searchType, String searchValue);
 }
