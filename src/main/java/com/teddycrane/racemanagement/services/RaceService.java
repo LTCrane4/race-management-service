@@ -23,4 +23,13 @@ public interface RaceService {
 
   Race updateRace(UUID id, String name, Category category, Instant updatedTimestamp)
       throws ConflictException, NotFoundException;
+
+  /**
+   * Finds races that a racer is involved in
+   *
+   * @param racerId The UUID of a racer to find race involvment for
+   * @return A List of Races that a racer is involved in
+   * @throws NotFoundException Throws if the racer cannot be found
+   */
+  List<Race> getRacesForRacer(UUID racerId) throws NotFoundException;
 }

@@ -108,4 +108,7 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> updateRace(
       @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request);
+
+  @GetMapping("/races-for-racer/{racerId}")
+  ResponseEntity<? extends Response> getRacesForRacer(@PathVariable("racerId") String racerId);
 }

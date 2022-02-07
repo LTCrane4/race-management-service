@@ -9,7 +9,6 @@ import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
-// import com.teddycrane.racemanagement.services.RaceService;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
@@ -152,5 +151,11 @@ public class RaceController extends BaseController implements RaceApi {
       return this.createErrorResponse(
           String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
     }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> getRacesForRacer(String racerId) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

@@ -124,4 +124,10 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
     return this.raceRepository.save(race);
   }
+
+  @Override
+  public List<Race> getRacesForRacer(UUID racerId) throws NotFoundException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

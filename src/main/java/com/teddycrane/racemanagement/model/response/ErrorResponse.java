@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class ErrorResponse implements Response {
   private String message;
 }
