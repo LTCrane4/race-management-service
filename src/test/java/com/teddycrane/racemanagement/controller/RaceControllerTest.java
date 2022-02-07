@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -316,5 +317,33 @@ class RaceControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"),
         () -> assertNotNull(body, "The response body should not be null"));
+  }
+
+  @Test
+  @Description("Get races for racer should return a 200")
+  void getRacesForRacerShouldReturn200() {
+    when(this.raceService.getRacesForRacer(testId)).thenReturn((List<Race>) races);
+
+    var result = this.raceController.getRacesForRacer(testString);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"));
+  }
+
+  @Test
+  @Description("Get races for racer should handle service errors")
+  void getRacesForRacerShouldHandleServiceErrors() {
+    when(this.raceService.getRacesForRacer(testId)).thenThrow(NotFoundException.class);
+
+    var result = this.raceController.getRacesForRacer(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
   }
 }

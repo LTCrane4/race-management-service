@@ -110,5 +110,17 @@ public interface RaceApi {
       @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request);
 
   @GetMapping("/races-for-racer/{racerId}")
+  @Operation(description = "Get races that the specified racer participated in")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully found data",
+            content = {@Content(schema = @Schema(implementation = RaceCollectionResponse.class))}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Racer not found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
+      })
   ResponseEntity<? extends Response> getRacesForRacer(@PathVariable("racerId") String racerId);
 }

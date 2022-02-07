@@ -127,7 +127,16 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
   @Override
   public List<Race> getRacesForRacer(UUID racerId) throws NotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    Racer r =
+        this.racerRepository
+            .findById(racerId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(String.format("No racer found for the id %s", racerId)));
+
+    return this.raceRepository.findRacesByRacerId(r.getId()).stream()
+        .map((id) -> this.raceRepository.getById(UUID.fromString(id)))
+        .filter(item -> item != null)
+        .toList();
   }
 }

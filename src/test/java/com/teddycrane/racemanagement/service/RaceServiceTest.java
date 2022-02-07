@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -237,5 +238,14 @@ class RaceServiceTest {
         ConflictException.class,
         () -> this.raceService.updateRace(testId, null, null, Instant.now()),
         "A ConflictException should be thrown if the timestamps do not match");
+  }
+
+  @Test
+  @DisplayName("Get Races for racer should return a list of races")
+  @Disabled
+  void getRacesForRacerShouldReturnList() {
+    var racerId = UUID.randomUUID();
+    var racer = TestResourceGenerator.generateRacer();
+    when(this.racerRepository.findById(racerId)).thenReturn(Optional.of(racer));
   }
 }

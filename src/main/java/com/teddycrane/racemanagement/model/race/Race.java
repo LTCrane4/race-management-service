@@ -13,7 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class Race implements Response {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  @OneToMany private Collection<Racer> racers;
+  @ManyToMany private Collection<Racer> racers;
 
   private Race() {
     this.id = UUID.randomUUID();
