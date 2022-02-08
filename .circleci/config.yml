@@ -122,12 +122,12 @@ workflows:
             branches:
               only:
                 - main
-      - store-built-application:
-          requires:
-            - test
-            - build-application
-#            - integration-test
-          filters:
-            branches:
-              only:
-                - main
+#       - store-built-application:
+#           requires:
+#             - test
+#             - build-application
+# #            - integration-test
+#           filters:
+#             branches:
+#               only:
+#                 - main
