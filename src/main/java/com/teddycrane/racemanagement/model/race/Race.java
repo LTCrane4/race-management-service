@@ -56,4 +56,10 @@ public class Race implements Response {
     this.category = category;
     this.racers = new ArrayList<>(racers);
   }
+
+  public void addRacer(Racer newRacer) {
+    if (!this.racers.contains(newRacer)) {
+      this.racers.add(newRacer);
+    }
+  }
 }

@@ -143,9 +143,9 @@ public class RaceServiceImpl extends BaseService implements RaceService {
                             racer -> {
                               return racer.getId();
                             })
-                        .toList()
+                        .collect(Collectors.toList())
                         .contains(racerId))
-            .toList();
+            .collect(Collectors.toList());
 
     return races;
   }

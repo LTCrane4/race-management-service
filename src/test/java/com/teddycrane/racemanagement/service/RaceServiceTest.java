@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -240,12 +240,40 @@ class RaceServiceTest {
         "A ConflictException should be thrown if the timestamps do not match");
   }
 
+  private List<Race> setUpGetRacesForRacerList(Racer testRacer) {
+    List<Race> list = (List<Race>) TestResourceGenerator.generateRaceList();
+    list.get(0).addRacer(testRacer);
+    list.get(list.size() - 1).addRacer(testRacer);
+
+    return list;
+  }
+
   @Test
   @DisplayName("Get Races for racer should return a list of races")
-  @Disabled
   void getRacesForRacerShouldReturnList() {
-    var racerId = UUID.randomUUID();
     var racer = TestResourceGenerator.generateRacer();
-    when(this.racerRepository.findById(racerId)).thenReturn(Optional.of(racer));
+    var racerId = racer.getId();
+    List<Race> raceList = setUpGetRacesForRacerList(racer);
+    when(this.raceRepository.findAll()).thenReturn(raceList);
+
+    var result = this.raceService.getRacesForRacer(racerId);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(2, result.size(), "The list should have two entries"),
+        () ->
+            assertTrue(
+                result.get(0).getRacers().contains(racer), "The list should contain the racer"));
+  }
+
+  @Test
+  @DisplayName("Get Races for Racer should throw a NotFoundException")
+  void getRacesForRacerShouldThrowNotFound() {
+    when(this.racerRepository.existsById(any())).thenThrow(IllegalArgumentException.class);
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.raceService.getRacesForRacer(UUID.randomUUID()),
+        "The race service should throw an exception if the racer is not found");
   }
 }
