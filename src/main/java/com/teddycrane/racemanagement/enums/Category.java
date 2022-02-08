@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.enums;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public enum Category {
   CAT1("cat1"),
@@ -25,7 +26,7 @@ public enum Category {
   public static boolean hasValue(String value) {
     return Arrays.asList(Category.values()).stream()
         .map(item -> item.toString())
-        .toList()
+        .collect(Collectors.toList())
         .contains(value);
   }
 }
