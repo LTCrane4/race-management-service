@@ -4,6 +4,8 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -41,6 +43,9 @@ public class Race implements Response {
   private Category category;
 
   @ManyToMany private Collection<Racer> racers;
+
+  private LocalDate eventDate;
+  private LocalTime startTime, finishTime;
 
   private Race() {
     this.id = UUID.randomUUID();

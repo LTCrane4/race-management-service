@@ -8,6 +8,8 @@ import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -148,5 +150,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
             .collect(Collectors.toList());
 
     return races;
+  }
+
+  @Override
+  public Race startRace(UUID raceId, LocalDate startDate, LocalTime startTime)
+      throws ConflictException, NotFoundException {
+    return null;
   }
 }

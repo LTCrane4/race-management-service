@@ -5,6 +5,8 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -32,4 +34,7 @@ public interface RaceService {
    * @throws NotFoundException Throws if the racer cannot be found
    */
   List<Race> getRacesForRacer(UUID racerId) throws NotFoundException;
+
+  Race startRace(UUID raceId, LocalDate startDate, LocalTime startTime)
+      throws ConflictException, NotFoundException;
 }

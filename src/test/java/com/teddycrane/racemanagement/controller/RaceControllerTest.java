@@ -16,9 +16,12 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -345,5 +348,83 @@ class RaceControllerTest {
         () ->
             assertEquals(
                 HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName("Start race should start the race")
+  void startRaceShouldStartRace() {
+    when(this.raceService.startRace(eq(testId), any(), any())).thenReturn(expected);
+
+    var request =
+        StartRaceRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .startDate(LocalDate.now().toString())
+            .startTime(LocalTime.now().toString())
+            .build();
+
+    var result = this.raceController.startRace(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  @DisplayName("Start race should return a 400 when an invalid id is provided")
+  void startRaceShouldReturn400WhenRequestIsInvalid() {
+    var request =
+        StartRaceRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .startDate(LocalDate.now().toString())
+            .startTime(LocalTime.now().toString())
+            .build();
+    var result = this.raceController.startRace("bad id", request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName("Start race should return a 404 if the race is not found")
+  void startRaceShouldReturn404() {
+    when(this.raceService.startRace(any(UUID.class), any(LocalDate.class), any(LocalTime.class)))
+        .thenThrow(NotFoundException.class);
+
+    var request =
+        StartRaceRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .startDate(LocalDate.now().toString())
+            .startTime(LocalTime.now().toString())
+            .build();
+
+    var result = this.raceController.startRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName(
+      "Start race should return a 409 when the updated timestamp is not the most up to date")
+  void startRaceShouldReturn409() {
+    when(this.raceService.startRace(eq(testId), any(LocalDate.class), any(LocalTime.class)))
+        .thenThrow(ConflictException.class);
+
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+
+    var result = this.raceController.startRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
   }
 }

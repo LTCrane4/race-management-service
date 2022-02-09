@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -170,5 +172,11 @@ public class RaceController extends BaseController implements RaceApi {
       return this.createErrorResponse(
           String.format("No Racer found for the id %s", racerId), HttpStatus.NOT_FOUND);
     }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> startRace(String id, @Valid StartRaceRequest request) {
+    logger.info("startRace called");
+    return null;
   }
 }
