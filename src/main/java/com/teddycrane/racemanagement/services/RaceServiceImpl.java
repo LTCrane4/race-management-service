@@ -8,6 +8,7 @@ import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -153,6 +154,23 @@ public class RaceServiceImpl extends BaseService implements RaceService {
   @Override
   public Race startRace(UUID raceId, Instant updatedTimestamp)
       throws ConflictException, NotFoundException {
-    return null;
+    logger.info("startRace called for race {}", raceId);
+
+    Race r =
+        this.raceRepository
+            .findById(raceId)
+            .orElseThrow(() -> new NotFoundException("No Race found for the provided id"));
+
+    if (!r.getUpdatedTimestamp().equals(updatedTimestamp)) {
+      logger.error("Updated timestamps do not match!");
+      throw new ConflictException(
+          "The updated timestamp provided did not match.  Please re-fetch data and try again");
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    r.setStartTime(now.toLocalTime());
+    r.setEventDate(now.toLocalDate());
+
+    return this.raceRepository.save(r);
   }
 }

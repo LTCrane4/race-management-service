@@ -20,8 +20,6 @@ import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -353,7 +351,7 @@ class RaceControllerTest {
   @Test
   @DisplayName("Start race should start the race")
   void startRaceShouldStartRace() {
-    when(this.raceService.startRace(eq(testId), any(), any())).thenReturn(expected);
+    when(this.raceService.startRace(eq(testId), any())).thenReturn(expected);
 
     var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
 
@@ -381,8 +379,7 @@ class RaceControllerTest {
   @Test
   @DisplayName("Start race should return a 404 if the race is not found")
   void startRaceShouldReturn404() {
-    when(this.raceService.startRace(any(UUID.class), any(LocalDate.class), any(LocalTime.class)))
-        .thenThrow(NotFoundException.class);
+    when(this.raceService.startRace(any(UUID.class), any())).thenThrow(NotFoundException.class);
 
     var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
 
@@ -399,8 +396,7 @@ class RaceControllerTest {
   @DisplayName(
       "Start race should return a 409 when the updated timestamp is not the most up to date")
   void startRaceShouldReturn409() {
-    when(this.raceService.startRace(eq(testId), any(LocalDate.class), any(LocalTime.class)))
-        .thenThrow(ConflictException.class);
+    when(this.raceService.startRace(eq(testId), any())).thenThrow(ConflictException.class);
 
     var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
 

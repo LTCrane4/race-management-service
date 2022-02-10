@@ -280,7 +280,7 @@ class RaceServiceTest {
   @Test
   @DisplayName("Start race should start race at the current time")
   void startRaceShouldStartRace() {
-    when(this.raceRepository.getById(testId)).thenReturn(Optional.of(expected));
+    when(this.raceRepository.findById(testId)).thenReturn(Optional.of(expected));
     when(this.raceRepository.save(any())).thenAnswer(arguments -> arguments.getArgument(0));
 
     var result = this.raceService.startRace(testId, expected.getUpdatedTimestamp());

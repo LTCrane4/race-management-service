@@ -180,12 +180,18 @@ public class RaceController extends BaseController implements RaceApi {
 
     try {
       UUID raceId = UUID.fromString(id);
-      return new ResponseEntity.ok(
+      return ResponseEntity.ok(
           this.raceService.startRace(raceId, Instant.parse(request.getUpdatedTimestamp())));
     } catch (IllegalArgumentException e) {
       logger.error("Invalid UUID provided");
       return this.createErrorResponse(
           "The provided id was not in a valid format", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error("No race found for the id {}", id);
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    } catch (ConflictException e) {
+      return this.createErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
   }
 }
