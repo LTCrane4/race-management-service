@@ -14,8 +14,9 @@ public class StartRaceRequest {
   @NotBlank(message = "Updated timestamp must be included")
   private String updatedTimestamp;
 
-  // Desired race start time, must not be in the past.  Maps to LocalTime.
+  // mapped from LocalTime.
   private String startTime;
-  // Desired start date, must not be in the past. Maps to LocalDate.
+
+  // mapped from LocalDate.
   private String startDate;
 }

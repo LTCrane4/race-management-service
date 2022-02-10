@@ -355,12 +355,7 @@ class RaceControllerTest {
   void startRaceShouldStartRace() {
     when(this.raceService.startRace(eq(testId), any(), any())).thenReturn(expected);
 
-    var request =
-        StartRaceRequest.builder()
-            .updatedTimestamp(Instant.now().toString())
-            .startDate(LocalDate.now().toString())
-            .startTime(LocalTime.now().toString())
-            .build();
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
 
     var result = this.raceController.startRace(testString, request);
     var body = result.getBody();
@@ -373,12 +368,7 @@ class RaceControllerTest {
   @Test
   @DisplayName("Start race should return a 400 when an invalid id is provided")
   void startRaceShouldReturn400WhenRequestIsInvalid() {
-    var request =
-        StartRaceRequest.builder()
-            .updatedTimestamp(Instant.now().toString())
-            .startDate(LocalDate.now().toString())
-            .startTime(LocalTime.now().toString())
-            .build();
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
     var result = this.raceController.startRace("bad id", request);
 
     assertAll(
@@ -394,12 +384,7 @@ class RaceControllerTest {
     when(this.raceService.startRace(any(UUID.class), any(LocalDate.class), any(LocalTime.class)))
         .thenThrow(NotFoundException.class);
 
-    var request =
-        StartRaceRequest.builder()
-            .updatedTimestamp(Instant.now().toString())
-            .startDate(LocalDate.now().toString())
-            .startTime(LocalTime.now().toString())
-            .build();
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
 
     var result = this.raceController.startRace(testString, request);
 

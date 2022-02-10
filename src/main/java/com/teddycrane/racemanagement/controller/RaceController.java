@@ -177,6 +177,15 @@ public class RaceController extends BaseController implements RaceApi {
   @Override
   public ResponseEntity<? extends Response> startRace(String id, @Valid StartRaceRequest request) {
     logger.info("startRace called");
-    return null;
+
+    try {
+      UUID raceId = UUID.fromString(id);
+      return new ResponseEntity.ok(
+          this.raceService.startRace(raceId, Instant.parse(request.getUpdatedTimestamp())));
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid UUID provided");
+      return this.createErrorResponse(
+          "The provided id was not in a valid format", HttpStatus.BAD_REQUEST);
+    }
   }
 }

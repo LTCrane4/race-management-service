@@ -276,4 +276,15 @@ class RaceServiceTest {
         () -> this.raceService.getRacesForRacer(UUID.randomUUID()),
         "The race service should throw an exception if the racer is not found");
   }
+
+  @Test
+  @DisplayName("Start race should start race at the current time")
+  void startRaceShouldStartRace() {
+    when(this.raceRepository.getById(testId)).thenReturn(Optional.of(expected));
+    when(this.raceRepository.save(any())).thenAnswer(arguments -> arguments.getArgument(0));
+
+    var result = this.raceService.startRace(testId, expected.getUpdatedTimestamp());
+
+    assertAll(() -> assertNotNull(result, "The result should not be null"));
+  }
 }
