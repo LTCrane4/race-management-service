@@ -151,9 +151,13 @@ public class UserController extends BaseController implements UserApi {
       String id, @Valid ChangePasswordRequest request) {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
+    String oldPw, newPw;
 
     try {
       UUID userId = UUID.fromString(id);
+      oldPw = new String(Base64.getDecoder().decode(request.getOldPassword()));
+      newPw = new String(Base64.getDecoder().decode(request.getNewPassword()));
+
       logger.info("Password change requested for {}", userId);
 
       if (!audit.getUserId().equals(userId)) {
@@ -161,17 +165,15 @@ public class UserController extends BaseController implements UserApi {
             "User {} does not have the permissions to change another user's password",
             audit.getUserId());
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        return this.createErrorResponse("Forbidden", HttpStatus.FORBIDDEN);
       }
 
       return ResponseEntity.ok(
           new ChangePasswordResponse(
-              this.userService.changePassword(
-                  userId, request.getOldPassword(), request.getNewPassword()),
-              userId));
+              this.userService.changePassword(userId, oldPw, newPw), userId));
     } catch (IllegalArgumentException | BadRequestException e) {
-      logger.error("Unable to parse the provided id");
-      // return ResponseEntity.badRequest().build();
+      logger.error("Unable to parse the provided request");
       return this.createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);

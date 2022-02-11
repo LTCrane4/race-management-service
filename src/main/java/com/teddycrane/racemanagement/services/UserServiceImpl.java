@@ -16,6 +16,7 @@ import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
+import com.teddycrane.racemanagement.utils.PasswordEncoder;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
@@ -178,11 +179,9 @@ public class UserServiceImpl extends BaseService implements UserService {
             .findById(id)
             .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
 
-    String encodedPassword = encodePassword(oldPassword);
-    if (encodedPassword.equals(user.getPassword())) {
+    if (PasswordEncoder.validatePassword(user.getPassword(), oldPassword)) {
       user.setPassword(encodePassword(newPassword));
       this.userRepository.save(user);
-
       return true;
     } else {
       throw new BadRequestException("Previous password provided was incorrect.  Please try again.");

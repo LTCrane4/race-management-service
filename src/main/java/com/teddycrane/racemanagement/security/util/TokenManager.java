@@ -23,7 +23,7 @@ public class TokenManager implements Serializable {
   // @Value("${secret}")
   private String jwtSecret;
 
-  private static final long TOKEN_VALIDITY = 30 * (10 * 60 * 60);
+  private static final long TOKEN_VALIDITY = 60 * 60;
 
   public TokenManager(@Value("${secret}") String secret) {
     this.jwtSecret = secret;
@@ -33,8 +33,8 @@ public class TokenManager implements Serializable {
     UserPrincipal details = (UserPrincipal) userDetails;
 
     Map<String, Object> claims = new HashMap<>();
-    claims.put("iat", Instant.now().toEpochMilli());
-    claims.put("exp", Instant.now().toEpochMilli() + TOKEN_VALIDITY + 1000);
+    claims.put("iat", Instant.now().toEpochMilli() / 1000);
+    claims.put("exp", (Instant.now().toEpochMilli() / 1000) + TOKEN_VALIDITY + 1000);
     claims.put("roles", details.getUser().getUserType());
     claims.put("user", details.getUsername());
 

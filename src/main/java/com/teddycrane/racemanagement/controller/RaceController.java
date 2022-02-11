@@ -10,7 +10,6 @@ import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
-import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -32,12 +31,6 @@ public class RaceController extends BaseController implements RaceApi {
   public RaceController(RaceService raceService) {
     super();
     this.raceService = raceService;
-  }
-
-  @NonNull
-  private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
-    var body = ErrorResponse.builder().message(message).build();
-    return new ResponseEntity<>(body, status);
   }
 
   @Override
