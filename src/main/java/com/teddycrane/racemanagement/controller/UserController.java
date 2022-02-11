@@ -165,7 +165,6 @@ public class UserController extends BaseController implements UserApi {
             "User {} does not have the permissions to change another user's password",
             audit.getUserId());
 
-        // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return this.createErrorResponse("Forbidden", HttpStatus.FORBIDDEN);
       }
 
@@ -177,7 +176,6 @@ public class UserController extends BaseController implements UserApi {
       return this.createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
-      // return ResponseEntity.notFound().build();
       return this.createErrorResponse(
           String.format("No user found for the id %s", id), HttpStatus.NOT_FOUND);
     }
