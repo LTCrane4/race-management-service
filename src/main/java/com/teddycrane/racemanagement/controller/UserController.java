@@ -8,6 +8,7 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -19,6 +20,7 @@ import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.time.Instant;
 import java.util.*;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -144,8 +146,9 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<ChangePasswordResponse> changePassword(
-      String id, ChangePasswordRequest request) {
+  @Override
+  public ResponseEntity<? extends Response> changePassword(
+      String id, @Valid ChangePasswordRequest request) {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
 
@@ -168,10 +171,13 @@ public class UserController extends BaseController implements UserApi {
               userId));
     } catch (IllegalArgumentException | BadRequestException e) {
       logger.error("Unable to parse the provided id");
-      return ResponseEntity.badRequest().build();
+      // return ResponseEntity.badRequest().build();
+      return this.createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
-      return ResponseEntity.notFound().build();
+      // return ResponseEntity.notFound().build();
+      return this.createErrorResponse(
+          String.format("No user found for the id %s", id), HttpStatus.NOT_FOUND);
     }
   }
 

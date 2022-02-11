@@ -1,12 +1,12 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
-import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,7 +106,19 @@ public interface UserApi {
       @PathVariable("id") String id, @Valid @RequestBody UpdateUserRequest request);
 
   @PatchMapping("/user/{id}/change-password")
-  ResponseEntity<ChangePasswordResponse> changePassword(
+  @Operation(description = "Change password")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully changed password",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserResponse.class))
+            })
+      })
+  ResponseEntity<? extends Response> changePassword(
       @PathVariable("id") String id, @Valid @RequestBody ChangePasswordRequest request);
 
   @DeleteMapping("/user/{id}")
