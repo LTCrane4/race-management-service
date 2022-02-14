@@ -4,6 +4,8 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -13,7 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +42,10 @@ public class Race implements Response {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  @OneToMany private Collection<Racer> racers;
+  @ManyToMany private Collection<Racer> racers;
+
+  private LocalDate eventDate;
+  private LocalTime startTime, finishTime;
 
   private Race() {
     this.id = UUID.randomUUID();
@@ -55,5 +60,11 @@ public class Race implements Response {
     this.name = name;
     this.category = category;
     this.racers = new ArrayList<>(racers);
+  }
+
+  public void addRacer(Racer newRacer) {
+    if (!this.racers.contains(newRacer)) {
+      this.racers.add(newRacer);
+    }
   }
 }

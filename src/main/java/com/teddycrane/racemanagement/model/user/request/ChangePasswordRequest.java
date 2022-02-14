@@ -1,6 +1,6 @@
 package com.teddycrane.racemanagement.model.user.request;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,10 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class ChangePasswordRequest {
-  @NotNull private String oldPassword;
 
-  @NotNull private String newPassword;
+  @NotBlank(message = "Old Password cannot be blank")
+  private String oldPassword;
+
+  @NotBlank(message = "New password cannot be blank")
+  private String newPassword;
 }

@@ -1,12 +1,13 @@
 package com.teddycrane.racemanagement.model.user.request;
 
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.lang.NonNull;
 
 @Getter
 @AllArgsConstructor
 public class AuthenticationRequest {
 
-  @NonNull private String username, password;
+  @NotBlank(message = "username and password must both not be blank!")
+  private String username, password;
 }

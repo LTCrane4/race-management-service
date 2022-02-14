@@ -7,10 +7,9 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
-// import com.teddycrane.racemanagement.services.RaceService;
-import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -31,12 +31,6 @@ public class RaceController extends BaseController implements RaceApi {
   public RaceController(RaceService raceService) {
     super();
     this.raceService = raceService;
-  }
-
-  @NonNull
-  private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
-    var body = ErrorResponse.builder().message(message).build();
-    return new ResponseEntity<>(body, status);
   }
 
   @Override
@@ -151,6 +145,46 @@ public class RaceController extends BaseController implements RaceApi {
       logger.error("No Race found for the id {}", id);
       return this.createErrorResponse(
           String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> getRacesForRacer(String racerId) {
+    logger.info("getRacesForRacer called");
+
+    try {
+      UUID id = UUID.fromString(racerId);
+      return ResponseEntity.ok(
+          RaceCollectionResponse.builder().data(this.raceService.getRacesForRacer(id)).build());
+    } catch (IllegalArgumentException e) {
+      logger.error("The provided id is not a valid id!");
+      return this.createErrorResponse(
+          "The provided id was not a valid id!", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error("No racer found for the id {}", racerId);
+      return this.createErrorResponse(
+          String.format("No Racer found for the id %s", racerId), HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> startRace(String id, @Valid StartRaceRequest request) {
+    logger.info("startRace called");
+
+    try {
+      UUID raceId = UUID.fromString(id);
+      return ResponseEntity.ok(
+          this.raceService.startRace(raceId, Instant.parse(request.getUpdatedTimestamp())));
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid UUID provided");
+      return this.createErrorResponse(
+          "The provided id was not in a valid format", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error("No race found for the id {}", id);
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    } catch (ConflictException e) {
+      return this.createErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
   }
 }

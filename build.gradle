@@ -114,7 +114,7 @@ jacocoTestReport {
             fileTree(dir: it, exclude: [
                     "com/teddycrane/racemanagement/Application.class",
                     "com/teddycrane/racemanagement/config/*.class",
-                    "com/teddycrane/racemanagement/security/**/*.class"
+                    "com/teddycrane/racemanagement/security/filter/*.class"
             ])
         }))
     }

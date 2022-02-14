@@ -16,6 +16,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -316,5 +318,94 @@ class RaceControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"),
         () -> assertNotNull(body, "The response body should not be null"));
+  }
+
+  @Test
+  @Description("Get races for racer should return a 200")
+  void getRacesForRacerShouldReturn200() {
+    when(this.raceService.getRacesForRacer(testId)).thenReturn((List<Race>) races);
+
+    var result = this.raceController.getRacesForRacer(testString);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(body, "The response body should not be null"));
+  }
+
+  @Test
+  @Description("Get races for racer should handle service errors")
+  void getRacesForRacerShouldHandleServiceErrors() {
+    when(this.raceService.getRacesForRacer(testId)).thenThrow(NotFoundException.class);
+
+    var result = this.raceController.getRacesForRacer(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName("Start race should start the race")
+  void startRaceShouldStartRace() {
+    when(this.raceService.startRace(eq(testId), any())).thenReturn(expected);
+
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+
+    var result = this.raceController.startRace(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  @DisplayName("Start race should return a 400 when an invalid id is provided")
+  void startRaceShouldReturn400WhenRequestIsInvalid() {
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+    var result = this.raceController.startRace("bad id", request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+  }
+
+  @Test
+  @DisplayName("Start race should return a 404 if the race is not found")
+  void startRaceShouldReturn404() {
+    when(this.raceService.startRace(any(UUID.class), any())).thenThrow(NotFoundException.class);
+
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+
+    var result = this.raceController.startRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName(
+      "Start race should return a 409 when the updated timestamp is not the most up to date")
+  void startRaceShouldReturn409() {
+    when(this.raceService.startRace(eq(testId), any())).thenThrow(ConflictException.class);
+
+    var request = StartRaceRequest.builder().updatedTimestamp(Instant.now().toString()).build();
+
+    var result = this.raceController.startRace(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
   }
 }

@@ -23,6 +23,7 @@ import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -626,10 +627,12 @@ class UserControllerTest {
     UUID id = expected.getId();
     when(this.userService.changePassword(id, expected.getPassword(), "new password"))
         .thenReturn(true);
+    String encodedOld = Base64.getEncoder().encodeToString(expected.getPassword().getBytes());
+    String encodedNew = Base64.getEncoder().encodeToString("new password".getBytes());
 
     var result =
         this.userController.changePassword(
-            id.toString(), new ChangePasswordRequest(expected.getPassword(), "new password"));
+            id.toString(), new ChangePasswordRequest(encodedOld, encodedNew));
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
   }
