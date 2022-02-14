@@ -148,5 +148,8 @@ public interface RaceApi {
       @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request);
 
   @DeleteMapping("/{id}")
+  @Operation(description = "Deletes the specified race")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "204", description = "Successfully deleted race")})
   ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
 }
