@@ -408,4 +408,29 @@ class RaceControllerTest {
             assertEquals(
                 HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
   }
+
+  @Test
+  @DisplayName("Delete race should return a 204")
+  void deleteRaceShouldReturn204() {
+    when(this.raceService.deleteRace(any())).thenReturn(true);
+
+    var result = this.raceController.deleteRace(testString);
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NO_CONTENT, result.getStatusCode(), "The status code should be 204"));
+  }
+
+  @Test
+  void deleteRaceShouldReturn404() {
+    when(this.raceService.deleteRace(any())).thenThrow(NotFoundException.class);
+
+    var result = this.raceController.deleteRace(testString);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
 }
