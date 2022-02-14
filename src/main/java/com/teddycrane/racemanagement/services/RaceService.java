@@ -40,4 +40,6 @@ public interface RaceService {
   // should throw date exception too, once i get around to it
   // Race startRace(UUID raceId, Instant updatedTimestamp, LocalTime startTime, LocalDate startDate)
   // throws ConflictException, NotFoundException;
+
+  boolean deleteRace(UUID raceId) throws NotFoundException;
 }

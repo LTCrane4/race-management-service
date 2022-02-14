@@ -173,4 +173,10 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
     return this.raceRepository.save(r);
   }
+
+  @Override
+  public boolean deleteRace(UUID id) throws NotFoundException {
+    logger.info("deleteRace called for race {}", id);
+    return false;
+  }
 }
