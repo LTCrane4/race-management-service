@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,4 +146,7 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> startRace(
       @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request);
+
+  @DeleteMapping("/{id}")
+  ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
 }

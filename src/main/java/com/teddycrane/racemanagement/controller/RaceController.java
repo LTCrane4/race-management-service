@@ -187,4 +187,11 @@ public class RaceController extends BaseController implements RaceApi {
       return this.createErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
   }
+
+  @Override
+  public ResponseEntity<? extends Response> deleteRace(String id) {
+    logger.info("deleteRace called");
+
+    return null;
+  }
 }
