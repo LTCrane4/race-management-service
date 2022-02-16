@@ -150,6 +150,16 @@ public interface RaceApi {
   @DeleteMapping("/{id}")
   @Operation(description = "Deletes the specified race")
   @ApiResponses(
-      value = {@ApiResponse(responseCode = "204", description = "Successfully deleted race")})
+      value = {
+        @ApiResponse(responseCode = "204", description = "Successfully deleted race"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Not Found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
+      })
   ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
 }

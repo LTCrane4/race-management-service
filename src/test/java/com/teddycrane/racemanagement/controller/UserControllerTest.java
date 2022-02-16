@@ -134,13 +134,7 @@ class UserControllerTest {
         () ->
             assertEquals(
                 HttpStatus.OK, result.getStatusCode(), "The response status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
-        () ->
-            assertEquals(
-                expected.getUsername(), body.getUsername(), "The usernames should be equal"),
-        () ->
-            assertEquals(
-                expected.getUserType(), body.getUserType(), "The user types should be equal"));
+        () -> assertNotNull(body, "The response body should not be null"));
   }
 
   @Test
@@ -155,10 +149,7 @@ class UserControllerTest {
         () ->
             assertEquals(
                 HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
-        () ->
-            assertEquals(
-                expected.getUsername(), body.getUsername(), "The usernames should be equal"));
+        () -> assertNotNull(body, "The response body should not be null"));
   }
 
   @Test

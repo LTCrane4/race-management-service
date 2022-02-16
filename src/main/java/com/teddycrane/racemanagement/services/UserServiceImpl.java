@@ -82,6 +82,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     Optional<User> existing = this.userRepository.findByUsername(request.getUsername());
 
     if (existing.isPresent()) {
+      logger.error("Throwing duplicate exception!");
       throw new DuplicateItemException(
           "This username is already taken.  Please try a different username");
     }
