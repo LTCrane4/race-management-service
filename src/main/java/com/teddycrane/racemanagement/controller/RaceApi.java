@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,4 +146,20 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> startRace(
       @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request);
+
+  @DeleteMapping("/{id}")
+  @Operation(description = "Deletes the specified race")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "Successfully deleted race"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Not Found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
+      })
+  ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
 }

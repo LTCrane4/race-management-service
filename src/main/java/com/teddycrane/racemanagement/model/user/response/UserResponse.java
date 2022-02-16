@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.model.user.response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.User;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import org.springframework.lang.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class UserResponse {
+public class UserResponse implements Response {
 
   private UUID id;
 

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
@@ -286,5 +287,22 @@ class RaceServiceTest {
     var result = this.raceService.startRace(testId, expected.getUpdatedTimestamp());
 
     assertAll(() -> assertNotNull(result, "The result should not be null"));
+  }
+
+  @Test
+  @DisplayName("Delete Race should return true if the race is deleted")
+  void deleteRaceShouldDelete() {
+    when(this.raceRepository.findById(eq(testId))).thenReturn(Optional.of(expected));
+    var result = this.raceService.deleteRace(testId);
+
+    assertTrue(result);
+  }
+
+  @Test
+  @DisplayName("Delete Race should throw an exception if the race is not found")
+  void deleteRaceShouldThrowException() {
+    when(this.raceRepository.findById(eq(testId))).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> this.raceService.deleteRace(testId));
   }
 }

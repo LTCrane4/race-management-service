@@ -9,6 +9,7 @@ import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
+import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -70,12 +71,14 @@ public class UserController extends BaseController implements UserApi {
   }
 
   public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
-    logger.info("createUser called");
+    logger.info("createUsercalled");
 
     try {
       return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
     } catch (DuplicateItemException e) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+      logger.error("The username {} is already taken", request.getUsername());
+      return new ResponseEntity(
+          new ErrorResponse("The specified username is already taken"), HttpStatus.CONFLICT);
     }
   }
 

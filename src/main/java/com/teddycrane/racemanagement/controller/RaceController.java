@@ -187,4 +187,26 @@ public class RaceController extends BaseController implements RaceApi {
       return this.createErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
   }
+
+  @Override
+  public ResponseEntity<? extends Response> deleteRace(String id) {
+    logger.info("deleteRace called");
+
+    try {
+      UUID raceId = UUID.fromString(id);
+      if (this.raceService.deleteRace(raceId)) {
+        return ResponseEntity.noContent().build();
+      } else {
+        return ResponseEntity.internalServerError().build();
+      }
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id");
+      return this.createErrorResponse(
+          String.format("Unable to parse the id %s", id), HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error("No race found!");
+      return this.createErrorResponse(
+          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    }
+  }
 }

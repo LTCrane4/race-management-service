@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.model.Response;
+import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -90,13 +91,19 @@ public interface UserApi {
             }),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid request body format/request body missing required parameters"),
+            description = "Invalid request body format/request body missing required parameters",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
         @ApiResponse(
             responseCode = "409",
             description =
-                "Failed to create - A user with the provided username/email already exists")
+                "Failed to create - A user with the provided username/email already exists",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request);
+  ResponseEntity<? extends Response> createUser(@Valid @RequestBody CreateUserRequest request);
 
   @PostMapping("/login")
   ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request);
