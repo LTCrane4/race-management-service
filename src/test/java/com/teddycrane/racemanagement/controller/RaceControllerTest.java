@@ -16,6 +16,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.PlaceRacerRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
@@ -432,5 +433,61 @@ class RaceControllerTest {
         () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  @DisplayName("Place racer should return 200 when a valid request and race id are provided")
+  void placeRacerShouldReturn200() {
+    when(this.raceService.placeRacer(any(), anyList(), any())).thenReturn(expected);
+
+    var request =
+        PlaceRacerRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .racerIds(List.of(UUID.randomUUID().toString()))
+            .build();
+    var result = this.raceController.placeRacer(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(body, "The body should not be null"));
+  }
+
+  @Test
+  @DisplayName("Place racer should return a 400 if the UUID is not valid")
+  void placeRacerShouldReturn400WhenIdIsInvalid() {
+    var request =
+        PlaceRacerRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .racerIds(List.of(UUID.randomUUID().toString()))
+            .build();
+    var result = this.raceController.placeRacer("bad id", request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+  }
+
+  @Test
+  @DisplayName("Place Racer should return a 404 when the Race Service throws a NotFoundException")
+  void placeRacerShouldReturn404() {
+    when(this.raceService.placeRacer(eq(testId), anyList(), any()))
+        .thenThrow(NotFoundException.class);
+
+    var request =
+        PlaceRacerRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .racerIds(List.of())
+            .build();
+    var result = this.raceController.placeRacer(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
   }
 }

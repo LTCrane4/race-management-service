@@ -4,6 +4,7 @@ import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.PlaceRacerRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
@@ -162,4 +163,24 @@ public interface RaceApi {
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
   ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
+
+  @PutMapping("/{id}/place-racer")
+  @Operation(description = "Place racers in finish order")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Placed racers in finish order",
+            content = {@Content(schema = @Schema(implementation = Race.class))}),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No race or racer found",
+            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+      })
+  ResponseEntity<? extends Response> placeRacer(
+      @PathVariable("id") String id, @Valid @RequestBody PlaceRacerRequest request);
 }

@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.PlaceRacerRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
@@ -207,6 +208,29 @@ public class RaceController extends BaseController implements RaceApi {
       logger.error("No race found!");
       return this.createErrorResponse(
           String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> placeRacer(
+      String id, @Valid PlaceRacerRequest request) {
+    logger.info("placeRacer called");
+
+    try {
+      UUID raceId = UUID.fromString(id);
+      List<UUID> racerIds =
+          request.getRacerIds().stream()
+              .map((racerId) -> UUID.fromString(racerId))
+              .collect(Collectors.toList());
+
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid UUID format detected");
+      return this.createErrorResponse("invalid UUID format detected", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.error(e.getMessage());
+      return this.createErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    } catch (ConflictException e) {
+      return this.createErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
   }
 }

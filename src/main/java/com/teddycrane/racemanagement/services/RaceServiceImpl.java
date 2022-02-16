@@ -186,4 +186,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
     this.raceRepository.delete(r);
     return true;
   }
+
+  @Override
+  public Race placeRacer(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+      throws ConflictException, NotFoundException {
+    logger.info("placeRacer called for race {}", raceId);
+    return null;
+  }
 }
