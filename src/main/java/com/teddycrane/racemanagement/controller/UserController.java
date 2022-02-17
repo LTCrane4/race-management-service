@@ -12,6 +12,7 @@ import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangeUserStatusRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -210,6 +211,20 @@ public class UserController extends BaseController implements UserApi {
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> changeStatus(
+      String id, @Valid ChangeUserStatusRequest request) {
+    logger.info("changeStatus called");
+
+    try {
+      UUID userId = UUID.fromString(id);
+      return null;
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id");
+      return this.createErrorResponse("Unable to parse the provided id!", HttpStatus.BAD_REQUEST);
     }
   }
 }

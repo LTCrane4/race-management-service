@@ -1,6 +1,7 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
@@ -41,4 +42,7 @@ public interface UserService {
   boolean changePassword(UUID id, String oldPassword, String newPassword) throws NotFoundException;
 
   User deleteUser(UUID id) throws NotFoundException;
+
+  User changeUserStatus(UUID id, Instant updatedTimestamp, UserStatus status)
+      throws ConflictException, NotFoundException;
 }

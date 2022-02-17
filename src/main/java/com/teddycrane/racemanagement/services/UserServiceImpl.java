@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.services;
 import static com.teddycrane.racemanagement.utils.PasswordEncoder.encodePassword;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
@@ -199,5 +200,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     this.userRepository.delete(u);
     return u;
+  }
+
+  @Override
+  public User changeUserStatus(UUID id, Instant updatedTimestamp, UserStatus status)
+      throws ConflictException, NotFoundException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
