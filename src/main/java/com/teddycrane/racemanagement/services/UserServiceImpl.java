@@ -205,7 +205,17 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public User changeUserStatus(UUID id, Instant updatedTimestamp, UserStatus status)
       throws ConflictException, NotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    logger.info("changeUserStatus called for user {}", id);
+    User u =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+
+    if (!u.getUpdatedTimestamp().equals(updatedTimestamp)) {
+      throw new ConflictException("Updated timestamps do not match");
+    }
+
+    u.setStatus(status);
+    return this.userRepository.save(u);
   }
 }

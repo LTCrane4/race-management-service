@@ -5,6 +5,7 @@ import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangeUserStatusRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;

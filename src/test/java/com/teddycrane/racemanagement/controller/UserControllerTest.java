@@ -682,4 +682,8 @@ class UserControllerTest {
             assertEquals(
                 HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
   }
+
+  @Test
+  @DisplayName("Change status should return a 200")
+  void changeStatusShouldReturn200() {}
 }

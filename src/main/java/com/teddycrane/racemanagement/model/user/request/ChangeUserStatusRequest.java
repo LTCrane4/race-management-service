@@ -15,6 +15,5 @@ public class ChangeUserStatusRequest {
   @NotBlank(message = "An updated timestamp must be provided")
   private String updatedTimestamp;
 
-  @NotBlank(message = "A user status must be provided")
   private UserStatus userStatus;
 }

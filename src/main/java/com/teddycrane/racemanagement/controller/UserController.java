@@ -21,6 +21,7 @@ import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -221,10 +222,25 @@ public class UserController extends BaseController implements UserApi {
 
     try {
       UUID userId = UUID.fromString(id);
-      return null;
+      Instant updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
+      return ResponseEntity.ok(
+          new UserResponse(
+              this.userService.changeUserStatus(
+                  userId, updatedTimestamp, request.getUserStatus())));
     } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the provided id");
+      logger.warn("Unable to parse the provided id");
       return this.createErrorResponse("Unable to parse the provided id!", HttpStatus.BAD_REQUEST);
+    } catch (DateTimeParseException e) {
+      logger.warn("Unable to parse the provided timestamp");
+      return this.createErrorResponse(
+          "Unable to parse the provided timestamp", HttpStatus.BAD_REQUEST);
+    } catch (NotFoundException e) {
+      logger.warn("No user found for the id {}", id);
+      return this.createErrorResponse(
+          String.format("No user found for the id %s", id), HttpStatus.NOT_FOUND);
+    } catch (ConflictException e) {
+      logger.warn("Updated timestamps did not match");
+      return this.createErrorResponse("Updated timestamps did not match", HttpStatus.CONFLICT);
     }
   }
 }
