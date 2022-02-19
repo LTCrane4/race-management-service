@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
@@ -16,6 +17,7 @@ import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
+import com.teddycrane.racemanagement.model.user.request.ChangeUserStatusRequest;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
 import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
@@ -685,5 +687,20 @@ class UserControllerTest {
 
   @Test
   @DisplayName("Change status should return a 200")
-  void changeStatusShouldReturn200() {}
+  void changeStatusShouldReturn200() {
+    when(this.userService.changeUserStatus(eq(testId), any(), any())).thenReturn(expected);
+
+    var request =
+        ChangeUserStatusRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .userStatus(UserStatus.ACTIVE)
+            .build();
+
+    var result = this.userController.changeStatus(testString, request);
+    var body = result.getBody();
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
 }
