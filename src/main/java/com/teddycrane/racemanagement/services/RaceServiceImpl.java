@@ -188,9 +188,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
   }
 
   @Override
-  public Race placeRacer(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+  public Race placeRacer(
+      UUID raceId, List<UUID> racerIds, Instant updatedTimestamp, Instant finishTime)
       throws ConflictException, NotFoundException {
     logger.info("placeRacer called for race {}", raceId);
-    return null;
+
+    Collection<Racer> allRacers = this.racerRepository.findAllById(racerIds);
   }
 }

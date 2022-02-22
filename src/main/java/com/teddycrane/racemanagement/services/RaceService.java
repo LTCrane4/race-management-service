@@ -41,6 +41,6 @@ public interface RaceService {
 
   boolean deleteRace(UUID raceId) throws NotFoundException;
 
-  Race placeRacer(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp)
+  Race placeRacer(UUID raceId, List<UUID> racerIds, Instant updatedTimestamp, Instant finishTime)
       throws ConflictException, NotFoundException;
 }

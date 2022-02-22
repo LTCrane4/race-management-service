@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -43,6 +44,8 @@ public class Race implements Response {
   private Category category;
 
   @ManyToMany private Collection<Racer> racers;
+
+  @ManyToMany private Map<Instant, Racer> finishOrder;
 
   private LocalDate eventDate;
   private LocalTime startTime, finishTime;

@@ -17,4 +17,7 @@ public class PlaceRacerRequest {
 
   @NotBlank(message = "Racer ids must not be blank")
   private List<String> racerIds;
+
+  @NotBlank(message = "Racer finish time must not be blank")
+  private String finishTime;
 }

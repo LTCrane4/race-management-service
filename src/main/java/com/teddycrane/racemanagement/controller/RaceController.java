@@ -218,14 +218,23 @@ public class RaceController extends BaseController implements RaceApi {
 
     try {
       UUID raceId = UUID.fromString(id);
+      Instant updatedTimestamp, finishTime;
+      updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
+      finishTime = Instant.parse(request.getFinishTime());
       List<UUID> racerIds =
           request.getRacerIds().stream()
               .map((racerId) -> UUID.fromString(racerId))
               .collect(Collectors.toList());
 
+      return ResponseEntity.ok(
+          this.raceService.placeRacer(raceId, racerIds, updatedTimestamp, finishTime));
     } catch (IllegalArgumentException e) {
       logger.error("Invalid UUID format detected");
       return this.createErrorResponse("invalid UUID format detected", HttpStatus.BAD_REQUEST);
+    } catch (DateTimeParseException e) {
+      logger.error("Unable to parse one of the provided date strings");
+      return this.createErrorResponse(
+          "Unable to parse a provided date string", HttpStatus.BAD_REQUEST);
     } catch (NotFoundException e) {
       logger.error(e.getMessage());
       return this.createErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);

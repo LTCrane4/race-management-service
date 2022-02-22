@@ -438,7 +438,7 @@ class RaceControllerTest {
   @Test
   @DisplayName("Place racer should return 200 when a valid request and race id are provided")
   void placeRacerShouldReturn200() {
-    when(this.raceService.placeRacer(any(), anyList(), any())).thenReturn(expected);
+    when(this.raceService.placeRacer(any(), anyList(), any(), any())).thenReturn(expected);
 
     var request =
         PlaceRacerRequest.builder()
@@ -474,7 +474,7 @@ class RaceControllerTest {
   @Test
   @DisplayName("Place Racer should return a 404 when the Race Service throws a NotFoundException")
   void placeRacerShouldReturn404() {
-    when(this.raceService.placeRacer(eq(testId), anyList(), any()))
+    when(this.raceService.placeRacer(eq(testId), anyList(), any(), any()))
         .thenThrow(NotFoundException.class);
 
     var request =
