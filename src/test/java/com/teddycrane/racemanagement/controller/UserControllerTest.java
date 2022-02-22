@@ -697,8 +697,6 @@ class UserControllerTest {
             .build();
 
     var result = this.userController.changeStatus(testString, request);
-    var body = result.getBody();
-
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
