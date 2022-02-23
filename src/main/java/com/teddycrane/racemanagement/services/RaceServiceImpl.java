@@ -193,6 +193,23 @@ public class RaceServiceImpl extends BaseService implements RaceService {
       throws ConflictException, NotFoundException {
     logger.info("placeRacer called for race {}", raceId);
 
-    Collection<Racer> allRacers = this.racerRepository.findAllById(racerIds);
+    Race race =
+        this.raceRepository
+            .findById(raceId)
+            .orElseThrow(() -> new NotFoundException("No Race found for the provided id"));
+
+    if (!updatedTimestamp.equals(race.getUpdatedTimestamp())) {
+      logger.error("Conflict exception: Updated timestamps do not match");
+      throw new ConflictException(
+          "The updated timestamps do not match.  Re-fetch data and try again");
+    }
+
+    Collection<Racer> allRacers =
+        this.racerRepository.findAllById(racerIds).stream()
+            .filter((racer) -> racer != null)
+            .collect(Collectors.toList());
+    allRacers.forEach((racer) -> race.placeRacer(racer, finishTime));
+
+    return race;
   }
 }

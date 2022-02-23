@@ -70,4 +70,8 @@ public class Race implements Response {
       this.racers.add(newRacer);
     }
   }
+
+  public boolean placeRacer(Racer racer, Instant finishTime) {
+    return this.finishOrder.put(finishTime, racer) != null;
+  }
 }

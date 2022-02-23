@@ -444,6 +444,7 @@ class RaceControllerTest {
         PlaceRacerRequest.builder()
             .updatedTimestamp(Instant.now().toString())
             .racerIds(List.of(UUID.randomUUID().toString()))
+            .finishTime(Instant.now().toString())
             .build();
     var result = this.raceController.placeRacer(testString, request);
     var body = result.getBody();
@@ -461,6 +462,7 @@ class RaceControllerTest {
         PlaceRacerRequest.builder()
             .updatedTimestamp(Instant.now().toString())
             .racerIds(List.of(UUID.randomUUID().toString()))
+            .finishTime(Instant.now().toString())
             .build();
     var result = this.raceController.placeRacer("bad id", request);
 
@@ -481,6 +483,7 @@ class RaceControllerTest {
         PlaceRacerRequest.builder()
             .updatedTimestamp(Instant.now().toString())
             .racerIds(List.of())
+            .finishTime(Instant.now().toString())
             .build();
     var result = this.raceController.placeRacer(testString, request);
 
@@ -489,5 +492,45 @@ class RaceControllerTest {
         () ->
             assertEquals(
                 HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName("Place Racer should return a 409 when a conflictException is thrown")
+  void placeRacerShouldReturn409WhenConflict() {
+    when(this.raceService.placeRacer(any(), any(), any(), any()))
+        .thenThrow(ConflictException.class);
+    var request =
+        PlaceRacerRequest.builder()
+            .updatedTimestamp(Instant.now().toString())
+            .finishTime(Instant.now().toString())
+            .racerIds(List.of())
+            .build();
+
+    var result = this.raceController.placeRacer(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
+  }
+
+  @Test
+  @DisplayName("Place Racer should return a 400 when a date is not parsable")
+  void placeRacerShouldReturn400WhenDateIsInvalid() {
+    var request =
+        PlaceRacerRequest.builder()
+            .updatedTimestamp("not valid")
+            .racerIds(List.of())
+            .finishTime("not valid")
+            .build();
+
+    var result = this.raceController.placeRacer(testString, request);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
   }
 }
