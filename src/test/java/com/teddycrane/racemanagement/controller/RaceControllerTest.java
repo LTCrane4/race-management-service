@@ -349,6 +349,18 @@ class RaceControllerTest {
   }
 
   @Test
+  @DisplayName("Get races for racer should handle bad id")
+  void getRacesForRacerShouldHandleBadId() {
+    var result = this.raceController.getRacesForRacer("bad id");
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+  }
+
+  @Test
   @DisplayName("Start race should start the race")
   void startRaceShouldStartRace() {
     when(this.raceService.startRace(eq(testId), any())).thenReturn(expected);
