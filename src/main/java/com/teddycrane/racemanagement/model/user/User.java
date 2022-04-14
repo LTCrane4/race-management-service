@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.model.user;
 
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.time.Instant;
 import java.util.UUID;
@@ -28,6 +29,11 @@ public class User {
   @NonNull
   private UserType userType;
 
+  @Enumerated(EnumType.STRING)
+  @Setter
+  @NonNull
+  private UserStatus status;
+
   @Setter @NonNull private Instant updatedTimestamp;
 
   public User() {
@@ -50,6 +56,7 @@ public class User {
       String email,
       String password,
       UserType userType,
+      UserStatus status,
       Instant createdTimestamp,
       Instant updatedTimestamp) {
     this.id = id;
@@ -59,6 +66,7 @@ public class User {
     this.email = email;
     this.password = password;
     this.userType = userType;
+    this.status = status;
     this.createdTimestamp = createdTimestamp;
     this.updatedTimestamp = updatedTimestamp;
   }
@@ -100,13 +108,17 @@ public class User {
     this.userType = userType;
   }
 
-  // TODO enable when user status works
-  //  public User(String firstName, String lastName, String username, String
-  //  email,
-  //              String password, UserType userType, UserStatus status) {
-  //    this(firstName, lastName, username, email, password, userType);
-  //    this.status = status;
-  //  }
+  public User(
+      String firstName,
+      String lastName,
+      String username,
+      String email,
+      String password,
+      UserType userType,
+      UserStatus status) {
+    this(firstName, lastName, username, email, password, userType);
+    this.status = status;
+  }
 
   public User(@NonNull User other) {
     this(
@@ -117,6 +129,7 @@ public class User {
         other.email,
         other.password,
         other.userType,
+        other.status,
         other.createdTimestamp,
         other.updatedTimestamp);
   }

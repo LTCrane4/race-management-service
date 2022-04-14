@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.model.user.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.User;
@@ -33,6 +34,8 @@ public class UserResponse implements Response {
 
   private Instant updatedTimestamp;
 
+  private UserStatus status;
+
   public UserResponse(@NonNull User u) {
     this(
         u.getId(),
@@ -41,7 +44,8 @@ public class UserResponse implements Response {
         u.getEmail(),
         u.getUsername(),
         u.getUserType(),
-        u.getUpdatedTimestamp());
+        u.getUpdatedTimestamp(),
+        u.getStatus());
   }
 
   @Override

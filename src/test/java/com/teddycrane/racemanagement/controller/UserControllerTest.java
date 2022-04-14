@@ -4,20 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.ConflictException;
-import com.teddycrane.racemanagement.error.DuplicateItemException;
-import com.teddycrane.racemanagement.error.InternalServerError;
-import com.teddycrane.racemanagement.error.NotAuthorizedException;
-import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
-import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
-import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
-import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
+import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
@@ -27,6 +20,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -125,7 +119,8 @@ class UserControllerTest {
     when(this.userService.createUser(any(CreateUserRequest.class))).thenReturn(expected);
 
     var result =
-        this.userController.createUser(new CreateUserRequest("", "", "", "", "", UserType.USER));
+        this.userController.createUser(
+            new CreateUserRequest("", "", "", "", "", UserType.USER, UserStatus.ACTIVE));
 
     var body = result.getBody();
 
@@ -681,5 +676,51 @@ class UserControllerTest {
         () ->
             assertEquals(
                 HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+  }
+
+  @Test
+  @DisplayName("Change Status should return a 200")
+  void changeStatusShouldReturn200() {
+    when(this.userService.changeStatus(any(), any(), any())).thenReturn(expected);
+
+    var result =
+        this.userController.changeStatus(
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  void changeStatusShouldReturn404() {
+    when(this.userService.changeStatus(eq(testId), any(), any()))
+        .thenThrow(NotFoundException.class);
+
+    var result =
+        this.userController.changeStatus(
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+  }
+
+  @Test
+  @Disabled
+  void changeStatusShouldReturn405() {
+    when(this.userService.changeStatus(eq(testId), any(), any()))
+        .thenThrow(TransitionNotAllowedException.class);
+
+    var result =
+        this.userController.changeStatus(
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode(), "The status should be 405"));
   }
 }

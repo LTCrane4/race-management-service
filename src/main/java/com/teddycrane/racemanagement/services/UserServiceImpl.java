@@ -3,13 +3,9 @@ package com.teddycrane.racemanagement.services;
 import static com.teddycrane.racemanagement.utils.PasswordEncoder.encodePassword;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.ConflictException;
-import com.teddycrane.racemanagement.error.DuplicateItemException;
-import com.teddycrane.racemanagement.error.InternalServerError;
-import com.teddycrane.racemanagement.error.NotAuthorizedException;
-import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -88,6 +84,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     UserType type = request.getUserType() == null ? UserType.USER : request.getUserType();
+    UserStatus status = request.getStatus() == null ? UserStatus.ACTIVE : request.getStatus();
 
     return this.userRepository.save(
         new User(
@@ -96,7 +93,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             request.getUsername(),
             request.getEmail(),
             encodePassword(request.getPassword()),
-            type));
+            type,
+            status));
   }
 
   @Override
@@ -199,5 +197,24 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     this.userRepository.delete(u);
     return u;
+  }
+
+  @Override
+  public User changeStatus(UUID id, UserStatus status, Instant updatedTimestamp)
+      throws NotFoundException, TransitionNotAllowedException, ConflictException {
+    logger.info("changeStatus called for {}", id);
+
+    User u =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+
+    if (!u.getUpdatedTimestamp().equals(updatedTimestamp)) {
+      throw new ConflictException("Updated Timestamps do not match!");
+    }
+
+    u.setStatus(status);
+    u.setUpdatedTimestamp(Instant.now());
+    return this.userRepository.save(u);
   }
 }

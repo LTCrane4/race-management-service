@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.model.user.request;
 
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -27,13 +28,26 @@ public class CreateUserRequest {
 
   private UserType userType;
 
+  private UserStatus status;
+
   public CreateUserRequest(
-      String username, String password, String firstName, String lastName, String email) {
+      String username,
+      String password,
+      String firstName,
+      String lastName,
+      String email,
+      UserType userType) {
     this.username = username;
     this.password = password;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
-    this.userType = UserType.USER;
+    this.userType = userType;
+    this.status = UserStatus.ACTIVE;
+  }
+
+  public CreateUserRequest(
+      String username, String password, String firstName, String lastName, String email) {
+    this(username, password, firstName, lastName, email, UserType.USER);
   }
 }

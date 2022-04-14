@@ -2,18 +2,10 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.ConflictException;
-import com.teddycrane.racemanagement.error.DuplicateItemException;
-import com.teddycrane.racemanagement.error.InternalServerError;
-import com.teddycrane.racemanagement.error.NotAuthorizedException;
-import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
-import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
-import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
+import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
@@ -210,6 +202,36 @@ public class UserController extends BaseController implements UserApi {
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> changeStatus(String id, ChangeStatusRequest request) {
+    logger.info("changeStatus called");
+
+    try {
+      UUID userId = UUID.fromString(id);
+
+      return ResponseEntity.ok(
+          new UserResponse(
+              this.userService.changeStatus(
+                  userId, request.getStatus(), request.getUpdatedTimestamp())));
+    } catch (IllegalArgumentException e) {
+      logger.error("Unable to parse the provided id {}", id);
+      return ResponseEntity.badRequest().build();
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(
+              ErrorResponse.builder()
+                  .message(String.format("No user found for the id %s", id))
+                  .build());
+    } catch (TransitionNotAllowedException e) {
+      // use the message from the exception to get the current status and desired status into the
+      // console
+      logger.error(e.getMessage());
+      return ResponseEntity.status(e.getStatus())
+          .body(ErrorResponse.builder().message(e.getMessage()).build());
     }
   }
 }
