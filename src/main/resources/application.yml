@@ -2,20 +2,18 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://docker-mysql:3306/${MYSQL_DATABASE}
+    # url: jdbc:mysql://docker-mysql:3306/${MYSQL_DATABASE}
+    url: jdbc:postgresql://postgres:5432/spring
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    open-in-view: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: create
         hbm2ddl:
           auto: update
-        ddl-auto: create
-        dialect:
-          storage_engine: innodb
-    open-in-view: true
-  mvc:
 logging:
   file:
     path: /logs

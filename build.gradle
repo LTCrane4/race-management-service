@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.teddycrane"
-version = "0.0.1-SNAPSHOT"
+version = "0.1.1-SNAPSHOT"
 sourceCompatibility = "11"
 
 repositories {
@@ -24,13 +24,13 @@ dependencies {
     implementation "org.springframework.security:spring-security-test"
     implementation "com.github.javafaker:javafaker:$java_faker_version"
     implementation("io.jsonwebtoken:jjwt:$jwt_version")
-    implementation "mysql:mysql-connector-java"
+    implementation "org.postgresql:postgresql"
     implementation "org.springdoc:springdoc-openapi-ui:$springdoc_version"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.testcontainers:testcontainers:$testcontainers_version"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
-    testImplementation "org.testcontainers:mysql:$testcontainers_version"
+    testImplementation "org.testcontainers:postgresql:$testcontainers_version"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
     compileOnly "org.projectlombok:lombok:$lombok_version"

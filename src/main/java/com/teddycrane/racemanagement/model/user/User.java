@@ -3,27 +3,21 @@ package com.teddycrane.racemanagement.model.user;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.time.Instant;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
 @EqualsAndHashCode
 @ToString
+@Table(name = "_user")
 public class User {
 
-  @Id
-  @Type(type = "uuid-char")
-  //  @GeneratedValue(strategy = GenerationType.AUTO)
-  private final UUID id;
+  @Id private final UUID id;
 
   private final Instant createdTimestamp;
 

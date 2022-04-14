@@ -19,10 +19,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -31,15 +32,17 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @WithMockUser("testuser")
 public abstract class IntegrationBase {
 
-  @Container public static final MySQLContainer<?> CONTAINER;
+  @Container public static final PostgreSQLContainer<?> CONTAINER;
   protected static final String AUTHORIZATION_HEADER = "Authorization";
   protected static final String BEARER = "Bearer";
   protected static final String USER_TOKEN =
       String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
 
   static {
+    DockerImageName myImage =
+        DockerImageName.parse("postgresql:latest").asCompatibleSubstituteFor("postgres");
     CONTAINER =
-        new MySQLContainer<>("mysql:8.0.20")
+        new PostgreSQLContainer<>(myImage)
             .withReuse(true)
             .withDatabaseName("test")
             .withUsername("tester")
