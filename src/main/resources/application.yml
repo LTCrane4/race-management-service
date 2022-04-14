@@ -16,7 +16,7 @@ spring:
           auto: update
 logging:
   file:
-    path: /logs
+    path: /logs/
 server:
   error:
     include-message: always
