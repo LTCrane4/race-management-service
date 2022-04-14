@@ -1,6 +1,6 @@
 use test;
 
-create table user
+create table _User
 (
     id         varchar(255) not null
         primary key,
