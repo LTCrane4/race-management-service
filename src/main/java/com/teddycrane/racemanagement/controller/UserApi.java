@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public interface UserApi {
 
-  @GetMapping("/user")
+  @GetMapping(value = "/user", produces = "application/json", consumes = "application/json")
   @Operation(summary = "Get all Users")
   @ApiResponse(
       responseCode = "200",
@@ -41,7 +41,7 @@ public interface UserApi {
       })
   ResponseEntity<UserCollectionResponse> getAllUsers();
 
-  @GetMapping("/user/{id}")
+  @GetMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
   @Operation(summary = "Get single user by id")
   @ApiResponses(
       value = {
@@ -58,7 +58,8 @@ public interface UserApi {
       })
   ResponseEntity<UserResponse> getUser(@PathVariable("id") String id);
 
-  @GetMapping("/user/search")
+  // TODO update this to use a POST instead
+  @GetMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
   @Operation(summary = "Search users")
   @ApiResponses(
       value = {
@@ -77,12 +78,12 @@ public interface UserApi {
   ResponseEntity<UserCollectionResponse> searchUsers(
       @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue);
 
-  @PostMapping("/user/new")
+  @PostMapping(value = "/user/new", consumes = "application/json", produces = "application/json")
   @Operation(summary = "Create new User")
   @ApiResponses(
       value = {
         @ApiResponse(
-            responseCode = "200",
+            responseCode = "201",
             description = "Successfully created user",
             content = {
               @Content(
@@ -105,14 +106,17 @@ public interface UserApi {
       })
   ResponseEntity<? extends Response> createUser(@Valid @RequestBody CreateUserRequest request);
 
-  @PostMapping("/login")
+  @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
   ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request);
 
-  @PatchMapping("/user/{id}")
+  @PatchMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
   ResponseEntity<UserResponse> updateUser(
       @PathVariable("id") String id, @Valid @RequestBody UpdateUserRequest request);
 
-  @PatchMapping("/user/{id}/change-password")
+  @PatchMapping(
+      value = "/user/{id}/change-password",
+      produces = "application/json",
+      consumes = "application/json")
   @Operation(description = "Change password")
   @ApiResponses(
       value = {
@@ -128,6 +132,6 @@ public interface UserApi {
   ResponseEntity<? extends Response> changePassword(
       @PathVariable("id") String id, @Valid @RequestBody ChangePasswordRequest request);
 
-  @DeleteMapping("/user/{id}")
+  @DeleteMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
   ResponseEntity<UserResponse> deleteUser(@PathVariable("id") String id);
 }
