@@ -24,7 +24,8 @@ dependencies {
     implementation "org.springframework.security:spring-security-test"
     implementation "com.github.javafaker:javafaker:$java_faker_version"
     implementation("io.jsonwebtoken:jjwt:$jwt_version")
-    implementation "mysql:mysql-connector-java"
+    // implementation "mysql:mysql-connector-java"
+    implementation "org.postgresql:postgresql"
     implementation "org.springdoc:springdoc-openapi-ui:$springdoc_version"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
