@@ -11,6 +11,7 @@ import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import com.teddycrane.racemanagement.utils.ResponseStatusGenerator;
 import java.time.Instant;
 import java.util.*;
 import javax.validation.Valid;
@@ -217,21 +218,16 @@ public class UserController extends BaseController implements UserApi {
               this.userService.changeStatus(
                   userId, request.getStatus(), request.getUpdatedTimestamp())));
     } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the provided id {}", id);
-      return ResponseEntity.badRequest().build();
+      logger.error("Bad Request: unable to parse the provided ID");
+      return ResponseStatusGenerator.generateBadRequestResponse(
+          "Unable to parse the provided user ID");
+    } catch (TransitionNotAllowedException e) {
+      logger.error("Bad Request: invalid timestamp found");
+      return ResponseStatusGenerator.generateBadRequestResponse("Invalid timestamp.");
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body(
-              ErrorResponse.builder()
-                  .message(String.format("No user found for the id %s", id))
-                  .build());
-    } catch (TransitionNotAllowedException e) {
-      // use the message from the exception to get the current status and desired status into the
-      // console
-      logger.error(e.getMessage());
-      return ResponseEntity.status(e.getStatus())
-          .body(ErrorResponse.builder().message(e.getMessage()).build());
+      return ResponseStatusGenerator.generateNotFoundResponse(
+          String.format("No user found for the id %s", id));
     }
   }
 }

@@ -693,6 +693,21 @@ class UserControllerTest {
   }
 
   @Test
+  void changeStatusShouldReturn400() {
+    var result =
+        this.userController.changeStatus(
+            "bad", new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                HttpStatus.BAD_REQUEST,
+                result.getStatusCode(),
+                "The result status should be a 400"));
+  }
+
+  @Test
   void changeStatusShouldReturn404() {
     when(this.userService.changeStatus(eq(testId), any(), any()))
         .thenThrow(NotFoundException.class);

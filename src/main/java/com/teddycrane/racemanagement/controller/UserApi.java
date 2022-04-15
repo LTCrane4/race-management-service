@@ -129,6 +129,34 @@ public interface UserApi {
       value = "/user/{id}/status",
       produces = "application/json",
       consumes = "application/json")
+  @Operation(description = "Change user status")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully changed user status",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid ID format or invalid timestamp",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+      })
   ResponseEntity<? extends Response> changeStatus(
       @PathVariable("id") String id, @Valid @RequestBody ChangeStatusRequest request);
 }
