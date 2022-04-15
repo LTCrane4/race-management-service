@@ -40,5 +40,5 @@ public interface UserService {
   User deleteUser(UUID id) throws NotFoundException;
 
   User changeStatus(UUID id, UserStatus status, Instant updatedTimestamp)
-      throws NotFoundException, TransitionNotAllowedException;
+      throws ConflictException, NotFoundException, TransitionNotAllowedException;
 }

@@ -22,4 +22,8 @@ public class ResponseStatusGenerator {
   public static ResponseEntity<ErrorResponse> generateBadRequestResponse(String message) {
     return generateResponse(HttpStatus.BAD_REQUEST, message);
   }
+
+  public static ResponseEntity<ErrorResponse> generateConflictResponse(String message) {
+    return generateResponse(HttpStatus.CONFLICT, message);
+  }
 }

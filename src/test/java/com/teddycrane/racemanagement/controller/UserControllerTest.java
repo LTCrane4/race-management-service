@@ -163,7 +163,7 @@ class UserControllerTest {
   }
 
   @Test
-  void loginShouldAuthenticateUser() throws Exception {
+  void loginShouldAuthenticateUser() {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
@@ -685,7 +685,7 @@ class UserControllerTest {
 
     var result =
         this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -696,7 +696,7 @@ class UserControllerTest {
   void changeStatusShouldReturn400() {
     var result =
         this.userController.changeStatus(
-            "bad", new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+            "bad", new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -714,7 +714,7 @@ class UserControllerTest {
 
     var result =
         this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -730,7 +730,7 @@ class UserControllerTest {
 
     var result =
         this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now()));
+            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
