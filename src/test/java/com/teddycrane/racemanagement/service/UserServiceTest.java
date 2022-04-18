@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.SearchType;
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
@@ -284,5 +285,39 @@ class UserServiceTest {
         NotFoundException.class,
         () -> this.userService.changePassword(testId, "", ""),
         "A NotFoundException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Change Status should successfully change the status")
+  void changeStatusShouldBeSuccessful() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.userRepository.save(any())).thenReturn(existing);
+
+    var result =
+        this.userService.changeStatus(testId, UserStatus.ACTIVE, existing.getUpdatedTimestamp());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(existing, result, "The result should match the expected value"));
+  }
+
+  @Test
+  @DisplayName("Change status should throw an exception if the user is not found")
+  void changeStatusShouldThrowNotFound() {
+    when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userService.changeStatus(testId, UserStatus.ACTIVE, Instant.now()));
+  }
+
+  @Test
+  @DisplayName("Change Status should throw exception if the timestamps don't match")
+  void changeStatusShouldCheckTimestamps() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.userService.changeStatus(testId, UserStatus.ACTIVE, Instant.now()));
   }
 }

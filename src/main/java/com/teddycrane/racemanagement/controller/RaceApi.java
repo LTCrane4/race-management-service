@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/race")
 public interface RaceApi {
 
-  @GetMapping
+  @GetMapping(consumes = "application/json", produces = "application/json")
   @Operation(description = "Get all races")
   @ApiResponse(responseCode = "200", description = "Found all races")
   ResponseEntity<RaceCollectionResponse> getAllRaces();
 
-  @GetMapping("/{id}")
+  @GetMapping(value = "/{id}", produces = "application/json", consumes = "application/json")
   @Operation(description = "Get single race")
   @ApiResponses(
       value = {
@@ -53,7 +53,7 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> getRace(@PathVariable("id") String id);
 
-  @PostMapping
+  @PostMapping(produces = "application/json", consumes = "application/json")
   @Operation(description = "Create new race")
   @ApiResponses(
       value = {
@@ -68,7 +68,10 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> createRace(@Valid @RequestBody CreateRaceRequest request);
 
-  @PostMapping("/{raceId}/add-racers")
+  @PostMapping(
+      value = "/{raceId}/add-racers",
+      produces = "application/json",
+      consumes = "application/json")
   @Operation(description = "Add racers to existing race")
   @ApiResponses(
       value = {
@@ -88,7 +91,7 @@ public interface RaceApi {
   ResponseEntity<? extends Response> addRacersToRace(
       @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 
-  @PatchMapping("/{id}")
+  @PatchMapping(value = "/{id}", produces = "application/json", consumes = "application/json")
   @Operation(description = "Update race metadata")
   @ApiResponses(
       value = {
@@ -112,7 +115,10 @@ public interface RaceApi {
   ResponseEntity<? extends Response> updateRace(
       @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request);
 
-  @GetMapping("/races-for-racer/{racerId}")
+  @GetMapping(
+      value = "/races-for-racer/{racerId}",
+      produces = "application/json",
+      consumes = "application/json")
   @Operation(description = "Get races that the specified racer participated in")
   @ApiResponses(
       value = {
@@ -127,7 +133,10 @@ public interface RaceApi {
       })
   ResponseEntity<? extends Response> getRacesForRacer(@PathVariable("racerId") String racerId);
 
-  @PutMapping("/{id}/start-race")
+  @PutMapping(
+      value = "/{id}/start-race",
+      produces = "application/json",
+      consumes = "application/json")
   @Operation(description = "Starts the specified race")
   @ApiResponses(
       value = {
@@ -147,7 +156,7 @@ public interface RaceApi {
   ResponseEntity<? extends Response> startRace(
       @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request);
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
   @Operation(description = "Deletes the specified race")
   @ApiResponses(
       value = {

@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+/** Table Name is _user */
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
@@ -37,4 +40,21 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   Collection<User> findAllByUserType(UserType userType);
 
   Collection<User> findAllByLastName(String lastName);
+
+  @Query(
+      name = "Search users",
+      nativeQuery = true,
+      value =
+          "SELECT * FROM _user U "
+              + "WHERE (:uid IS null OR U.id = CAST(:uid as uuid)) "
+              + "AND (:first IS null OR U.first_name = CAST(:first as text)) "
+              + "AND (:last IS null OR U.last_name = CAST(:last as text)) "
+              + "AND (:uname IS null OR U.username = CAST(:uname as text)) "
+              + "AND (:type IS null OR U.user_type = CAST(:type as text))")
+  Collection<User> searchUsers(
+      @Param("uid") String id,
+      @Param("first") String firstName,
+      @Param("last") String lastName,
+      @Param("uname") String username,
+      @Param("type") String userType);
 }

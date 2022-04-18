@@ -11,7 +11,7 @@ public class Application {
   @PostConstruct
   public void init() {
     // Setting Spring Boot SetTimeZone
-    TimeZone.setDefault(TimeZone.getTimeZone("PST"));
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
   }
 
   public static void main(String[] args) {

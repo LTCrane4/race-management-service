@@ -1,25 +1,17 @@
 package com.teddycrane.racemanagement.controller;
 
-import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.error.ConflictException;
-import com.teddycrane.racemanagement.error.DuplicateItemException;
-import com.teddycrane.racemanagement.error.InternalServerError;
-import com.teddycrane.racemanagement.error.NotAuthorizedException;
-import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
-import com.teddycrane.racemanagement.model.user.request.ChangePasswordRequest;
-import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.UpdateUserRequest;
-import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
+import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import com.teddycrane.racemanagement.utils.ResponseStatusGenerator;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -57,39 +49,23 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<UserCollectionResponse> searchUsers(
-      SearchType searchType, String searchValue) {
-    logger.info("searchUsers called");
-
-    try {
-      return ResponseEntity.ok(
-          new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue)));
-    } catch (IllegalArgumentException e) {
-      logger.error("Mismatch: Unable to map search type {}, to value", searchType);
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
+  @Override
+  public ResponseEntity<ErrorResponse> searchUsers(SearchUserRequest request) {
+    logger.info("searchUsers (deprecated) called");
+    logger.warn("Redirecting to new user search");
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+        .body(new ErrorResponse("Permanently moved to POST /users/search"));
   }
 
-  public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
-    logger.info("createUsercalled");
+  public ResponseEntity<? extends Response> createUser(CreateUserRequest request) {
+    logger.info("createUser called");
 
     try {
       return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
     } catch (DuplicateItemException e) {
       logger.error("The username {} is already taken", request.getUsername());
-      return new ResponseEntity(
-          new ErrorResponse("The specified username is already taken"), HttpStatus.CONFLICT);
-    }
-  }
-
-  public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
-    logger.info("login requested");
-    try {
-      return ResponseEntity.ok()
-          .body(this.userService.login(request.getUsername(), request.getPassword()));
-    } catch (NotAuthorizedException e) {
-      logger.error("User is not authorized");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.CONFLICT)
+          .body(new ErrorResponse("The specified username is already taken"));
     }
   }
 
@@ -210,6 +186,34 @@ public class UserController extends BaseController implements UserApi {
     } catch (NotFoundException e) {
       logger.error("No user found for the id {}", id);
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  @Override
+  public ResponseEntity<? extends Response> changeStatus(String id, ChangeStatusRequest request) {
+    logger.info("changeStatus called");
+
+    try {
+      UUID userId = UUID.fromString(id);
+      Instant timestamp = Instant.parse(request.getUpdatedTimestamp());
+
+      return ResponseEntity.ok(
+          new UserResponse(this.userService.changeStatus(userId, request.getStatus(), timestamp)));
+    } catch (IllegalArgumentException e) {
+      logger.error("Bad Request: unable to parse the provided ID");
+      return ResponseStatusGenerator.generateBadRequestResponse(
+          "Unable to parse the provided user ID");
+    } catch (DateTimeParseException e) {
+      logger.error("Bad Request: invalid timestamp found");
+      return ResponseStatusGenerator.generateBadRequestResponse("Invalid timestamp.");
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      return ResponseStatusGenerator.generateNotFoundResponse(
+          String.format("No user found for the id %s", id));
+    } catch (ConflictException e) {
+      logger.error("Timestamp mismatch");
+      return ResponseStatusGenerator.generateConflictResponse(
+          "The updated timestamps do not match.  Re-fetch data and try again");
     }
   }
 }
