@@ -9,7 +9,6 @@ import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.SearchUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import com.teddycrane.racemanagement.security.util.TokenManager;
@@ -70,11 +69,6 @@ public class UserServiceImpl extends BaseService implements UserService {
       default:
         return this.userRepository.findAllByLastName(searchValue);
     }
-  }
-
-  @Override
-  public Collection<User> searchUsersNew(SearchUserRequest request) {
-    return null;
   }
 
   @Override

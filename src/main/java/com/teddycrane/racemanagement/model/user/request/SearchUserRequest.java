@@ -1,19 +1,29 @@
 package com.teddycrane.racemanagement.model.user.request;
 
 import com.teddycrane.racemanagement.enums.UserType;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @NoArgsConstructor
+@Setter
 @AllArgsConstructor
 @Builder
 public class SearchUserRequest {
-  private String userId;
-  private String firstName, lastName, username;
+  private UUID userId;
+  @Getter private String firstName, lastName, username;
   private UserType userType;
+
+  public String getUserType() {
+    return userType != null ? userType.toString() : null;
+  }
+
+  public String getUserId() {
+    return userId != null ? userId.toString() : null;
+  }
 
   public boolean isValidRequest() {
     return userId != null

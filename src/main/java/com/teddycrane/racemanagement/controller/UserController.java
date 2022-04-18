@@ -1,6 +1,5 @@
 package com.teddycrane.racemanagement.controller;
 
-import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.Response;
@@ -50,52 +49,25 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<UserCollectionResponse> searchUsers(
-      SearchType searchType, String searchValue) {
-    logger.info("searchUsers called");
-
-    try {
-      return ResponseEntity.ok(
-          new UserCollectionResponse(this.userService.searchUsers(searchType, searchValue)));
-    } catch (IllegalArgumentException e) {
-      logger.error("Mismatch: Unable to map search type {}, to value", searchType);
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-  }
-
   @Override
-  public ResponseEntity<UserCollectionResponse> searchUsersNew(SearchUserRequest request) {
-    logger.info("searchUsersNew called");
-    if (request.isValidRequest()) {
-      return ResponseEntity.ok(
-          new UserCollectionResponse(this.userService.searchUsersNew(request)));
-    } else {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserCollectionResponse());
-    }
+  public ResponseEntity<ErrorResponse> searchUsers(SearchUserRequest request) {
+    logger.info("searchUsers (deprecated) called");
+    logger.warn("Redirecting to new user search");
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+        .body(new ErrorResponse("Permanently moved to POST /users/search"));
   }
 
-  public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
-    logger.info("createUsercalled");
+  public ResponseEntity<? extends Response> createUser(CreateUserRequest request) {
+    logger.info("createUser called");
 
     try {
       return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
     } catch (DuplicateItemException e) {
       logger.error("The username {} is already taken", request.getUsername());
-      return new ResponseEntity(
-          new ErrorResponse("The specified username is already taken"), HttpStatus.CONFLICT);
+      return ResponseEntity.status(HttpStatus.CONFLICT)
+          .body(new ErrorResponse("The specified username is already taken"));
     }
   }
-
-  //  public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
-  //    logger.info("redirecting to new login endpoint");
-  ////    try {
-  ////      return ResponseEntity.ok()
-  ////          .body(this.userService.login(request.getUsername(), request.getPassword()));
-  ////    } catch (NotAuthorizedException e) {
-  ////      logger.error("User is not authorized");
-  ////      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-  ////    }
-  //  }
 
   public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request) {
     logger.info("updateUser called");

@@ -78,6 +78,19 @@ public class User {
       String username,
       String email,
       String password,
+      UserType userType,
+      UserStatus status) {
+    this(id, firstName, lastName, username, email, password, userType);
+    this.status = status;
+  }
+
+  public User(
+      UUID id,
+      String firstName,
+      String lastName,
+      String username,
+      String email,
+      String password,
       UserType userType) {
     this(id);
     this.firstName = firstName;

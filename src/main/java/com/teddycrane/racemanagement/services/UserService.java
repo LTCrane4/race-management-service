@@ -6,7 +6,6 @@ import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
-import com.teddycrane.racemanagement.model.user.request.SearchUserRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import java.time.Instant;
 import java.util.Collection;
@@ -22,8 +21,6 @@ public interface UserService {
 
   Collection<User> searchUsers(SearchType searchType, String searchValue)
       throws IllegalArgumentException;
-
-  Collection<User> searchUsersNew(SearchUserRequest request);
 
   User createUser(CreateUserRequest request) throws DuplicateItemException;
 

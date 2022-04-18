@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.services;
 
+import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
@@ -51,7 +52,8 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
             testUsername,
             "testuser@test.fake",
             encoder.encode(testUserPassword),
-            UserType.USER);
+            UserType.USER,
+            UserStatus.ACTIVE);
     this.userRepository.save(user);
 
     User admin =
@@ -62,7 +64,8 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
             testAdmin,
             "testadmin@test.fake",
             encoder.encode(testAdminPassword),
-            UserType.ADMIN);
+            UserType.ADMIN,
+            UserStatus.ACTIVE);
     this.userRepository.save(admin);
   }
 

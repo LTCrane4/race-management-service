@@ -3,7 +3,6 @@ package com.teddycrane.racemanagement.controller;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
@@ -498,26 +497,15 @@ class UserControllerTest {
   }
 
   @Test
-  void shouldSearchUsers() {
-    when(this.userService.searchUsers(any(SearchType.class), anyString()))
-        .thenReturn(TestResourceGenerator.generateUserList(5));
-
-    var response = this.userController.searchUsers(SearchType.TYPE, "test");
-    assertNotNull(response, "response should not be null");
-  }
-
-  @Test
-  void shouldReturn400IfSearchTypeAndValueMismatched() {
-    when(this.userService.searchUsers(SearchType.TYPE, "not a type"))
-        .thenThrow(IllegalArgumentException.class);
-
-    var result = this.userController.searchUsers(SearchType.TYPE, "not a type");
-
+  void oldUserSearchShouldReturnRedirect() {
+    var response = this.userController.searchUsers(null);
     assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertNotNull(response, "response should not be null"),
         () ->
             assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+                HttpStatus.MOVED_PERMANENTLY,
+                response.getStatusCode(),
+                "The status should be 301"));
   }
 
   @Test

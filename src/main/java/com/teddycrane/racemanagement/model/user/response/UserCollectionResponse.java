@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.model.user.response;
 
+import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.User;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +10,7 @@ import org.springframework.lang.NonNull;
 
 @Getter
 @NoArgsConstructor
-public class UserCollectionResponse {
+public class UserCollectionResponse implements Response {
   private Collection<UserResponse> users;
 
   public UserCollectionResponse(@NonNull Collection<User> users) {

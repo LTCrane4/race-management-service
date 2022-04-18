@@ -1,6 +1,5 @@
 package com.teddycrane.racemanagement.controller;
 
-import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.*;
@@ -47,30 +46,21 @@ public interface UserApi {
       })
   ResponseEntity<UserResponse> getUser(@PathVariable("id") String id);
 
-  // TODO update this to use a POST instead
-  @GetMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
+  @PostMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
   @Operation(summary = "Search users (deprecated)")
   @ApiResponses(
       value = {
         @ApiResponse(
-            responseCode = "200",
-            description = "Found users matching search params",
+            responseCode = "301",
+            description = "Permanently moved to /users/search",
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = UserCollectionResponse.class))
-            }),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid search type or search type and search value mismatch")
+                  schema = @Schema(implementation = ErrorResponse.class))
+            })
       })
   @Deprecated
-  ResponseEntity<UserCollectionResponse> searchUsers(
-      @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue);
-
-  @PostMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
-  @Operation(summary = "Search Users")
-  ResponseEntity<UserCollectionResponse> searchUsersNew(@RequestBody SearchUserRequest request);
+  ResponseEntity<ErrorResponse> searchUsers(@Valid @RequestBody SearchUserRequest request);
 
   @PostMapping(value = "/user/new", consumes = "application/json", produces = "application/json")
   @Operation(summary = "Create new User")
@@ -99,11 +89,6 @@ public interface UserApi {
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
   ResponseEntity<? extends Response> createUser(@Valid @RequestBody CreateUserRequest request);
-
-  //  @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
-  //  @Deprecated
-  //  ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest
-  // request);
 
   @PatchMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
   ResponseEntity<UserResponse> updateUser(
