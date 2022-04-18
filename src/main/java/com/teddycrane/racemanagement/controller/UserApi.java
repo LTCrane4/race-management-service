@@ -4,7 +4,6 @@ import com.teddycrane.racemanagement.enums.SearchType;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.*;
-import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +49,7 @@ public interface UserApi {
 
   // TODO update this to use a POST instead
   @GetMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
-  @Operation(summary = "Search users")
+  @Operation(summary = "Search users (deprecated)")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -65,8 +64,13 @@ public interface UserApi {
             responseCode = "400",
             description = "Invalid search type or search type and search value mismatch")
       })
+  @Deprecated
   ResponseEntity<UserCollectionResponse> searchUsers(
       @RequestParam("type") SearchType searchType, @RequestParam("value") String searchValue);
+
+  @PostMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
+  @Operation(summary = "Search Users")
+  ResponseEntity<UserCollectionResponse> searchUsersNew(@RequestBody SearchUserRequest request);
 
   @PostMapping(value = "/user/new", consumes = "application/json", produces = "application/json")
   @Operation(summary = "Create new User")
@@ -96,8 +100,10 @@ public interface UserApi {
       })
   ResponseEntity<? extends Response> createUser(@Valid @RequestBody CreateUserRequest request);
 
-  @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
-  ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request);
+  //  @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
+  //  @Deprecated
+  //  ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest
+  // request);
 
   @PatchMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
   ResponseEntity<UserResponse> updateUser(

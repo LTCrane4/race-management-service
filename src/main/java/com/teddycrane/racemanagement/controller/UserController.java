@@ -6,7 +6,6 @@ import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.request.*;
-import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
@@ -64,6 +63,17 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
+  @Override
+  public ResponseEntity<UserCollectionResponse> searchUsersNew(SearchUserRequest request) {
+    logger.info("searchUsersNew called");
+    if (request.isValidRequest()) {
+      return ResponseEntity.ok(
+          new UserCollectionResponse(this.userService.searchUsersNew(request)));
+    } else {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserCollectionResponse());
+    }
+  }
+
   public ResponseEntity<UserResponse> createUser(CreateUserRequest request) {
     logger.info("createUsercalled");
 
@@ -76,16 +86,16 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
-    logger.info("login requested");
-    try {
-      return ResponseEntity.ok()
-          .body(this.userService.login(request.getUsername(), request.getPassword()));
-    } catch (NotAuthorizedException e) {
-      logger.error("User is not authorized");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-  }
+  //  public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
+  //    logger.info("redirecting to new login endpoint");
+  ////    try {
+  ////      return ResponseEntity.ok()
+  ////          .body(this.userService.login(request.getUsername(), request.getPassword()));
+  ////    } catch (NotAuthorizedException e) {
+  ////      logger.error("User is not authorized");
+  ////      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  ////    }
+  //  }
 
   public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request) {
     logger.info("updateUser called");

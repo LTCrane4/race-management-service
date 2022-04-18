@@ -11,7 +11,6 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.*;
-import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
@@ -160,32 +159,6 @@ class UserControllerTest {
         () ->
             assertEquals(
                 HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
-  }
-
-  @Test
-  void loginShouldAuthenticateUser() {
-    AuthenticationResponse expected = new AuthenticationResponse("valid token");
-    when(this.userService.login(anyString(), anyString())).thenReturn(expected);
-
-    var actual = this.userController.login(new AuthenticationRequest("test", "test"));
-    assertAll(
-        () -> assertNotNull(actual, "The response should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"));
-  }
-
-  @Test
-  void loginShouldHandleExceptions() {
-    when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
-
-    var result = this.userController.login(new AuthenticationRequest("", ""));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.UNAUTHORIZED, result.getStatusCode(), "The status should be 401"));
   }
 
   @Test
