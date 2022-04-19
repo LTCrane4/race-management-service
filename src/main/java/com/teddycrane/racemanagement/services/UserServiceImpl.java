@@ -54,10 +54,11 @@ public class UserServiceImpl extends BaseService implements UserService {
     logger.info("getUser called");
     return this.userRepository
         .findById(id)
-        .orElseThrow(() -> new NotFoundException("No user found for the provided id"));
+        .orElseThrow(() -> new NotFoundException(String.format("No user found for the id %s", id)));
   }
 
   @Override
+  @Deprecated
   public Collection<User> searchUsers(@NonNull SearchType searchType, String searchValue)
       throws IllegalArgumentException {
     logger.info("searchUsers called");

@@ -20,10 +20,12 @@ public class TokenManager implements Serializable {
   private static final long serialVersionUID = 7008375124389347049L;
   private static final String ISSUER = "com.teddycrane.racemanagement";
 
-  // @Value("${secret}")
+  @Value("${secret}")
   private String jwtSecret;
 
   private static final long TOKEN_VALIDITY = 60 * 60;
+
+  public TokenManager() {}
 
   public TokenManager(@Value("${secret}") String secret) {
     this.jwtSecret = secret;

@@ -13,7 +13,6 @@ public interface RaceRepository extends JpaRepository<Race, UUID> {
   Optional<Race> findByName(String name);
 
   @Query(
-      name = "Get Races With Racer Id",
       nativeQuery = true,
       value =
           "SELECT race.id FROM race INNER JOIN race_racers ON race_racers.racers_id='?1'"
