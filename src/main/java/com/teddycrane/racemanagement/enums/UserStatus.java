@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.enums;
 public enum UserStatus {
   ACTIVE("active"),
   DISABLED("disabled"),
+  DELETED("deleted"),
   TERMINATED("terminated");
 
   private final String text;

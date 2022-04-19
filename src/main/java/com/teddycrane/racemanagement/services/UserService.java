@@ -41,6 +41,7 @@ public interface UserService {
    * @return A collection of users matching the search parameters.
    * @throws IllegalArgumentException thrown if one of the parameters is invalid.
    */
+  @Deprecated
   Collection<User> searchUsers(SearchType searchType, String searchValue)
       throws IllegalArgumentException;
 
@@ -60,6 +61,8 @@ public interface UserService {
   boolean changePassword(UUID id, String oldPassword, String newPassword) throws NotFoundException;
 
   User deleteUser(UUID id) throws NotFoundException;
+
+  User deleteUserNew(UUID id) throws NotFoundException;
 
   User changeStatus(UUID id, UserStatus status, Instant updatedTimestamp)
       throws ConflictException, NotFoundException, TransitionNotAllowedException;

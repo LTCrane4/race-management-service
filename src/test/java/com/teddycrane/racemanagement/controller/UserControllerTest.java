@@ -18,7 +18,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -335,6 +334,7 @@ class UserControllerTest {
     assertAll(
         () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -595,19 +595,16 @@ class UserControllerTest {
   }
 
   @Test
-  @Disabled
+  @DisplayName("Change status should not allow certain status transitions")
   void changeStatusShouldReturn405() {
     when(this.userService.changeStatus(eq(testId), any(), any()))
         .thenThrow(TransitionNotAllowedException.class);
 
-    var result =
-        this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        TransitionNotAllowedException.class,
         () ->
-            assertEquals(
-                HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode(), "The status should be 405"));
+            this.userController.changeStatus(
+                testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString())),
+        "A TransitionNotAllowedException should be thrown");
   }
 }

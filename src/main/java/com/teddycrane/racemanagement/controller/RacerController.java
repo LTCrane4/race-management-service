@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.enums.RacerSearchType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -14,6 +15,7 @@ import com.teddycrane.racemanagement.model.racer.response.RacerCollectionRespons
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,12 +49,11 @@ public class RacerController extends BaseController implements RacerApi {
   @Override
   public ResponseEntity<RacerCollectionResponse> getAllRacers() {
     logger.info("getAllRacers called");
-
     return ResponseEntity.ok(new RacerCollectionResponse(this.racerService.getAllRacers()));
   }
 
   @Override
-  public ResponseEntity<Racer> getRacer(String id) {
+  public ResponseEntity<Racer> getRacer(String id) throws BadRequestException, NotFoundException {
     logger.info("getRacer called");
 
     try {
@@ -60,15 +61,13 @@ public class RacerController extends BaseController implements RacerApi {
       return ResponseEntity.ok(this.racerService.getRacer(userId));
     } catch (IllegalArgumentException e) {
       logger.error("Could not parse a valid UUID from the provided id");
-      return ResponseEntity.badRequest().build();
-    } catch (NotFoundException e) {
-      logger.error("No racer found for the id {}", id);
-      return ResponseEntity.notFound().build();
+      throw new BadRequestException("A valid ID was not provided");
     }
   }
 
   @Override
-  public ResponseEntity<Racer> createRacer(@NonNull CreateRacerRequest request) {
+  public ResponseEntity<Racer> createRacer(@NonNull CreateRacerRequest request)
+      throws DuplicateItemException, BadRequestException {
     logger.info("createRacer called");
 
     try {
@@ -84,23 +83,22 @@ public class RacerController extends BaseController implements RacerApi {
               request.getPhoneNumber(),
               request.getEmail(),
               request.getBibNumber()));
-    } catch (DuplicateItemException e) {
-      logger.error("Cannot create a duplicate of an existing item");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } catch (IllegalArgumentException e) {
       logger.error("The provided value {} is not a valid category value", request.getCategory());
-      return ResponseEntity.badRequest().build();
+      throw new BadRequestException(
+          String.format("The category value %s is not a valid Category", request.getCategory()));
     }
   }
 
   @Override
-  public ResponseEntity<Racer> updateRacer(String id, @Valid UpdateRacerRequest request) {
+  public ResponseEntity<Racer> updateRacer(String id, @Valid UpdateRacerRequest request)
+      throws BadRequestException, NotFoundException, ConflictException {
     logger.info("updateRacer called");
 
     // validate parameters here
     if (request.allParamsNull()) {
-      logger.error("Cannot update a user");
-      return ResponseEntity.badRequest().build();
+      logger.error("Cannot update a racer with no values");
+      throw new BadRequestException("Cannot provide an empty request body");
     }
 
     try {
@@ -118,20 +116,16 @@ public class RacerController extends BaseController implements RacerApi {
               request.getTeamName(),
               request.getPhoneNumber(),
               request.getEmail()));
-    } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the id: {}", id);
-      return ResponseEntity.badRequest().build();
-    } catch (NotFoundException e) {
-      logger.error(e.getMessage());
-      return ResponseEntity.notFound().build();
-    } catch (ConflictException e) {
-      logger.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      logger.error(
+          "Unable to parse the id: {}, or timestamp: {}", id, request.getUpdatedTimestamp());
+      throw new BadRequestException("Unable to parse the id or timestamp");
     }
   }
 
   @Override
-  public ResponseEntity<Racer> deleteRacer(@Valid DeleteRacerRequest request) {
+  public ResponseEntity<Racer> deleteRacer(@Valid DeleteRacerRequest request)
+      throws BadRequestException, ConflictException, NotFoundException {
     logger.info("deleteRacer called");
 
     try {
@@ -141,15 +135,12 @@ public class RacerController extends BaseController implements RacerApi {
       return this.racerService.deleteRacer(id, updatedTimestamp)
           ? ResponseEntity.noContent().build()
           : ResponseEntity.internalServerError().build();
-    } catch (IllegalArgumentException e) {
-      logger.error("Unable to parse the id {}", request.getId());
-      return ResponseEntity.badRequest().build();
-    } catch (ConflictException e) {
-      logger.error("Cannot delete racer {}.  Please fetch data and try again", request.getId());
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } catch (NotFoundException e) {
-      logger.error("No racer found with the id {}", request.getId());
-      return ResponseEntity.notFound().build();
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      logger.error(
+          "Unable to parse the id: {}, or timestamp: {}",
+          request.getId(),
+          request.getUpdatedTimestamp());
+      throw new BadRequestException("Unable to parse the provided id or timestamp");
     }
   }
 

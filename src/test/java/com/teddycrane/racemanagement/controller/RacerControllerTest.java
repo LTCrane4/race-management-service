@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.enums.RacerSearchType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
@@ -86,25 +88,21 @@ class RacerControllerTest {
   @Test
   void getShouldHandleBadId() {
 
-    var result = this.racerController.getRacer("not a valid id");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.racerController.getRacer("not a valid id"),
+        "A BadRequestException should be thrown");
   }
 
   @Test
+  @DisplayName("Get Racer should throw a 404 when a racer is not found")
   void shouldHandleNotFound() {
     when(this.racerService.getRacer(any(UUID.class))).thenThrow(NotFoundException.class);
 
-    var result = this.racerController.getRacer(testString);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+    assertThrows(
+        NotFoundException.class,
+        () -> this.racerController.getRacer(UUID.randomUUID().toString()),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -166,15 +164,14 @@ class RacerControllerTest {
             .bibNumber(2)
             .build();
 
-    var result = this.racerController.createRacer(request);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+    assertThrows(
+        DuplicateItemException.class,
+        () -> this.racerController.createRacer(request),
+        "A DuplicateItemException should be thrown");
   }
 
   @Test
+  @DisplayName("Should throw a BadRequestException if a category is invalid")
   void shouldReturn400WhenBadCategoryValueIsProvided() {
     CreateRacerRequest request =
         CreateRacerRequest.builder()
@@ -187,13 +184,10 @@ class RacerControllerTest {
             .phoneNumber("Phone Number")
             .bibNumber(2)
             .build();
-    var result = this.racerController.createRacer(request);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.racerController.createRacer(request),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -393,17 +387,14 @@ class RacerControllerTest {
   @Test
   @DisplayName("Should error if the request body is empty")
   void shouldErrorIfNoParamsProvided() {
-    var result = this.racerController.updateRacer(testString, new UpdateRacerRequest());
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.racerController.updateRacer(testString, new UpdateRacerRequest()),
+        "A BadRequestException should be thrown");
   }
 
   @Test
-  @DisplayName("Handles service errors")
+  @DisplayName("Should throw a NotFoundException when no racer is found")
   void shouldHandleServiceErrors() {
     when(this.racerService.updateRacer(
             eq(testId),
@@ -421,21 +412,11 @@ class RacerControllerTest {
             .updatedTimestamp(Instant.now().toString())
             .firstName("test")
             .build();
-    var result1 = this.racerController.updateRacer(testString, request);
 
-    assertAll(
-        () -> assertNotNull(result1, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.NOT_FOUND, result1.getStatusCode(), "The status code should be 404"));
-
-    var result2 = this.racerController.updateRacer("not valid", request);
-
-    assertAll(
-        () -> assertNotNull(result2, "The request should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result2.getStatusCode(), "The status should be 400"));
+    assertThrows(
+        NotFoundException.class,
+        () -> this.racerController.updateRacer(testString, request),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -453,18 +434,16 @@ class RacerControllerTest {
             isNull()))
         .thenThrow(ConflictException.class);
 
-    var request =
-        UpdateRacerRequest.builder()
-            .updatedTimestamp(Instant.now().toString())
-            .firstName("test")
-            .build();
-
-    var result = this.racerController.updateRacer(testString, request);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        ConflictException.class,
         () ->
-            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+            this.racerController.updateRacer(
+                testString,
+                UpdateRacerRequest.builder()
+                    .updatedTimestamp(Instant.now().toString())
+                    .firstName("test")
+                    .build()),
+        "A ConflictException should be thrown");
   }
 
   @Test
@@ -492,17 +471,15 @@ class RacerControllerTest {
     when(this.racerService.deleteRacer(eq(testId), any(Instant.class)))
         .thenThrow(NotFoundException.class);
 
-    var result =
-        this.racerController.deleteRacer(
-            DeleteRacerRequest.builder()
-                .id(testId.toString())
-                .updatedTimestamp(Instant.now().toString())
-                .build());
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        NotFoundException.class,
         () ->
-            assertEquals(
-                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+            this.racerController.deleteRacer(
+                DeleteRacerRequest.builder()
+                    .id(testId.toString())
+                    .updatedTimestamp(Instant.now().toString())
+                    .build()),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -511,17 +488,15 @@ class RacerControllerTest {
     when(this.racerService.deleteRacer(eq(testId), any(Instant.class)))
         .thenThrow(ConflictException.class);
 
-    var result =
-        this.racerController.deleteRacer(
-            DeleteRacerRequest.builder()
-                .id(testString)
-                .updatedTimestamp(Instant.now().toString())
-                .build());
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        ConflictException.class,
         () ->
-            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+            this.racerController.deleteRacer(
+                DeleteRacerRequest.builder()
+                    .id(testString)
+                    .updatedTimestamp(Instant.now().toString())
+                    .build()),
+        "A ConflictException should be thrown");
   }
 
   @Test
@@ -549,18 +524,15 @@ class RacerControllerTest {
   @Test
   @DisplayName("Delete Racer should handle invalid UUIDs")
   void deleteShouldHandleInvalidUUID() {
-    var response =
-        this.racerController.deleteRacer(
-            DeleteRacerRequest.builder()
-                .id("not valid")
-                .updatedTimestamp(Instant.now().toString())
-                .build());
-
-    assertAll(
-        () -> assertNotNull(response, "The response should not be null"),
+    assertThrows(
+        BadRequestException.class,
         () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, response.getStatusCode(), "The status code should be 400"));
+            this.racerController.deleteRacer(
+                DeleteRacerRequest.builder()
+                    .id("not valid")
+                    .updatedTimestamp(Instant.now().toString())
+                    .build()),
+        "A BadRequestException should be thrown");
   }
 
   @Test

@@ -1,6 +1,10 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.RacerSearchType;
+import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
@@ -57,14 +61,17 @@ public interface RacerApi {
         @ApiResponse(responseCode = "400", description = "Invalid racer id"),
         @ApiResponse(responseCode = "404", description = "No racer found")
       })
-  ResponseEntity<Racer> getRacer(@PathVariable("id") String id);
+  ResponseEntity<Racer> getRacer(@PathVariable("id") String id)
+      throws BadRequestException, NotFoundException;
 
   @PostMapping
-  ResponseEntity<Racer> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request);
+  ResponseEntity<Racer> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request)
+      throws DuplicateItemException, BadRequestException;
 
   @PatchMapping("/{id}")
   ResponseEntity<Racer> updateRacer(
-      @PathVariable("id") String id, @Valid @RequestBody UpdateRacerRequest request);
+      @PathVariable("id") String id, @Valid @RequestBody UpdateRacerRequest request)
+      throws BadRequestException, NotFoundException, ConflictException;
 
   @DeleteMapping
   @Operation(summary = "Soft delete a racer")
@@ -74,7 +81,8 @@ public interface RacerApi {
         @ApiResponse(responseCode = "404", description = "No racer found for id"),
         @ApiResponse(responseCode = "409", description = "Updated timestamps do not match")
       })
-  ResponseEntity<Racer> deleteRacer(@Valid @RequestBody DeleteRacerRequest request);
+  ResponseEntity<Racer> deleteRacer(@Valid @RequestBody DeleteRacerRequest request)
+      throws BadRequestException, ConflictException, NotFoundException;
 
   @GetMapping("/search")
   @Operation(summary = "Search Racers")

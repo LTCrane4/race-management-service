@@ -140,7 +140,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     if (isUpdated) {
-      existing.setUpdatedTimestamp(Instant.now());
+      existing.setUpdatedTimestamp();
       return this.userRepository.save(existing);
     } else {
       throw new InternalServerError();
@@ -201,6 +201,21 @@ public class UserServiceImpl extends BaseService implements UserService {
   }
 
   @Override
+  public User deleteUserNew(UUID id) throws NotFoundException {
+    logger.info("deleteUserNew called");
+
+    User u =
+        this.userRepository
+            .findById(id)
+            .orElseThrow(
+                () -> new NotFoundException(String.format("No user found for the id '%s'", id)));
+
+    u.setStatus(UserStatus.DELETED);
+    u.setUpdatedTimestamp();
+    return this.userRepository.save(u);
+  }
+
+  @Override
   public User changeStatus(UUID id, UserStatus status, Instant updatedTimestamp)
       throws NotFoundException, TransitionNotAllowedException, ConflictException {
     logger.info("changeStatus called for {}", id);
@@ -214,8 +229,13 @@ public class UserServiceImpl extends BaseService implements UserService {
       throw new ConflictException("Updated Timestamps do not match!");
     }
 
+    if (u.getStatus() == UserStatus.TERMINATED && status == UserStatus.DISABLED) {
+      throw new TransitionNotAllowedException(
+          "The status transition between TERMINATED and DISABLED is not allowed");
+    }
+
     u.setStatus(status);
-    u.setUpdatedTimestamp(Instant.now());
+    u.setUpdatedTimestamp();
     return this.userRepository.save(u);
   }
 }
