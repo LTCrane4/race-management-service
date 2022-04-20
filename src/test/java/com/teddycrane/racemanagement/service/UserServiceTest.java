@@ -15,6 +15,7 @@ import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
+import com.teddycrane.racemanagement.error.TransitionNotAllowedException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.request.CreateUserRequest;
@@ -319,5 +320,47 @@ class UserServiceTest {
     assertThrows(
         ConflictException.class,
         () -> this.userService.changeStatus(testId, UserStatus.ACTIVE, Instant.now()));
+  }
+
+  @Test
+  @DisplayName("Change Status should not allow certain transitions")
+  void changeStatusShouldDisallowTransitions() {
+    User user = TestResourceGenerator.generateUser();
+
+    when(this.userRepository.findById(any()))
+        .thenAnswer(
+            (input) -> {
+              user.setStatus(UserStatus.TERMINATED);
+              return Optional.of(user);
+            });
+    assertThrows(
+        TransitionNotAllowedException.class,
+        () ->
+            this.userService.changeStatus(testId, UserStatus.DISABLED, user.getUpdatedTimestamp()));
+  }
+
+  @Test
+  @DisplayName("Delete user should set the status to deleted")
+  void deleteUserNewShouldChangeStatus() {
+    when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
+    when(this.userRepository.save(any(User.class))).thenAnswer((input) -> input.getArgument(0));
+
+    var result = this.userService.deleteUserNew(testId);
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () ->
+            assertEquals(
+                UserStatus.DELETED, result.getStatus(), "The user status should be deleted"));
+  }
+
+  @Test
+  @DisplayName("Delete User should throw a NotFoundException when no user is found")
+  void deleteUserNewShouldReturn404() {
+    when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userService.deleteUserNew(UUID.randomUUID()),
+        "A NotFoundException should be thrown");
   }
 }

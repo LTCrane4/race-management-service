@@ -9,7 +9,6 @@ import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
-import com.teddycrane.racemanagement.utils.ResponseStatusGenerator;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -34,7 +33,7 @@ public class UserController extends BaseController implements UserApi {
     return ResponseEntity.ok(new UserCollectionResponse(this.userService.getAllUsers()));
   }
 
-  public ResponseEntity<UserResponse> getUser(String id) {
+  public ResponseEntity<UserResponse> getUser(String id) throws BadRequestException {
     logger.info("getUser called");
 
     try {
@@ -42,10 +41,7 @@ public class UserController extends BaseController implements UserApi {
       return ResponseEntity.ok(new UserResponse(this.userService.getUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id", id);
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    } catch (NotFoundException e) {
-      logger.error("No user found for the id {}", id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      throw new BadRequestException(String.format("The id %s is not a valid user id", id));
     }
   }
 
@@ -60,23 +56,19 @@ public class UserController extends BaseController implements UserApi {
   public ResponseEntity<? extends Response> createUser(CreateUserRequest request) {
     logger.info("createUser called");
 
-    try {
-      return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
-    } catch (DuplicateItemException e) {
-      logger.error("The username {} is already taken", request.getUsername());
-      return ResponseEntity.status(HttpStatus.CONFLICT)
-          .body(new ErrorResponse("The specified username is already taken"));
-    }
+    return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
   }
 
-  public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request) {
+  public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request)
+      throws BadRequestException, ForbiddenException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
     this.printAuditLog(auditData.getUserName(), auditData.getUserId(), auditData.getUserType());
 
     if (auditData.getUserType().equals(UserType.USER)) {
-      logger.error("This user does not have the proper permissions to update other users");
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      logger.error(
+          "{} does not have the proper permissions to update other users", auditData.getUserName());
+      throw new ForbiddenException();
     }
 
     try {
@@ -105,29 +97,21 @@ public class UserController extends BaseController implements UserApi {
                     updated)));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
-        return ResponseEntity.badRequest().build();
+        throw new BadRequestException("At least one parameter must be provided to update a User!");
       }
     } catch (IllegalArgumentException e) {
       logger.error(
           "Unable to parse one of the required values id: {}, updatedTimestamp: {}",
           id,
           request.getUpdatedTimestamp());
-      return ResponseEntity.badRequest().build();
-    } catch (ConflictException e) {
-      logger.error("The timestamp provided is not the most recent");
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } catch (NotFoundException e) {
-      logger.error("No user found for the id {}", id);
-      return ResponseEntity.notFound().build();
-    } catch (InternalServerError e) {
-      logger.error("An internal server error occurred");
-      return ResponseEntity.internalServerError().build();
+      throw new BadRequestException("Unable to parse a required value");
     }
   }
 
   @Override
   public ResponseEntity<? extends Response> changePassword(
-      String id, @Valid ChangePasswordRequest request) {
+      String id, @Valid ChangePasswordRequest request)
+      throws BadRequestException, ForbiddenException {
     logger.info("changePassword called");
     UserAuditData audit = this.getUserAuditData();
     String oldPw, newPw;
@@ -144,7 +128,7 @@ public class UserController extends BaseController implements UserApi {
             "User {} does not have the permissions to change another user's password",
             audit.getUserId());
 
-        return this.createErrorResponse("Forbidden", HttpStatus.FORBIDDEN);
+        throw new ForbiddenException();
       }
 
       return ResponseEntity.ok(
@@ -152,23 +136,20 @@ public class UserController extends BaseController implements UserApi {
               this.userService.changePassword(userId, oldPw, newPw), userId));
     } catch (IllegalArgumentException | BadRequestException e) {
       logger.error("Unable to parse the provided request");
-      return this.createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
-    } catch (NotFoundException e) {
-      logger.error("No user found for the id {}", id);
-      return this.createErrorResponse(
-          String.format("No user found for the id %s", id), HttpStatus.NOT_FOUND);
+      throw new BadRequestException("Unable to parse the request");
     }
   }
 
-  public ResponseEntity<UserResponse> deleteUser(String id) throws NotFoundException {
+  public ResponseEntity<UserResponse> deleteUser(String id)
+      throws BadRequestException, NotFoundException, ForbiddenException,
+          TransitionNotAllowedException {
     logger.info("deleteUser called");
 
     UserAuditData data = this.getUserAuditData();
 
     // verify the user has a role allowed to delete
     if (data.getUserType().equals(UserType.USER)) {
-      logger.error("The user has insufficient permissions to perform this action");
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      throw new ForbiddenException("Insufficient Permissions");
     }
 
     try {
@@ -176,16 +157,13 @@ public class UserController extends BaseController implements UserApi {
 
       if (userId.equals(data.getUserId())) {
         logger.error("Users are unable to self-delete");
-        return ResponseEntity.badRequest().build();
+        throw new TransitionNotAllowedException("A user cannot delete themselves");
       }
 
       return ResponseEntity.ok(new UserResponse(this.userService.deleteUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
-      return ResponseEntity.badRequest().build();
-    } catch (NotFoundException e) {
-      logger.error("No user found for the id {}", id);
-      return ResponseEntity.notFound().build();
+      throw new BadRequestException("Unable to parse the provided id");
     }
   }
 
@@ -199,21 +177,8 @@ public class UserController extends BaseController implements UserApi {
 
       return ResponseEntity.ok(
           new UserResponse(this.userService.changeStatus(userId, request.getStatus(), timestamp)));
-    } catch (IllegalArgumentException e) {
-      logger.error("Bad Request: unable to parse the provided ID");
-      return ResponseStatusGenerator.generateBadRequestResponse(
-          "Unable to parse the provided user ID");
-    } catch (DateTimeParseException e) {
-      logger.error("Bad Request: invalid timestamp found");
-      return ResponseStatusGenerator.generateBadRequestResponse("Invalid timestamp.");
-    } catch (NotFoundException e) {
-      logger.error("No user found for the id {}", id);
-      return ResponseStatusGenerator.generateNotFoundResponse(
-          String.format("No user found for the id %s", id));
-    } catch (ConflictException e) {
-      logger.error("Timestamp mismatch");
-      return ResponseStatusGenerator.generateConflictResponse(
-          "The updated timestamps do not match.  Re-fetch data and try again");
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      throw new BadRequestException("Unable to parse the provided ID or timestamp");
     }
   }
 }

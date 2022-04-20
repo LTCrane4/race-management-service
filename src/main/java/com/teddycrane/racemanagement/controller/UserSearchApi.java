@@ -1,5 +1,6 @@
 package com.teddycrane.racemanagement.controller;
 
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.request.SearchUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,5 +17,6 @@ public interface UserSearchApi {
       consumes = "application/json",
       produces = "application/json")
   @Operation(summary = "Search Users", description = "New user search endpoint")
-  ResponseEntity<? extends Response> searchUsers(@Valid @RequestBody SearchUserRequest request);
+  ResponseEntity<? extends Response> searchUsers(@Valid @RequestBody SearchUserRequest request)
+      throws BadRequestException;
 }

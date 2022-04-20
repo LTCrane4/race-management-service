@@ -24,13 +24,14 @@ dependencies {
     implementation "org.springframework.security:spring-security-test"
     implementation "com.github.javafaker:javafaker:$java_faker_version"
     implementation("io.jsonwebtoken:jjwt:$jwt_version")
-    implementation "org.postgresql:postgresql"
+    implementation "org.postgresql:postgresql:$postgres_version"
     implementation "org.springdoc:springdoc-openapi-ui:$springdoc_version"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.testcontainers:testcontainers:$testcontainers_version"
     testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
     testImplementation "org.testcontainers:postgresql:$testcontainers_version"
+    testImplementation "org.postgresql:postgresql:$postgres_version"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
     compileOnly "org.projectlombok:lombok:$lombok_version"

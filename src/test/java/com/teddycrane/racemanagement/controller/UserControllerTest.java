@@ -18,7 +18,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -89,26 +88,12 @@ class UserControllerTest {
   }
 
   @Test
-  void getUserShouldReturn400IfIdIsNotValid() {
-    var result = this.userController.getUser("not a uuid");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
-  }
-
-  @Test
-  void getUserShouldReturn404IfUserNotFound() {
-    when(this.userService.getUser(any(UUID.class))).thenThrow(NotFoundException.class);
-    var result = this.userController.getUser(testString);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.NOT_FOUND, result.getStatusCode(), "The response status should be 404"));
+  @DisplayName("Get user should throw an Illegal Argument Exception when the id is invalid")
+  void getUserShouldThrowForInvalidId() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.getUser("asdf"),
+        "The method should throw a BadRequestException");
   }
 
   @Test
@@ -143,21 +128,6 @@ class UserControllerTest {
             assertEquals(
                 HttpStatus.OK, actual.getStatusCode(), "The response status should be 200"),
         () -> assertNotNull(body, "The response body should not be null"));
-  }
-
-  @Test
-  @DisplayName("Create user should return a 409 when another user exists")
-  void createUserShouldReturnConflict() {
-    when(this.userService.createUser(any(CreateUserRequest.class)))
-        .thenThrow(DuplicateItemException.class);
-
-    var result = this.userController.createUser(new CreateUserRequest());
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.CONFLICT, result.getStatusCode(), "The status code should be 409"));
   }
 
   @Test
@@ -364,6 +334,7 @@ class UserControllerTest {
     assertAll(
         () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -378,22 +349,21 @@ class UserControllerTest {
 
   @Test
   void updateUserShouldHandleBadUserId() {
-    var response = this.userController.updateUser("bad id", new UpdateUserRequest());
-
-    assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.updateUser("bad id", new UpdateUserRequest()),
+        "A BadRequestException should be thrown");
   }
 
   @Test
   void updateUserShouldHandleEmptyParamsUpdate() {
-    var response =
-        this.userController.updateUser(
-            testString, new UpdateUserRequest(null, null, null, null, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()));
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.userController.updateUser(
+                testString,
+                new UpdateUserRequest(null, null, null, null, Instant.now().toString())),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -401,33 +371,30 @@ class UserControllerTest {
     this.expected = TestResourceGenerator.generateUser(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    var response =
-        this.userController.updateUser(
-            testString, new UpdateUserRequest(null, null, null, null, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode()));
+    assertThrows(
+        ForbiddenException.class,
+        () ->
+            this.userController.updateUser(
+                testString,
+                new UpdateUserRequest(null, null, null, null, Instant.now().toString())),
+        "A ForbiddenException should be thrown");
   }
 
   @Test
   @DisplayName("Update user should not update if timestamp cannot be converted")
   void updateUserShouldNotUpdateIfBadTimestamp() {
-    var response =
-        this.userController.updateUser(
-            testString, new UpdateUserRequest(null, null, null, null, null));
-
-    assertAll(
-        () -> assertNotNull(response, "The response should not be null"),
+    assertThrows(
+        BadRequestException.class,
         () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, response.getStatusCode(), "The status should be 400"));
+            this.userController.updateUser(
+                testString, new UpdateUserRequest(null, null, null, null, null)),
+        "A BadRequestException should be thrown");
   }
 
   @Test
   @DisplayName(
       "Update user should return a Conflict status code if the updated timestamp is out of date")
-  void updateUserShouldReturn409IfTheTimeIsOutOfDate() {
+  void updateUserShouldThrowConflictException() {
     when(this.userService.updateUser(
             eq(testId),
             anyString(),
@@ -437,14 +404,13 @@ class UserControllerTest {
             any(Instant.class)))
         .thenThrow(ConflictException.class);
 
-    var result =
-        this.userController.updateUser(
-            testString, new UpdateUserRequest("", "", "", UserType.USER, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        ConflictException.class,
         () ->
-            assertEquals(HttpStatus.CONFLICT, result.getStatusCode(), "The status should be 409"));
+            this.userController.updateUser(
+                testString,
+                new UpdateUserRequest("", "", "", UserType.USER, Instant.now().toString())),
+        "A ConflictException should be thrown");
   }
 
   @Test
@@ -459,41 +425,13 @@ class UserControllerTest {
             any(Instant.class)))
         .thenThrow(NotFoundException.class);
 
-    var result =
-        this.userController.updateUser(
-            testString,
-            new UpdateUserRequest("", "", "", UserType.ADMIN, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        NotFoundException.class,
         () ->
-            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
-  }
-
-  @Test
-  @DisplayName("Update user should handle internal server errors")
-  void updateUserShouldHandleInternalServerError() {
-    when(this.userService.updateUser(
-            eq(testId),
-            anyString(),
-            anyString(),
-            anyString(),
-            any(UserType.class),
-            any(Instant.class)))
-        .thenThrow(InternalServerError.class);
-
-    var result =
-        this.userController.updateUser(
-            testString,
-            new UpdateUserRequest("", "", "", UserType.ADMIN, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                result.getStatusCode(),
-                "The status should be 500"));
+            this.userController.updateUser(
+                testString,
+                new UpdateUserRequest("", "", "", UserType.ADMIN, Instant.now().toString())),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -525,12 +463,10 @@ class UserControllerTest {
 
   @Test
   void deleteUserShouldHandleBadId() {
-    var result = this.userController.deleteUser("not a valid id");
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.deleteUser("not a valid id"),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -538,35 +474,28 @@ class UserControllerTest {
     this.expected.setUserType(UserType.USER);
     this.setUpSecurityContext(this.expected);
 
-    var result = this.userController.deleteUser(testString);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode(), "The status should be 403"));
+    assertThrows(
+        ForbiddenException.class,
+        () -> this.userController.deleteUser(testString),
+        "A ForbiddenException should be thrown");
   }
 
   @Test
   void deleteUserShouldNotAllowUsersToDeleteThemselves() {
-    var result = this.userController.deleteUser(expected.getId().toString());
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status code should be 400"));
+    assertThrows(
+        TransitionNotAllowedException.class,
+        () -> this.userController.deleteUser(expected.getId().toString()),
+        "A TransitionNotAllowedException should be thrown");
   }
 
   @Test
   void deleteUserShouldThrow404IfUserNotFound() {
     when(this.userService.deleteUser(any(UUID.class))).thenThrow(NotFoundException.class);
 
-    var result = this.userController.deleteUser(testString);
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+    assertThrows(
+        NotFoundException.class,
+        () -> this.userController.deleteUser(testString),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -586,15 +515,12 @@ class UserControllerTest {
 
   @Test
   void changePasswordShouldReturn403IfUserChangesOtherUsersPassword() {
-    var result =
-        this.userController.changePassword(
-            UUID.randomUUID().toString(), new ChangePasswordRequest("oldPassword", "newPassword"));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        ForbiddenException.class,
         () ->
-            assertEquals(
-                HttpStatus.FORBIDDEN, result.getStatusCode(), "The status code should be 403"));
+            this.userController.changePassword(
+                UUID.randomUUID().toString(),
+                new ChangePasswordRequest("oldPassword", "newPassword")));
   }
 
   @Test
@@ -604,39 +530,31 @@ class UserControllerTest {
 
     ChangePasswordRequest request = new ChangePasswordRequest("old", "new");
 
-    var result1 =
-        this.userController.changePassword(
-            expected.getId().toString(), new ChangePasswordRequest("test", "Test"));
-
-    assertAll(
-        () -> assertNotNull(result1, "The result should not be null"),
+    assertThrows(
+        BadRequestException.class,
         () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result1.getStatusCode(), "The status code should be 400"));
+            this.userController.changePassword(
+                expected.getId().toString(), new ChangePasswordRequest("test", "Test")),
+        "A BadRequestException should be thrown");
 
-    var result2 = this.userController.changePassword("not a uuid", request);
-
-    assertAll(
-        () -> assertNotNull(result2, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST, result2.getStatusCode(), "The status should be 400"));
+    assertThrows(
+        BadRequestException.class,
+        () -> this.userController.changePassword("not a uuid", request),
+        "A BadRequestException should be thrown");
   }
 
   @Test
+  @DisplayName("Change password should throw a NotFoundException if the user is not found")
   void changePasswordShouldReturn404IfUserNotFound() {
     when(this.userService.changePassword(eq(expected.getId()), anyString(), anyString()))
         .thenThrow(NotFoundException.class);
 
-    var result =
-        this.userController.changePassword(
-            expected.getId().toString(), new ChangePasswordRequest("old", "new"));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        NotFoundException.class,
         () ->
-            assertEquals(
-                HttpStatus.NOT_FOUND, result.getStatusCode(), "The status code should be 404"));
+            this.userController.changePassword(
+                expected.getId().toString(), new ChangePasswordRequest("old", "new")),
+        "A NotFoundException should be thrown");
   }
 
   @Test
@@ -655,17 +573,12 @@ class UserControllerTest {
 
   @Test
   void changeStatusShouldReturn400() {
-    var result =
-        this.userController.changeStatus(
-            "bad", new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        BadRequestException.class,
         () ->
-            assertEquals(
-                HttpStatus.BAD_REQUEST,
-                result.getStatusCode(),
-                "The result status should be a 400"));
+            this.userController.changeStatus(
+                "bad", new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString())),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -673,30 +586,25 @@ class UserControllerTest {
     when(this.userService.changeStatus(eq(testId), any(), any()))
         .thenThrow(NotFoundException.class);
 
-    var result =
-        this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        NotFoundException.class,
         () ->
-            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode(), "The status should be 404"));
+            this.userController.changeStatus(
+                testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString())),
+        "A NotFoundException should be thrown");
   }
 
   @Test
-  @Disabled
+  @DisplayName("Change status should not allow certain status transitions")
   void changeStatusShouldReturn405() {
     when(this.userService.changeStatus(eq(testId), any(), any()))
         .thenThrow(TransitionNotAllowedException.class);
 
-    var result =
-        this.userController.changeStatus(
-            testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString()));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
+    assertThrows(
+        TransitionNotAllowedException.class,
         () ->
-            assertEquals(
-                HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode(), "The status should be 405"));
+            this.userController.changeStatus(
+                testString, new ChangeStatusRequest(UserStatus.ACTIVE, Instant.now().toString())),
+        "A TransitionNotAllowedException should be thrown");
   }
 }

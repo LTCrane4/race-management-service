@@ -20,8 +20,6 @@ public class UserSearchServiceImpl extends BaseService implements UserSearchServ
   @Override
   public Collection<User> searchUsers(@NonNull SearchUserRequest request) {
     logger.info("searchUsers called");
-    // only allow search by names here
-
     return this.userRepository.searchUsers(
         request.getUserId(),
         request.getFirstName(),

@@ -34,7 +34,7 @@ public class User {
   @NonNull
   private UserStatus status;
 
-  @Setter @NonNull private Instant updatedTimestamp;
+  @NonNull private Instant updatedTimestamp;
 
   public User() {
     this(UUID.randomUUID());
@@ -145,5 +145,14 @@ public class User {
         other.status,
         other.createdTimestamp,
         other.updatedTimestamp);
+  }
+
+  public void setUpdatedTimestamp() {
+    this.updatedTimestamp = Instant.now();
+  }
+
+  @Deprecated
+  public void setUpdatedTimestamp(@NonNull Instant updatedTimestamp) {
+    this.updatedTimestamp = updatedTimestamp;
   }
 }

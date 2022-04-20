@@ -11,12 +11,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Resolve Dependencies
           command: ./gradlew resolveDependencies
       - save_cache:
-          key: cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+          key: cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
           paths:
             - ~/.gradle/caches/modules-2/files-2.1
             - .gradle
@@ -28,7 +28,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Gradle Build
           command: ./gradlew build -x test
@@ -49,7 +49,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Split Tests
           command: circleci tests glob "src/test/**/*.java" | circleci tests split --split-by=timings | xargs -n 1 echo
@@ -72,7 +72,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Split Tests by Runtime
           command: circleci tests glob "src/integrationTest/**/*.java" | circleci tests split --split-by=timings | xargs -n 1 echo
@@ -95,7 +95,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - cache-{{ .Branch }}-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - cache-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
       - run:
           name: Build Application
           command: ./gradlew jar
@@ -115,13 +115,13 @@ workflows:
             - install-dependencies
           post-steps:
             - codecov/upload
-      # - integration-test:
-      #     requires:
-      #       - install-dependencies
-      #     filters:
-      #       branches:
-      #         only:
-      #           - main
+      - integration-test:
+          requires:
+            - install-dependencies
+          filters:
+            branches:
+              only:
+                - main
 #       - store-built-application:
 #           requires:
 #             - test

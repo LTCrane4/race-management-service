@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/race")
 public interface RaceApi {
 
-  @GetMapping(consumes = "application/json", produces = "application/json")
+  @GetMapping(produces = "application/json")
   @Operation(description = "Get all races")
   @ApiResponse(responseCode = "200", description = "Found all races")
   ResponseEntity<RaceCollectionResponse> getAllRaces();
 
-  @GetMapping(value = "/{id}", produces = "application/json", consumes = "application/json")
+  @GetMapping(value = "/{id}", produces = "application/json")
   @Operation(description = "Get single race")
   @ApiResponses(
       value = {

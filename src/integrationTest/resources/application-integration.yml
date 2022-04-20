@@ -6,6 +6,7 @@ spring:
     password: password # pragma: allowlist secret
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:latest:///test?TC_INITSCRIPT=file:src/integrationTest/resources/init.sql
+
   jpa:
     properties:
       hibernate:
@@ -13,7 +14,7 @@ spring:
 logging:
   group:
     testImpl: com.teddycrane.racemanagement.test.integration.tests
-    testcontainers: org.testcontainers
+    testcontainers: org.testcontainers.*
   level:
     testImpl: info
     testcontainers: error
