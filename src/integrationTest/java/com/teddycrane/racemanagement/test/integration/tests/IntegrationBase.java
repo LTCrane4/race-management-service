@@ -20,10 +20,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -39,15 +37,12 @@ public abstract class IntegrationBase {
       String.format("%s %s", BEARER, JwtTokenProviderMock.generateMockToken("testuser"));
 
   static {
-    DockerImageName myImage =
-        DockerImageName.parse("postgresql:latest").asCompatibleSubstituteFor("postgres");
     CONTAINER =
-        new PostgreSQLContainer<>(myImage)
+        new PostgreSQLContainer<>("postgres:latest")
             .withReuse(true)
             .withDatabaseName("test")
             .withUsername("tester")
-            .withPassword("password")
-            .waitingFor(Wait.forLogMessage("mysqld: ready for connections", 1));
+            .withPassword("password");
     CONTAINER.start();
   }
 
@@ -72,6 +67,10 @@ public abstract class IntegrationBase {
     if (!CONTAINER.isRunning()) {
       setUpDatabase();
     }
+
+    System.setProperty("DB_URL", CONTAINER.getJdbcUrl());
+    System.setProperty("DB_USERNAME", CONTAINER.getUsername());
+    System.setProperty("DB_PASSWORD", CONTAINER.getPassword());
   }
 
   private void setUpMockTokenManager() {

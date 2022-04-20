@@ -10,7 +10,7 @@ class HealthCheck extends IntegrationBase {
 
   @Test
   void shouldStart() throws Exception {
-    assertTrue(CONTAINER.isRunning());
+    assertTrue(CONTAINER.isRunning(), "The test Postgres container should be running");
 
     this.mockMvc.perform(get("/actuator/health")).andExpect(status().isOk());
   }
