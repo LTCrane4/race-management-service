@@ -1,40 +1,76 @@
 package com.teddycrane.racemanagement.model.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
 @EqualsAndHashCode
-@ToString
+@Builder
+@AllArgsConstructor
 @Table(name = "_user")
 public class User {
 
-  @Id private final UUID id;
+  @Id
+  @Column(name = "id", nullable = false, updatable = false, unique = true)
+  private final UUID id;
 
+  @Column(name = "created_timestamp", nullable = false, updatable = false)
   private final Instant createdTimestamp;
 
-  @Setter @NonNull private String firstName, lastName, email, username, password;
+  @Setter
+  @NonNull
+  @Column(name = "first_name")
+  private String firstName;
+
+  @Setter
+  @NonNull
+  @Column(name = "last_name")
+  private String lastName;
+
+  @Setter
+  @Column(name = "email")
+  @Email
+  @NonNull
+  private String email;
+
+  @Setter
+  @NonNull
+  @Column(name = "username")
+  private String username;
+
+  @Setter
+  @NonNull
+  @Column(name = "password")
+  private String password;
 
   @Setter
   @Enumerated(EnumType.STRING)
   @NonNull
+  @Column(name = "user_type")
   private UserType userType;
 
   @Enumerated(EnumType.STRING)
   @Setter
   @NonNull
+  @Column(name = "status")
   private UserStatus status;
 
-  @NonNull private Instant updatedTimestamp;
+  @NonNull
+  @Column(name = "updated_timestamp")
+  private Instant updatedTimestamp;
 
   public User() {
     this(UUID.randomUUID());
@@ -154,5 +190,15 @@ public class User {
   @Deprecated
   public void setUpdatedTimestamp(@NonNull Instant updatedTimestamp) {
     this.updatedTimestamp = updatedTimestamp;
+  }
+
+  @Override
+  public String toString() {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return mapper.writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      return "";
+    }
   }
 }

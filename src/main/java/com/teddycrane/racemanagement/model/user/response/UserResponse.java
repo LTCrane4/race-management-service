@@ -8,6 +8,7 @@ import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.User;
 import java.time.Instant;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -24,15 +25,17 @@ import org.springframework.lang.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Deprecated
 public class UserResponse implements Response {
 
+  @NotNull(message = "The User ID can never be null")
   private UUID id;
 
   private String firstName, lastName, email, username;
 
   private UserType userType;
 
-  private Instant updatedTimestamp;
+  private Instant createdTimestamp, updatedTimestamp;
 
   private UserStatus status;
 
@@ -44,6 +47,7 @@ public class UserResponse implements Response {
         u.getEmail(),
         u.getUsername(),
         u.getUserType(),
+        u.getCreatedTimestamp(),
         u.getUpdatedTimestamp(),
         u.getStatus());
   }

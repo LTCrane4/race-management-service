@@ -65,6 +65,8 @@ public abstract class BaseController {
     private UserType userType;
   }
 
+  // TODO fully remove this method
+  @Deprecated
   protected ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
     return new ResponseEntity<ErrorResponse>(new ErrorResponse(message), status);
   }

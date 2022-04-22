@@ -11,8 +11,8 @@ import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
-import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import com.teddycrane.racemanagement.utils.mapper.UserMapper;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collection;
@@ -132,14 +132,17 @@ class UserControllerTest {
 
   @Test
   void getAllUsersShouldReturnCorrectResponse() {
-    Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
-    when(this.userService.getAllUsers()).thenReturn(expectedList);
+    Collection<User> expectedServiceResponse = TestResourceGenerator.generateUserList(5);
+    when(this.userService.getAllUsers()).thenReturn(expectedServiceResponse);
 
     UserCollectionResponse actual = this.userController.getAllUsers().getBody();
 
     assertAll(
         () -> assertNotNull(actual, "The response entity body should not be null"),
-        () -> assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers()));
+        () ->
+            assertEquals(
+                UserMapper.convertEntityListToDTO(expectedServiceResponse).getUsers(),
+                actual.getUsers()));
   }
 
   @Test
@@ -458,7 +461,9 @@ class UserControllerTest {
         () -> assertEquals(HttpStatus.OK, actual.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
-                new UserResponse(expected), body, "The result should match the expected value"));
+                UserMapper.convertEntityToDTO(expected),
+                body,
+                "The result should match the expected value"));
   }
 
   @Test
