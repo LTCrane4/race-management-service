@@ -3,7 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.dto.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDTO;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
@@ -78,7 +78,7 @@ public class UserController extends BaseController implements UserApi {
 
     try {
       UUID userId = UUID.fromString(id);
-      Instant updated = null;
+      Instant updated;
 
       if (request.getUpdatedTimestamp() != null) {
         updated = Instant.parse(request.getUpdatedTimestamp());

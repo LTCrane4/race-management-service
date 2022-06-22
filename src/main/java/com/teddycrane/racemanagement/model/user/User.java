@@ -10,21 +10,19 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
-@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 @Table(name = "_user")
 public class User {
 
   @Id
-  @Column(name = "id", nullable = false, updatable = false, unique = true)
+  @Column(name = "user_id", nullable = false, updatable = false, unique = true)
   private final UUID id;
 
   @Column(name = "created_timestamp", nullable = false, updatable = false)
@@ -86,15 +84,15 @@ public class User {
 
   private User(
       UUID id,
-      String firstName,
-      String lastName,
-      String username,
-      String email,
-      String password,
-      UserType userType,
-      UserStatus status,
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password,
+      @NonNull UserType userType,
+      @NonNull UserStatus status,
       Instant createdTimestamp,
-      Instant updatedTimestamp) {
+      @NonNull Instant updatedTimestamp) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -115,19 +113,19 @@ public class User {
       String email,
       String password,
       UserType userType,
-      UserStatus status) {
+      @NonNull UserStatus status) {
     this(id, firstName, lastName, username, email, password, userType);
     this.status = status;
   }
 
   public User(
       UUID id,
-      String firstName,
-      String lastName,
-      String username,
-      String email,
-      String password,
-      UserType userType) {
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password,
+      @NonNull UserType userType) {
     this(id);
     this.firstName = firstName;
     this.lastName = lastName;
@@ -137,7 +135,12 @@ public class User {
     this.userType = userType;
   }
 
-  public User(String firstName, String lastName, String username, String email, String password) {
+  public User(
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password) {
     this();
     this.firstName = firstName;
     this.lastName = lastName;
@@ -152,7 +155,7 @@ public class User {
       String username,
       String email,
       String password,
-      UserType userType) {
+      @NonNull UserType userType) {
     this(firstName, lastName, username, email, password);
     this.userType = userType;
   }
@@ -164,7 +167,7 @@ public class User {
       String email,
       String password,
       UserType userType,
-      UserStatus status) {
+      @NonNull UserStatus status) {
     this(firstName, lastName, username, email, password, userType);
     this.status = status;
   }

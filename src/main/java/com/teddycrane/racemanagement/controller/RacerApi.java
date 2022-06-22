@@ -6,9 +6,10 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.RacerDTO;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import javax.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,21 +58,99 @@ public interface RacerApi {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = Racer.class))
+                  schema = @Schema(implementation = RacerDTO.class))
             }),
-        @ApiResponse(responseCode = "400", description = "Invalid racer id"),
-        @ApiResponse(responseCode = "404", description = "No racer found")
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid racer id",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No racer found",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            })
       })
-  ResponseEntity<Racer> getRacer(@PathVariable("id") String id)
+  ResponseEntity<RacerDTO> getRacer(@PathVariable("id") String id)
       throws BadRequestException, NotFoundException;
 
   @PostMapping
-  ResponseEntity<Racer> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request)
+  @Operation(description = "Creates a new racer")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Successfully created racer",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = RacerDTO.class))
+            }),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request body",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Attempted duplicate created",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            })
+      })
+  ResponseEntity<RacerDTO> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request)
       throws DuplicateItemException, BadRequestException;
 
   @PatchMapping("/{id}")
-  ResponseEntity<Racer> updateRacer(
-      @PathVariable("id") String id, @Valid @RequestBody UpdateRacerRequest request)
+  @Operation(description = "Update racer data")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully updated racer",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = RacerDTO.class))
+            }),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid racer id",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No racer found",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Timestamps do not match",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            })
+      })
+  ResponseEntity<RacerDTO> updateRacer(
+      @PathVariable("id") String id, @Valid @RequestBody @NonNull UpdateRacerRequest request)
       throws BadRequestException, NotFoundException, ConflictException;
 
   @DeleteMapping
@@ -78,12 +158,35 @@ public interface RacerApi {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "Successfully deleted racer"),
-        @ApiResponse(responseCode = "404", description = "No racer found for id"),
-        @ApiResponse(responseCode = "409", description = "Updated timestamps do not match")
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request: Unable to delete racer",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No racer found for id",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Updated timestamps do not match",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            })
       })
-  ResponseEntity<Racer> deleteRacer(@Valid @RequestBody DeleteRacerRequest request)
+  ResponseEntity<Response> deleteRacer(@Valid @RequestBody DeleteRacerRequest request)
       throws BadRequestException, ConflictException, NotFoundException;
 
+  // TODO deprecate this endpoint and replace with POST
   @GetMapping("/search")
   @Operation(summary = "Search Racers")
   @ApiResponses(
@@ -99,4 +202,20 @@ public interface RacerApi {
       })
   ResponseEntity<? extends Response> searchRacers(
       @RequestParam("type") RacerSearchType searchType, @RequestParam("value") String searchValue);
+
+  @PostMapping("/search")
+  @Operation(summary = "Search Racers (new)")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Found racers",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = RacerCollectionResponse.class))
+            })
+      })
+  ResponseEntity<RacerCollectionResponse> searchRacersNew(
+      @Valid @NonNull SearchRacerRequest request) throws BadRequestException;
 }

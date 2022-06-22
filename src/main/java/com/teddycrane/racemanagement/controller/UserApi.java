@@ -6,7 +6,7 @@ import com.teddycrane.racemanagement.error.ForbiddenException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.error.TransitionNotAllowedException;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.dto.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDTO;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;

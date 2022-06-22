@@ -6,6 +6,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 public class RacerServiceImpl extends BaseService implements RacerService {
@@ -57,11 +59,17 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       throws DuplicateItemException {
     logger.info("createRacer called");
 
-    Racer r =
-        new Racer(
-            firstName, lastName, category, middleName, teamName, phoneNumber, email, bibNumber);
-
-    return this.racerRepository.save(r);
+    return this.racerRepository.save(
+        Racer.builder()
+            .firstName(firstName)
+            .lastName(lastName)
+            .category(category)
+            .middleName(middleName)
+            .teamName(teamName)
+            .phoneNumber(phoneNumber)
+            .email(email)
+            .bibNumber(bibNumber)
+            .build());
   }
 
   @Override
@@ -151,8 +159,20 @@ public class RacerServiceImpl extends BaseService implements RacerService {
         }
       default:
         {
-          return new ArrayList<Racer>();
+          return new ArrayList<>();
         }
     }
+  }
+
+  @Override
+  public Collection<Racer> searchRacers(@NonNull @Validated SearchRacerRequest request) {
+    // TODO remove the (new)
+    logger.info("searchRacers (new) called");
+    return this.racerRepository.searchRacers(
+        request.getFirstName(),
+        request.getMiddleName(),
+        request.getLastName(),
+        request.getTeamName(),
+        request.getCategory().toString());
   }
 }

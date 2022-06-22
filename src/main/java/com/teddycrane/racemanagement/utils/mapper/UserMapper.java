@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.utils.mapper;
 
 import com.teddycrane.racemanagement.model.user.User;
-import com.teddycrane.racemanagement.model.user.dto.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDTO;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import java.util.Collection;
 import java.util.stream.Collectors;

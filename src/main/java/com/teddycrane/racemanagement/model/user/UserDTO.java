@@ -1,4 +1,4 @@
-package com.teddycrane.racemanagement.model.user.dto;
+package com.teddycrane.racemanagement.model.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

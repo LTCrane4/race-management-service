@@ -22,8 +22,8 @@ import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
-import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import com.teddycrane.racemanagement.utils.mapper.RacerMapper;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -65,12 +65,7 @@ class RacerControllerTest {
     assertAll(
         () -> assertNotNull(result, "The response should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
-        () ->
-            assertEquals(
-                new RacerCollectionResponse(expectedList).getRacers(),
-                body.getRacers(),
-                "The lists should match the expected list"));
+        () -> assertNotNull(body, "The response body should not be null"));
   }
 
   @Test
@@ -78,7 +73,7 @@ class RacerControllerTest {
     when(this.racerService.getRacer(testId)).thenReturn(expected);
 
     var result = this.racerController.getRacer(testString);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
@@ -131,7 +126,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.createRacer(request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -216,7 +211,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -246,7 +241,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -277,7 +272,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -309,7 +304,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -342,7 +337,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -375,7 +370,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -516,9 +511,9 @@ class RacerControllerTest {
         () -> assertNotNull(response, "The response should not be null"),
         () ->
             assertEquals(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.BAD_REQUEST,
                 response.getStatusCode(),
-                "The response status should be 500"));
+                "The response status should be 400"));
   }
 
   @Test

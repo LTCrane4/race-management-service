@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.model.user.response;
 
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.user.dto.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDTO;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;

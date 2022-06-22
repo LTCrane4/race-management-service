@@ -6,6 +6,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
@@ -45,4 +46,6 @@ public interface RacerService {
       throws ConflictException, NotFoundException;
 
   Collection<Racer> searchRacers(RacerSearchType searchType, String searchValue);
+
+  Collection<Racer> searchRacers(SearchRacerRequest request);
 }
