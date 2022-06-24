@@ -135,20 +135,14 @@ public class RaceServiceImpl extends BaseService implements RaceService {
       throw new NotFoundException("No racer found for the provided id");
     }
 
-    List<Race> races =
-        this.raceRepository.findAll().stream()
-            .filter(
-                race ->
-                    race.getRacers().stream()
-                        .map(
-                            racer -> {
-                              return racer.getId();
-                            })
-                        .collect(Collectors.toList())
-                        .contains(racerId))
-            .collect(Collectors.toList());
-
-    return races;
+    return this.raceRepository.findAll().stream()
+        .filter(
+            race ->
+                race.getRacers().stream()
+                    .map(Racer::getId)
+                    .collect(Collectors.toList())
+                    .contains(racerId))
+        .collect(Collectors.toList());
   }
 
   @Override

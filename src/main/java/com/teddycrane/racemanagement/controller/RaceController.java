@@ -5,12 +5,14 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
+import com.teddycrane.racemanagement.model.race.RaceDTO;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 import com.teddycrane.racemanagement.services.RaceService;
+import com.teddycrane.racemanagement.utils.mapper.RaceMapper;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -37,28 +39,29 @@ public class RaceController extends BaseController implements RaceApi {
   public ResponseEntity<RaceCollectionResponse> getAllRaces() {
     logger.info("getAllRaces called");
 
-    return ResponseEntity.ok(new RaceCollectionResponse(this.raceService.getAllRaces()));
+    return ResponseEntity.ok(
+        new RaceCollectionResponse(
+            RaceMapper.convertEntityListToDTOList(this.raceService.getAllRaces())));
   }
 
   @Override
-  public ResponseEntity<? extends Response> getRace(String id) {
-    logger.info("getRace called");
+  public ResponseEntity<RaceDTO> getRace(String id) {
+    logger.info("getRace called for id: {}", id);
 
     try {
       UUID raceId = UUID.fromString(id);
-      return ResponseEntity.ok(this.raceService.getRace(raceId));
+      return ResponseEntity.ok(RaceMapper.convertEntityToDTO(this.raceService.getRace(raceId)));
     } catch (IllegalArgumentException e) {
       logger.error("Invalid UUID provided");
-      return this.createErrorResponse("Invalid UUID provided!", HttpStatus.BAD_REQUEST);
+      throw new BadRequestException("Invalid UUID provided!");
     } catch (NotFoundException e) {
       logger.error("No race found for the id {}", id);
-      return this.createErrorResponse(
-          String.format("No race found for the id %s", id), HttpStatus.NOT_FOUND);
+      throw new NotFoundException(String.format("No race found for the id %s", id));
     }
   }
 
   @Override
-  public ResponseEntity<? extends Response> createRace(@NonNull CreateRaceRequest request) {
+  public ResponseEntity<RaceDTO> createRace(@NonNull CreateRaceRequest request) {
     logger.info("createRace called");
     String name = request.getName();
     Category category = request.getCategory();
@@ -70,17 +73,17 @@ public class RaceController extends BaseController implements RaceApi {
     }
 
     try {
-      return ResponseEntity.ok(this.raceService.createRace(name, category, racers));
+      return ResponseEntity.ok(
+          RaceMapper.convertEntityToDTO(this.raceService.createRace(name, category, racers)));
     } catch (ConflictException e) {
       logger.error("Name Collision: Cannot create duplicate race");
-      return this.createErrorResponse(
-          "Cannot create a duplicate of an existing race!", HttpStatus.CONFLICT);
+      throw new ConflictException("Cannot create a duplicate of an existing race!");
     }
   }
 
   @Override
-  public ResponseEntity<? extends Response> addRacersToRace(
-      String raceId, @NonNull AddRacersRequest request) {
+  public ResponseEntity<RaceDTO> addRacersToRace(String raceId, @NonNull AddRacersRequest request)
+      throws BadRequestException, ConflictException, NotFoundException {
     logger.info("addRacersToRace called");
 
     try {
@@ -88,22 +91,20 @@ public class RaceController extends BaseController implements RaceApi {
       Instant updatedTimestamp = Instant.parse(request.getUpdatedTimestamp());
 
       return ResponseEntity.ok(
-          this.raceService.addRacersToRace(id, request.getRacerIds(), updatedTimestamp));
+          RaceMapper.convertEntityToDTO(
+              this.raceService.addRacersToRace(id, request.getRacerIds(), updatedTimestamp)));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.error("A provided parameter was not provided in a valid format");
-      return this.createErrorResponse(
-          "One of the required parameters was not provided in a valid format",
-          HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(
+          "One of the required parameters was not provided in a valid format");
     } catch (NotFoundException e) {
       logger.error(
-          "An error ocurred when attempting to resolve data for the following UUID: {}",
+          "An error occurred when attempting to resolve data for the following UUID: {}",
           e.getMessage());
-      return this.createErrorResponse(
-          String.format("No entries found for the id %s", e.getMessage()), HttpStatus.NOT_FOUND);
+      throw new NotFoundException(String.format("No entries found for the id %s", e.getMessage()));
     } catch (ConflictException e) {
       logger.error("Newer data has been provided.");
-      return this.createErrorResponse(
-          "Newer data exists.  Please re-fetch and try again.", HttpStatus.CONFLICT);
+      throw new ConflictException("Newer data exists.  Please re-fetch and try again.");
     }
   }
 
@@ -155,7 +156,9 @@ public class RaceController extends BaseController implements RaceApi {
     try {
       UUID id = UUID.fromString(racerId);
       return ResponseEntity.ok(
-          RaceCollectionResponse.builder().data(this.raceService.getRacesForRacer(id)).build());
+          RaceCollectionResponse.builder()
+              .data(RaceMapper.convertEntityListToDTOList(this.raceService.getRacesForRacer(id)))
+              .build());
     } catch (IllegalArgumentException e) {
       logger.error("The provided id is not a valid id!");
       return this.createErrorResponse(

@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
   }
 
   private ResponseEntity<ErrorResponse> handleConflictException(
-      ConflictException ex, WebRequest reques, HttpHeaders headers) {
+      ConflictException ex, WebRequest request, HttpHeaders headers) {
     String message = ex.getMessage() != null ? ex.getMessage() : "Conflict";
 
     return new ResponseEntity<>(new ErrorResponse(message), headers, HttpStatus.CONFLICT);

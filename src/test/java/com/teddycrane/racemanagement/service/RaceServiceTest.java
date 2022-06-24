@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -252,7 +251,6 @@ class RaceServiceTest {
 
   @Test
   @DisplayName("Get Races for racer should return a list of races")
-  @Disabled
   void getRacesForRacerShouldReturnList() {
     var racer = TestResourceGenerator.generateRacer();
     var racerId = racer.getId();

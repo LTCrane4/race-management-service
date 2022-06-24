@@ -48,6 +48,7 @@ public class TestResourceGenerator {
 
   public static Racer generateRacer(Category category) {
     return Racer.builder()
+        .id(UUID.randomUUID())
         .firstName(faker.name().firstName())
         .lastName(faker.name().lastName())
         .category(category)

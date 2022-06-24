@@ -204,4 +204,60 @@ public class User {
       return "";
     }
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    User user = (User) o;
+
+    if (!id.equals(user.id)) {
+      return false;
+    }
+    if (!createdTimestamp.equals(user.createdTimestamp)) {
+      return false;
+    }
+    if (!firstName.equals(user.firstName)) {
+      return false;
+    }
+    if (!lastName.equals(user.lastName)) {
+      return false;
+    }
+    if (!email.equals(user.email)) {
+      return false;
+    }
+    if (!username.equals(user.username)) {
+      return false;
+    }
+    if (!password.equals(user.password)) {
+      return false;
+    }
+    if (userType != user.userType) {
+      return false;
+    }
+    if (status != user.status) {
+      return false;
+    }
+    return updatedTimestamp.equals(user.updatedTimestamp);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id.hashCode();
+    result = 31 * result + createdTimestamp.hashCode();
+    result = 31 * result + firstName.hashCode();
+    result = 31 * result + lastName.hashCode();
+    result = 31 * result + email.hashCode();
+    result = 31 * result + username.hashCode();
+    result = 31 * result + password.hashCode();
+    result = 31 * result + userType.hashCode();
+    result = 31 * result + status.hashCode();
+    result = 31 * result + updatedTimestamp.hashCode();
+    return result;
+  }
 }

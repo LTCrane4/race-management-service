@@ -137,6 +137,8 @@ class UserControllerTest {
 
     UserCollectionResponse actual = this.userController.getAllUsers().getBody();
 
+    assertNotNull(actual, "The response body should not be null");
+
     assertAll(
         () -> assertNotNull(actual, "The response entity body should not be null"),
         () ->
@@ -162,6 +164,8 @@ class UserControllerTest {
             new UpdateUserRequest(
                 "", "", "", UserType.ADMIN, expected.getUpdatedTimestamp().toString()));
     var actual = result.getBody();
+
+    assertNotNull(actual, "The response body should not be null");
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -191,10 +195,10 @@ class UserControllerTest {
             new UpdateUserRequest(
                 null, null, null, UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response should not be null");
+
     assertAll(
-        () -> assertNotNull(response, "The response should not be null"),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -218,9 +222,9 @@ class UserControllerTest {
             testString,
             new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response body should not be null");
 
     assertAll(
-        () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
         () ->
             assertEquals(
@@ -246,9 +250,10 @@ class UserControllerTest {
             new UpdateUserRequest(null, "", null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "the response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -273,9 +278,10 @@ class UserControllerTest {
             new UpdateUserRequest("", null, null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "The response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -306,9 +312,10 @@ class UserControllerTest {
                 null, null, "", UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "The response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -333,6 +340,7 @@ class UserControllerTest {
             testString,
             new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response body should not be null");
 
     assertAll(
         () -> assertNotNull(response),
