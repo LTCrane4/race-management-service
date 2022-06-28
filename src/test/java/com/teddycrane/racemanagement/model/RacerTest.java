@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.model;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.teddycrane.racemanagement.enums.Category;
@@ -24,7 +25,7 @@ class RacerTest {
     Racer defaultRacer = new Racer();
     assertNotNull(defaultRacer, "The default constructor should construct a valid racer");
 
-    defaultRacer = new Racer(this.racer);
+    defaultRacer = Racer.copyOf(this.racer);
     Racer finalRacer = defaultRacer;
 
     Racer fullConstructor =
@@ -41,7 +42,11 @@ class RacerTest {
   }
 
   @Test
-  void shouldRepresentAsString() {
-    assertNotNull(racer.toString(), "The toString representation should not be null");
+  void shouldEqual() {
+    Racer defaultRacer = new Racer();
+    Racer other = Racer.copyOf(defaultRacer);
+    assertEquals(defaultRacer, other, "The copyOf method should copy the racer");
+
+    assertNotEquals(defaultRacer, "test");
   }
 }

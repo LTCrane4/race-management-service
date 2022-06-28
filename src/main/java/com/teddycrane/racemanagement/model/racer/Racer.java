@@ -1,7 +1,5 @@
 package com.teddycrane.racemanagement.model.racer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.Category;
 import java.time.Instant;
 import java.util.Objects;
@@ -18,7 +16,6 @@ import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
 
@@ -26,7 +23,6 @@ import org.springframework.lang.NonNull;
 @Getter
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "racer")
 public class Racer {
 
@@ -41,7 +37,6 @@ public class Racer {
   private UUID id;
 
   @Setter
-  @NonNull
   @Column(name = "first_name", nullable = false)
   private String firstName;
 
@@ -50,7 +45,6 @@ public class Racer {
   private String middleName;
 
   @Setter
-  @NonNull
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
@@ -68,7 +62,6 @@ public class Racer {
   private String email;
 
   @Enumerated(EnumType.STRING)
-  @NonNull
   @Column(name = "category", nullable = false)
   private Category category;
 
@@ -89,8 +82,9 @@ public class Racer {
 
   public Racer() {
     this.id = UUID.randomUUID();
-
+    this.createdTimestamp = Instant.now();
     this.updatedTimestamp = Instant.now();
+    this.isDeleted = false;
   }
 
   private Racer(
@@ -142,8 +136,7 @@ public class Racer {
     this.bibNumber = bibNumber;
   }
 
-  @Deprecated
-  public Racer(@NonNull Racer other) {
+  private Racer(@NonNull Racer other) {
     this(
         other.firstName,
         other.lastName,
@@ -159,15 +152,8 @@ public class Racer {
         other.id);
   }
 
-  @Override
-  @Deprecated
-  public String toString() {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.writeValueAsString(this);
-    } catch (JsonProcessingException e) {
-      return "";
-    }
+  public static Racer copyOf(Racer original) {
+    return new Racer(original);
   }
 
   @Override
@@ -189,48 +175,21 @@ public class Racer {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
     Racer racer = (Racer) o;
-
-    if (bibNumber != racer.bibNumber) {
-      return false;
-    }
-    if (isDeleted != racer.isDeleted) {
-      return false;
-    }
-    if (!createdTimestamp.equals(racer.createdTimestamp)) {
-      return false;
-    }
-    if (id != null ? !id.equals(racer.id) : racer.id != null) {
-      return false;
-    }
-    if (!firstName.equals(racer.firstName)) {
-      return false;
-    }
-    if (middleName != null ? !middleName.equals(racer.middleName) : racer.middleName != null) {
-      return false;
-    }
-    if (!lastName.equals(racer.lastName)) {
-      return false;
-    }
-    if (teamName != null ? !teamName.equals(racer.teamName) : racer.teamName != null) {
-      return false;
-    }
-    if (phoneNumber != null ? !phoneNumber.equals(racer.phoneNumber) : racer.phoneNumber != null) {
-      return false;
-    }
-    if (email != null ? !email.equals(racer.email) : racer.email != null) {
-      return false;
-    }
-    if (category != racer.category) {
-      return false;
-    }
-    return updatedTimestamp.equals(racer.updatedTimestamp);
+    return bibNumber == racer.bibNumber
+        && isDeleted == racer.isDeleted
+        && createdTimestamp.equals(racer.createdTimestamp)
+        && id.equals(racer.id)
+        && Objects.equals(firstName, racer.firstName)
+        && Objects.equals(middleName, racer.middleName)
+        && Objects.equals(lastName, racer.lastName)
+        && Objects.equals(teamName, racer.teamName)
+        && Objects.equals(phoneNumber, racer.phoneNumber)
+        && Objects.equals(email, racer.email)
+        && category == racer.category
+        && updatedTimestamp.equals(racer.updatedTimestamp);
   }
 }

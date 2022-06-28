@@ -4,12 +4,13 @@ import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.RaceDTO;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import lombok.experimental.UtilityClass;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 
-@UtilityClass
-public class RaceMapper {
-  public static RaceDTO convertEntityToDTO(@NonNull Race race) {
+@NoArgsConstructor
+public class RaceMapper extends Mapper<Race, RaceDTO> {
+
+  public RaceDTO convertEntityToDTO(@NonNull Race race) {
     return RaceDTO.builder()
         .id(race.getId())
         .name(race.getName())
@@ -23,7 +24,7 @@ public class RaceMapper {
         .build();
   }
 
-  public static Race convertDTOToEntity(@NonNull RaceDTO dto) {
+  public Race convertDTOToEntity(@NonNull RaceDTO dto) {
     return Race.builder()
         .id(dto.getId())
         .name(dto.getName())
@@ -37,11 +38,11 @@ public class RaceMapper {
         .build();
   }
 
-  public static Collection<Race> convertDTOListToEntityList(@NonNull Collection<RaceDTO> dtos) {
-    return dtos.stream().map(RaceMapper::convertDTOToEntity).collect(Collectors.toList());
+  public Collection<Race> convertDTOListToEntityList(@NonNull Collection<RaceDTO> dtos) {
+    return dtos.stream().map(this::convertDTOToEntity).collect(Collectors.toList());
   }
 
-  public static Collection<RaceDTO> convertEntityListToDTOList(@NonNull Collection<Race> races) {
-    return races.stream().map(RaceMapper::convertEntityToDTO).collect(Collectors.toList());
+  public Collection<RaceDTO> convertEntityListToDTOList(@NonNull Collection<Race> races) {
+    return races.stream().map(this::convertEntityToDTO).collect(Collectors.toList());
   }
 }

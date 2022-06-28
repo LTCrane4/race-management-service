@@ -115,7 +115,7 @@ class RacerServiceTest {
     when(this.racerRepository.findById(testId)).thenReturn(Optional.of(expected));
     when(this.racerRepository.save(any(Racer.class)))
         .thenAnswer(arguments -> arguments.getArgument(0));
-    var expectedRacer = new Racer(expected);
+    var expectedRacer = Racer.copyOf(expected);
     expectedRacer.setFirstName("First");
     expectedRacer.setLastName("Last");
     expectedRacer.setMiddleName("Middle");

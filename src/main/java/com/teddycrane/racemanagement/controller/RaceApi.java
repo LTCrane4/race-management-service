@@ -1,7 +1,9 @@
 package com.teddycrane.racemanagement.controller;
 
+import com.teddycrane.racemanagement.error.BadRequestException;
+import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.RaceDTO;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
@@ -9,6 +11,7 @@ import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
+import com.teddycrane.racemanagement.model.response.GenericResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -99,7 +102,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully updated Race",
-            content = {@Content(schema = @Schema(implementation = Race.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request",
@@ -113,8 +116,9 @@ public interface RaceApi {
             description = "Timestamp not up to date",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<? extends Response> updateRace(
-      @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request);
+  ResponseEntity<RaceDTO> updateRace(
+      @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request)
+      throws BadRequestException, ConflictException, NotFoundException;
 
   @GetMapping(
       value = "/races-for-racer/{racerId}",
@@ -132,7 +136,8 @@ public interface RaceApi {
             description = "Racer not found",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<? extends Response> getRacesForRacer(@PathVariable("racerId") String racerId);
+  ResponseEntity<RaceCollectionResponse> getRacesForRacer(@PathVariable("racerId") String racerId)
+      throws BadRequestException, NotFoundException;
 
   @PutMapping(
       value = "/{id}/start-race",
@@ -144,7 +149,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Race successfully started",
-            content = {@Content(schema = @Schema(implementation = Race.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request - Invalid UUID",
@@ -154,14 +159,18 @@ public interface RaceApi {
             description = "Race not found",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<? extends Response> startRace(
-      @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request);
+  ResponseEntity<RaceDTO> startRace(
+      @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request)
+      throws BadRequestException, ConflictException, NotFoundException;
 
   @DeleteMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
   @Operation(description = "Deletes the specified race")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "204", description = "Successfully deleted race"),
+        @ApiResponse(
+            responseCode = "204",
+            description = "Successfully deleted race",
+            content = {@Content(schema = @Schema(implementation = Response.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request",
@@ -171,5 +180,5 @@ public interface RaceApi {
             description = "Not Found",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<? extends Response> deleteRace(@PathVariable("id") String id);
+  ResponseEntity<GenericResponse> deleteRace(@PathVariable("id") String id);
 }
