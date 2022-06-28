@@ -43,7 +43,7 @@ public interface RacerApi {
       description = "Found racers",
       content = {
         @Content(
-            mediaType = "application/json",
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = RacerCollectionResponse.class))
       })
   ResponseEntity<RacerCollectionResponse> getAllRacers();
@@ -57,7 +57,7 @@ public interface RacerApi {
             description = "Found racer",
             content = {
               @Content(
-                  mediaType = "application/json",
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
                   schema = @Schema(implementation = RacerDTO.class))
             }),
         @ApiResponse(
@@ -186,7 +186,7 @@ public interface RacerApi {
   ResponseEntity<Response> deleteRacer(@Valid @RequestBody DeleteRacerRequest request)
       throws BadRequestException, ConflictException, NotFoundException;
 
-  // TODO deprecate this endpoint and replace with POST
+  // TODO remove this endpoint
   @GetMapping("/search")
   @Operation(summary = "Search Racers")
   @ApiResponses(
@@ -194,12 +194,21 @@ public interface RacerApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully found racers matching query params",
-            content = {@Content(schema = @Schema(implementation = RacerCollectionResponse.class))}),
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = RacerCollectionResponse.class))
+            }),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request",
-            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
+            }),
       })
+  @Deprecated
   ResponseEntity<? extends Response> searchRacers(
       @RequestParam("type") RacerSearchType searchType, @RequestParam("value") String searchValue);
 
@@ -214,6 +223,14 @@ public interface RacerApi {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
                   schema = @Schema(implementation = RacerCollectionResponse.class))
+            }),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Bad request",
+            content = {
+              @Content(
+                  mediaType = MediaType.APPLICATION_JSON_VALUE,
+                  schema = @Schema(implementation = ErrorResponse.class))
             })
       })
   ResponseEntity<RacerCollectionResponse> searchRacersNew(

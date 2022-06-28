@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
@@ -21,6 +20,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.services.RacerService;
 import com.teddycrane.racemanagement.utils.mapper.RacerMapper;
@@ -531,42 +531,41 @@ class RacerControllerTest {
   }
 
   @Test
-  @DisplayName("Search Racers should return a 200")
-  void searchRacersShouldReturnA200() {
-    var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(RacerSearchType.CATEGORY, "cat1")).thenReturn(expectedList);
-
-    var result =
-        this.racerController.searchRacers(RacerSearchType.CATEGORY, Category.CAT1.toString());
+  @DisplayName("Search Racers (old) should return a 304")
+  void searchRacersShouldReturn304() {
+    var result = this.racerController.searchRacers(null, null);
 
     assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
-  }
-
-  @Test
-  @DisplayName("Search Racers should return a 200 when searching by name")
-  void searchRacersShouldReturn200WhenSearchingByName() {
-    var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(RacerSearchType.FIRST_NAME, "Test"))
-        .thenReturn(expectedList);
-
-    var result = this.racerController.searchRacers(RacerSearchType.FIRST_NAME, "Test");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () -> assertEquals(HttpStatus.OK, result.getStatusCode()));
-  }
-
-  @Test
-  @DisplayName("Search Racers should return a 400 if the input is not valid")
-  void searchRacersShouldReturn400() {
-    var result = this.racerController.searchRacers(RacerSearchType.CATEGORY, "not a category");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+                HttpStatus.MOVED_PERMANENTLY,
+                result.getStatusCode(),
+                "The status code should be 304"),
+        () -> assertNotNull(result.getBody(), "The response body should contain a message"));
+  }
+
+  @Test
+  @DisplayName("Search Racers (new) should return a list of racers")
+  void searchRacersNewShouldReturnList() {
+    var expectedList = TestResourceGenerator.generateRacerList(4);
+    when(this.racerService.searchRacers(any())).thenReturn(expectedList);
+
+    var request = SearchRacerRequest.builder().firstName("test").build();
+
+    var result = this.racerController.searchRacersNew(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"));
+  }
+
+  @Test
+  @DisplayName("Search Racers (new) should handle invalid requests")
+  void searchRacersNewShouldHandleBadRequests() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.racerController.searchRacersNew(SearchRacerRequest.builder().build()),
+        "Search Racers (new) should throw a BadRequestException");
   }
 }

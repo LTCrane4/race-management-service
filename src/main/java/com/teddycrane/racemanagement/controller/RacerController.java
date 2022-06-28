@@ -13,7 +13,7 @@ import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
-import com.teddycrane.racemanagement.model.response.ErrorResponse;
+import com.teddycrane.racemanagement.model.response.GenericResponse;
 import com.teddycrane.racemanagement.services.RacerService;
 import com.teddycrane.racemanagement.utils.mapper.RacerMapper;
 import com.teddycrane.racemanagement.utils.resolver.CategoryResolver;
@@ -143,33 +143,13 @@ public class RacerController extends BaseController implements RacerApi {
   public ResponseEntity<? extends Response> searchRacers(
       RacerSearchType searchType, String searchValue) {
     logger.info("searchRacers called");
+    logger.warn("searchRacers is deprecated");
 
-    switch (searchType) {
-      case CATEGORY:
-        {
-          if (Category.hasValue(searchValue)) {
-            return new ResponseEntity<>(
-                new RacerCollectionResponse(
-                    RacerMapper.convertEntityListToDTO(
-                        this.racerService.searchRacers(searchType, searchValue))),
-                HttpStatus.OK);
-          }
-          return new ResponseEntity<>(
-              new ErrorResponse(
-                  String.format("The category value %s is not a valid category!", searchValue)),
-              HttpStatus.BAD_REQUEST);
-        }
-      case FIRST_NAME:
-      case LAST_NAME:
-      default:
-        {
-          return new ResponseEntity<>(
-              new RacerCollectionResponse(
-                  RacerMapper.convertEntityListToDTO(
-                      this.racerService.searchRacers(searchType, searchValue))),
-              HttpStatus.OK);
-        }
-    }
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+        .body(
+            GenericResponse.builder()
+                .message("This endpoint has moved to POST /racers/search")
+                .build());
   }
 
   @Override
@@ -178,7 +158,7 @@ public class RacerController extends BaseController implements RacerApi {
     logger.info("searchRacers (new) called");
 
     if (!request.isValidRequest()) {
-      logger.warn("Request is not valid");
+      logger.warn("Bad request!");
       throw new BadRequestException("Request must have at least one non-null field");
     }
     return ResponseEntity.ok(

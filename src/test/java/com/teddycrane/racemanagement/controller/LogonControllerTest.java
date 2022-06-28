@@ -9,14 +9,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.UserType;
+import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -75,5 +78,32 @@ class LogonControllerTest {
     var request = Map.of("username", "", "password", "");
 
     assertThrows(NotAuthorizedException.class, () -> this.loginController.login(request));
+  }
+
+  @Test
+  @DisplayName("Login should handle requests with no username")
+  void loginHandlesNoUsername() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.loginController.login(Map.of("password", "test")),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Login should handle requests with no password")
+  void loginHandlesNoPassword() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.loginController.login(Map.of("username", "test")),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Login should handle empty request")
+  void loginShouldHandleEmptyRequest() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.loginController.login(new HashMap<>()),
+        "A BadRequestException should be thrown");
   }
 }
