@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 @NoArgsConstructor
+@Component
 public class RaceMapper extends Mapper<Race, RaceDTO> {
 
   public RaceDTO convertEntityToDTO(@NonNull Race race) {

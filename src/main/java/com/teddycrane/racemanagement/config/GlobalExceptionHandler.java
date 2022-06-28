@@ -4,6 +4,7 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.ForbiddenException;
+import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.error.TransitionNotAllowedException;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
@@ -29,7 +30,8 @@ public class GlobalExceptionHandler {
     DuplicateItemException.class,
     ForbiddenException.class,
     NotFoundException.class,
-    TransitionNotAllowedException.class
+    TransitionNotAllowedException.class,
+    NotAuthorizedException.class,
   })
   public final ResponseEntity<ErrorResponse> handleException(Exception ex, WebRequest request) {
     HttpHeaders headers = new HttpHeaders();
@@ -56,6 +58,10 @@ public class GlobalExceptionHandler {
 
     if (ex instanceof ConflictException) {
       return this.handleConflictException((ConflictException) ex, request, headers);
+    }
+
+    if (ex instanceof NotAuthorizedException) {
+      return this.handleNotAuthorized((NotAuthorizedException) ex, request, headers);
     }
 
     return new ResponseEntity<>(
@@ -101,5 +107,14 @@ public class GlobalExceptionHandler {
     String message = ex.getMessage() != null ? ex.getMessage() : "Method Not Allowed";
 
     return new ResponseEntity<>(new ErrorResponse(message), headers, HttpStatus.METHOD_NOT_ALLOWED);
+  }
+
+  private ResponseEntity<ErrorResponse> handleNotAuthorized(
+      NotAuthorizedException ex, WebRequest request, HttpHeaders headers) {
+    String message = ex.getMessage() != null ? ex.getMessage() : "Unauthorized";
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .headers(headers)
+        .body(new ErrorResponse(message));
   }
 }

@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,9 +13,9 @@ import com.teddycrane.racemanagement.error.NotAuthorizedException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
-import com.teddycrane.racemanagement.model.user.request.AuthenticationRequest;
 import com.teddycrane.racemanagement.model.user.response.AuthenticationResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -24,7 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-class LoginControllerTest {
+class LogonControllerTest {
   private LogonApi loginController;
 
   private User expected;
@@ -48,7 +49,7 @@ class LoginControllerTest {
   @BeforeEach
   void init() {
     MockitoAnnotations.openMocks(this);
-    this.loginController = new LoginController(this.userService);
+    this.loginController = new LogonController(this.userService);
     this.expected = TestResourceGenerator.generateUser(UserType.ADMIN);
     this.setupSecurityContext(this.expected);
   }
@@ -58,7 +59,9 @@ class LoginControllerTest {
     AuthenticationResponse expected = new AuthenticationResponse("valid token");
     when(this.userService.login(anyString(), anyString())).thenReturn(expected);
 
-    var actual = this.loginController.login(new AuthenticationRequest("test", "test"));
+    var request = Map.of("username", "test", "password", "test");
+
+    var actual = this.loginController.login(request);
     assertAll(
         () -> assertNotNull(actual, "The response should not be null"),
         () ->
@@ -69,13 +72,8 @@ class LoginControllerTest {
   @Test
   void loginShouldHandleExceptions() {
     when(this.userService.login(anyString(), anyString())).thenThrow(NotAuthorizedException.class);
+    var request = Map.of("username", "", "password", "");
 
-    var result = this.loginController.login(new AuthenticationRequest("", ""));
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () ->
-            assertEquals(
-                HttpStatus.UNAUTHORIZED, result.getStatusCode(), "The status should be 401"));
+    assertThrows(NotAuthorizedException.class, () -> this.loginController.login(request));
   }
 }
