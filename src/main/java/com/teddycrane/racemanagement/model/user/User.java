@@ -245,19 +245,4 @@ public class User {
     }
     return updatedTimestamp.equals(user.updatedTimestamp);
   }
-
-  @Override
-  public int hashCode() {
-    int result = id.hashCode();
-    result = 31 * result + createdTimestamp.hashCode();
-    result = 31 * result + firstName.hashCode();
-    result = 31 * result + lastName.hashCode();
-    result = 31 * result + email.hashCode();
-    result = 31 * result + username.hashCode();
-    result = 31 * result + password.hashCode();
-    result = 31 * result + userType.hashCode();
-    result = 31 * result + status.hashCode();
-    result = 31 * result + updatedTimestamp.hashCode();
-    return result;
-  }
 }

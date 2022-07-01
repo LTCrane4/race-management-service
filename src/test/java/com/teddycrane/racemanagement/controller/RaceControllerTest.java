@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
@@ -304,6 +305,24 @@ class RaceControllerTest {
   }
 
   @Test
+  @DisplayName("Update Race should validate that the required parameters are present")
+  void updateRaceShouldValidateRequiredParameters() {
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.raceController.updateRace(
+                UUID.randomUUID().toString(), UpdateRaceRequest.builder().name(null).build()),
+        "A BadRequestException should be thrown");
+
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.raceController.updateRace(
+                UUID.randomUUID().toString(), UpdateRaceRequest.builder().category(null).build()),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
   @Description("Get races for racer should return a 200")
   void getRacesForRacerShouldReturn200() {
     when(this.raceService.getRacesForRacer(testId)).thenReturn((List<Race>) races);
@@ -326,6 +345,15 @@ class RaceControllerTest {
         NotFoundException.class,
         () -> this.raceController.getRacesForRacer(testString),
         "A NotFoundException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Get races for Racer should handle invalid ids")
+  void getRacesForRacerShouldHandleInvalidIds() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.raceController.getRacesForRacer("not valid"),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -401,5 +429,25 @@ class RaceControllerTest {
         NotFoundException.class,
         () -> this.raceController.deleteRace(testString),
         "A NotFoundException should be thrown");
+  }
+
+  @Test
+  @DisplayName("deleteRace should return a 400")
+  void deleteRaceShouldReturn400() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.raceController.deleteRace("asdf"),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
+  @DisplayName("deleteRace should return a 500 when the race fails to delete")
+  void deleteRaceShouldReturnA500() {
+    when(this.raceService.deleteRace(any(UUID.class))).thenReturn(false);
+
+    assertThrows(
+        InternalServerError.class,
+        () -> this.raceController.deleteRace(UUID.randomUUID().toString()),
+        "An InternalServerError should be thrown");
   }
 }

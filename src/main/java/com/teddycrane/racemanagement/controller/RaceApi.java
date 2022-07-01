@@ -2,6 +2,7 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.race.RaceDTO;
@@ -95,6 +96,17 @@ public interface RaceApi {
   ResponseEntity<RaceDTO> addRacersToRace(
       @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 
+  /**
+   * Updates metadata for a race.
+   *
+   * @param id The {@code UUID} for the race.
+   * @param request The {@code UpdateRaceRequest} with the updated metadata
+   * @return The updated {@code RaceDTO}
+   * @throws BadRequestException Thrown if one of the required parameters are not provided.
+   * @throws ConflictException Thrown if the {@code updatedTimestamp} does not match the database
+   *     value.
+   * @throws NotFoundException Thrown if no {@code Race} is found for the provided value.
+   */
   @PatchMapping(value = "/{id}", produces = "application/json", consumes = "application/json")
   @Operation(description = "Update race metadata")
   @ApiResponses(
@@ -180,5 +192,6 @@ public interface RaceApi {
             description = "Not Found",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<GenericResponse> deleteRace(@PathVariable("id") String id);
+  ResponseEntity<GenericResponse> deleteRace(@PathVariable("id") String id)
+      throws BadRequestException, NotFoundException, InternalServerError;
 }

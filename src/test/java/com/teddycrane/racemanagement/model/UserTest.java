@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.user.User;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
@@ -47,6 +48,7 @@ class UserTest {
   }
 
   @Test
+  @DisplayName("Should handle cases for equals()")
   void shouldCaptureAllEqualsBranches() {
     User expected = TestResourceGenerator.generateUser();
     User actual = new User(expected);
@@ -75,6 +77,7 @@ class UserTest {
 
   // TODO get email validation working again
   @Test
+  @DisplayName("setEmail should validate the email address")
   void setEmailShouldValidateEmail() {
     user.setEmail("test@test.fake");
     assertEquals("test@test.fake", user.getEmail());

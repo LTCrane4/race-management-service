@@ -3,6 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.RaceDTO;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
@@ -191,7 +192,8 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<GenericResponse> deleteRace(String id) {
+  public ResponseEntity<GenericResponse> deleteRace(String id)
+      throws BadRequestException, NotFoundException, InternalServerError {
     logger.info("deleteRace called");
 
     try {
@@ -199,7 +201,7 @@ public class RaceController extends BaseController implements RaceApi {
       if (this.raceService.deleteRace(raceId)) {
         return ResponseEntity.noContent().build();
       } else {
-        return ResponseEntity.internalServerError().build();
+        throw new InternalServerError();
       }
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id");

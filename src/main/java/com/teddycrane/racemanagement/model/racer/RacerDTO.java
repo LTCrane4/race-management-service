@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 
 @Getter
@@ -23,6 +24,7 @@ public class RacerDTO {
   private String bibNumber;
   private boolean isDeleted;
 
+  @Generated
   @Override
   public String toString() {
     try {

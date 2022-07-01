@@ -7,6 +7,7 @@ import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.repositories.UserRepository;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import lombok.Generated;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -42,6 +43,7 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
     this.userRepository = userRepository;
   }
 
+  @Generated
   private void createSeedUserData() {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     User user =
@@ -70,6 +72,7 @@ public class AuthenticationService extends BaseService implements UserDetailsSer
   }
 
   @PostConstruct
+  @Generated
   public void initialize() {
     // get the current profile
     String profile = System.getProperty("spring.profiles.active");

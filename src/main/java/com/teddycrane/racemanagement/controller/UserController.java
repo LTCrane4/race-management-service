@@ -95,11 +95,11 @@ public class UserController extends BaseController implements UserApi {
             UserMapper.convertEntityToDTO(
                 this.userService.updateUser(
                     userId,
+                    updated,
                     request.getFirstName(),
                     request.getLastName(),
                     request.getEmail(),
-                    request.getUserType(),
-                    updated)));
+                    request.getUserType())));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         throw new BadRequestException("At least one parameter must be provided to update a User!");

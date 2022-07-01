@@ -23,7 +23,6 @@ public interface RacerRepository extends JpaRepository<Racer, UUID> {
 
   // TODO get the isDeleted query working
   @Query(
-      name = "Search Racers",
       nativeQuery = true,
       value =
           "SELECT * FROM racer R "

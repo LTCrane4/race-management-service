@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -152,27 +153,12 @@ public class Racer {
         other.id);
   }
 
+  // TODO deprecate this
   public static Racer copyOf(Racer original) {
     return new Racer(original);
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(
-        createdTimestamp,
-        id,
-        firstName,
-        middleName,
-        lastName,
-        teamName,
-        phoneNumber,
-        email,
-        category,
-        updatedTimestamp,
-        bibNumber,
-        isDeleted);
-  }
-
+  @Generated
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {

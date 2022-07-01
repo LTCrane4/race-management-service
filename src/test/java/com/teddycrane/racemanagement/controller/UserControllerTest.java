@@ -151,11 +151,11 @@ class UserControllerTest {
   void updateUserShouldUpdateWithFullRequestBody() {
     when(this.userService.updateUser(
             any(UUID.class),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenReturn(expected);
 
     var result =
@@ -186,7 +186,7 @@ class UserControllerTest {
   @Test
   void updateUserWithType() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), isNull(), any(UserType.class), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
 
     var response =
@@ -214,7 +214,7 @@ class UserControllerTest {
   @Test
   void updateUserWithEmail() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -241,7 +241,7 @@ class UserControllerTest {
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), anyString(), isNull(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), anyString(), isNull(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -269,7 +269,7 @@ class UserControllerTest {
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(
-            any(UUID.class), anyString(), isNull(), isNull(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), anyString(), isNull(), isNull(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -298,11 +298,11 @@ class UserControllerTest {
   void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(
             any(UUID.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenReturn(expected);
 
     var response =
@@ -332,7 +332,7 @@ class UserControllerTest {
   void updateUserWithEmailOnly() {
     // userType is null and email is not null
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -408,11 +408,11 @@ class UserControllerTest {
   void updateUserShouldThrowConflictException() {
     when(this.userService.updateUser(
             eq(testId),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenThrow(ConflictException.class);
 
     assertThrows(
@@ -429,11 +429,11 @@ class UserControllerTest {
   void updateUserShouldHandleNotFound() {
     when(this.userService.updateUser(
             eq(testId),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenThrow(NotFoundException.class);
 
     assertThrows(
