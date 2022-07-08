@@ -22,6 +22,8 @@ public class UpdateRacerRequest {
 
   private String firstName, lastName, middleName, teamName, phoneNumber;
 
+  private Integer bibNumber;
+
   @Email private String email;
 
   public boolean allParamsNull() {
@@ -30,6 +32,7 @@ public class UpdateRacerRequest {
         && this.middleName == null
         && this.teamName == null
         && this.phoneNumber == null
+        && this.bibNumber == null
         && this.email == null;
   }
 }

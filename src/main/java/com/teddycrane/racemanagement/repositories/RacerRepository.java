@@ -31,7 +31,7 @@ public interface RacerRepository extends JpaRepository<Racer, UUID> {
               + "AND (:last IS null OR R.last_name = CAST(:last as text) "
               + "AND (:team IS null OR R.team_name = CAST(:team as text) "
               + "AND (:category IS null OR R.category = CAST(:category as text)")
-  Collection<Racer> searchRacers(
+  Collection<Racer> queryRacers(
       @Param("first") String firstName,
       @Param("middle") String middleName,
       @Param("last") String lastName,

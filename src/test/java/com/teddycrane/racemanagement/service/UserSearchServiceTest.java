@@ -34,7 +34,7 @@ class UserSearchServiceTest {
   @Test
   @DisplayName("User Search Service should return data")
   void searchUserShouldReturnData() {
-    when(this.userRepository.searchUsers(any(), any(), any(), any(), any())).thenReturn(expected);
+    when(this.userRepository.queryUsers(any(), any(), any(), any(), any())).thenReturn(expected);
     var request = SearchUserRequest.builder().build();
     var result = this.userSearchService.searchUsers(request);
 

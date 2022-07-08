@@ -39,7 +39,8 @@ public interface RacerService {
       @Nullable String middleName,
       @Nullable String teamName,
       @Nullable String phoneNumber,
-      @Nullable String email)
+      @Nullable String email,
+      @Nullable Integer bibNumber)
       throws ConflictException, NotFoundException;
 
   boolean deleteRacer(UUID id, Instant updatedTimestamp)

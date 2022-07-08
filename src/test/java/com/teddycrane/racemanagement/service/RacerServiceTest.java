@@ -132,7 +132,8 @@ class RacerServiceTest {
             "Middle",
             "Team",
             "123-456-789",
-            "newemail@email.fake");
+            "newemail@email.fake",
+            1);
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -161,7 +162,7 @@ class RacerServiceTest {
 
     var result =
         this.racerService.updateRacer(
-            testId, expected.getUpdatedTimestamp(), null, null, null, null, null, null);
+            testId, expected.getUpdatedTimestamp(), null, null, null, null, null, null, null);
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -177,7 +178,7 @@ class RacerServiceTest {
         ConflictException.class,
         () ->
             this.racerService.updateRacer(
-                testId, Instant.now(), null, null, null, null, null, null));
+                testId, Instant.now(), null, null, null, null, null, null, null));
   }
 
   @Test
@@ -189,7 +190,7 @@ class RacerServiceTest {
         NotFoundException.class,
         () ->
             this.racerService.updateRacer(
-                testId, Instant.now(), null, null, null, null, null, null));
+                testId, Instant.now(), null, null, null, null, null, null, null));
   }
 
   @Test

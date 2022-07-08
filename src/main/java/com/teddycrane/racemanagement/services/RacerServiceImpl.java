@@ -59,8 +59,12 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       throws DuplicateItemException {
     logger.info("createRacer called");
 
-    return this.racerRepository.save(
+    Instant now = Instant.now();
+    Racer r =
         Racer.builder()
+            .id(UUID.randomUUID())
+            .createdTimestamp(now)
+            .updatedTimestamp(now)
             .firstName(firstName)
             .lastName(lastName)
             .category(category)
@@ -69,7 +73,14 @@ public class RacerServiceImpl extends BaseService implements RacerService {
             .phoneNumber(phoneNumber)
             .email(email)
             .bibNumber(bibNumber)
-            .build());
+            .build();
+
+    if (this.racerRepository.findById(r.getId()).isPresent()) {
+      throw new DuplicateItemException(
+          String.format("A racer with the id %s already exists", r.getId()));
+    }
+
+    return this.racerRepository.save(r);
   }
 
   @Override
@@ -81,7 +92,8 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       @Nullable String middleName,
       @Nullable String teamName,
       @Nullable String phoneNumber,
-      @Nullable String email)
+      @Nullable String email,
+      @Nullable Integer bibNumber)
       throws ConflictException, NotFoundException {
     logger.info("updateRacer called for id {}", id);
 
@@ -114,6 +126,9 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     // todo email validation
     if (email != null) {
       r.setEmail(email);
+    }
+    if (bibNumber != null) {
+      r.setBibNumber(bibNumber);
     }
 
     r.setUpdatedTimestamp(Instant.now());
@@ -168,7 +183,7 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   public Collection<Racer> searchRacers(@NonNull @Validated SearchRacerRequest request) {
     // TODO remove the (new)
     logger.info("searchRacers (new) called");
-    return this.racerRepository.searchRacers(
+    return this.racerRepository.queryRacers(
         request.getFirstName(),
         request.getMiddleName(),
         request.getLastName(),

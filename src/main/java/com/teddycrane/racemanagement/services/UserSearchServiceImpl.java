@@ -20,7 +20,7 @@ public class UserSearchServiceImpl extends BaseService implements UserSearchServ
   @Override
   public Collection<User> searchUsers(@NonNull SearchUserRequest request) {
     logger.info("searchUsers called");
-    return this.userRepository.searchUsers(
+    return this.userRepository.queryUsers(
         request.getUserId(),
         request.getFirstName(),
         request.getLastName(),

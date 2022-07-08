@@ -110,7 +110,8 @@ public class RacerController extends BaseController implements RacerApi {
                   request.getMiddleName(),
                   request.getTeamName(),
                   request.getPhoneNumber(),
-                  request.getEmail())));
+                  request.getEmail(),
+                  request.getBibNumber())));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.error(
           "Unable to parse the id: {}, or timestamp: {}", id, request.getUpdatedTimestamp());
@@ -155,10 +156,10 @@ public class RacerController extends BaseController implements RacerApi {
   @Override
   public ResponseEntity<RacerCollectionResponse> searchRacersNew(
       @NonNull SearchRacerRequest request) throws BadRequestException {
-    logger.info("searchRacers (new) called");
+    logger.info("searchRacers (new) called: {}", request);
 
     if (!request.isValidRequest()) {
-      logger.warn("Bad request!");
+      logger.warn("Request must contain at least one non-null field");
       throw new BadRequestException("Request must have at least one non-null field");
     }
     return ResponseEntity.ok(
