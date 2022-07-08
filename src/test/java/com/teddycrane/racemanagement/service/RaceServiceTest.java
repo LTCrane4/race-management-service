@@ -290,6 +290,30 @@ class RaceServiceTest {
   }
 
   @Test
+  @DisplayName("Start Race should throw a NotFoundException if the race is not found")
+  void startRaceShouldThrowNotFound() {
+    when(this.raceRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> this.raceService.startRace(UUID.randomUUID(), Instant.now()),
+        "A NotFoundException should be thrown");
+  }
+
+  @Test
+  @DisplayName(
+      "Start Race should throw a ConflictException when the updatedTimestamps do not match")
+  void startRaceShouldThrowConflict() {
+    var race = TestResourceGenerator.generateRace();
+    when(this.raceRepository.findById(any(UUID.class))).thenReturn(Optional.of(new Race(race)));
+    race.setUpdatedTimestamp(Instant.now());
+
+    assertThrows(
+        ConflictException.class,
+        () -> this.raceService.startRace(race.getId(), race.getUpdatedTimestamp()));
+  }
+
+  @Test
   @DisplayName("Delete Race should return true if the race is deleted")
   void deleteRaceShouldDelete() {
     when(this.raceRepository.findById(eq(testId))).thenReturn(Optional.of(expected));

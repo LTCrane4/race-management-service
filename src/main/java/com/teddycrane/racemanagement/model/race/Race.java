@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.ToString.Exclude;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
@@ -79,6 +80,19 @@ public class Race implements Response {
     this.name = name;
     this.category = category;
     this.racers = new ArrayList<>(racers);
+  }
+
+  public Race(@NonNull Race other) {
+    this(
+        other.getId(),
+        other.getCreatedTimestamp(),
+        other.getUpdatedTimestamp(),
+        other.getName(),
+        other.getCategory(),
+        other.getRacers(),
+        other.getEventDate(),
+        other.getStartTime(),
+        other.getFinishTime());
   }
 
   public void addRacer(Racer newRacer) {
