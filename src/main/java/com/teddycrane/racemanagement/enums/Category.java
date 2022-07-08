@@ -1,8 +1,5 @@
 package com.teddycrane.racemanagement.enums;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 public enum Category {
   CAT1("cat1"),
   CAT2("cat2"),
@@ -23,10 +20,10 @@ public enum Category {
     return this.text;
   }
 
-  public static boolean hasValue(String value) {
-    return Arrays.asList(Category.values()).stream()
-        .map(item -> item.toString())
-        .collect(Collectors.toList())
-        .contains(value);
-  }
+  //  public static boolean hasValue(String value) {
+  //    return Arrays.stream(Category.values())
+  //        .map(Category::toString)
+  //        .collect(Collectors.toList())
+  //        .contains(value);
+  //  }
 }

@@ -6,15 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
+import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import com.teddycrane.racemanagement.services.RacerService;
 import com.teddycrane.racemanagement.services.RacerServiceImpl;
@@ -107,6 +109,21 @@ class RacerServiceTest {
     assertAll(
         () -> assertNotNull(actual, "the actual result should not be null"),
         () -> assertEquals("first", actual.getFirstName()));
+  }
+
+  @Test
+  @DisplayName(
+      "Should throw a DuplicateItemException when attempting to create a racer that already exists")
+  void createRacerShouldThrowDuplicateItemException() {
+    when(this.racerRepository.findById(any()))
+        .thenReturn(Optional.of(TestResourceGenerator.generateRacer()));
+
+    assertThrows(
+        DuplicateItemException.class,
+        () ->
+            this.racerService.createRacer(
+                "first", "last", Category.CAT1, "middle", "test", "phone", "email@email.fake", 1),
+        "A DuplicateItemException should be thrown");
   }
 
   @Test
@@ -231,38 +248,19 @@ class RacerServiceTest {
   }
 
   @Test
-  @DisplayName("Search racer functions properly for Category searches")
-  void searchRacerFunctionsForCategory() {
+  @DisplayName("Search racer functions for valid SearchRacerRequests")
+  void searchRacerFunctionsForValidRequest() {
     var expectedList = TestResourceGenerator.generateRacerList(5, Category.CAT1);
-    when(this.racerRepository.findAllByCategory(any(Category.class)))
-        .thenReturn((List<Racer>) expectedList);
+    when(this.racerRepository.queryRacers(any(), any(), any(), any(), eq("cat1")))
+        .thenReturn(expectedList);
 
-    var result = this.racerService.searchRacers(RacerSearchType.CATEGORY, "cat1");
+    var request = SearchRacerRequest.builder().category(Category.CAT1).build();
+    var result = this.racerService.searchRacers(request);
 
     assertAll(
         () -> assertNotNull(result, "The resulting list should not be null"),
         () ->
             assertEquals(
                 expectedList.size(), result.size(), "The sizes of the lists should match"));
-  }
-
-  @Test
-  @DisplayName("Search Racer functions properly for first name searches")
-  void searchRacerFunctionsForFirstName() {
-    var expectedList = TestResourceGenerator.generateRacerList(4);
-    when(this.racerRepository.findAllByFirstName(any())).thenReturn((List<Racer>) expectedList);
-
-    var result = this.racerService.searchRacers(RacerSearchType.FIRST_NAME, "Test value");
-
-    assertNotNull(result);
-  }
-
-  @Test
-  @DisplayName("Search Racer functions properly for last name searches")
-  void searchRacerFunctionsForLastName() {
-    var expectedList = TestResourceGenerator.generateRacerList(4);
-    when(this.racerRepository.findAllByLastName(any())).thenReturn((List<Racer>) expectedList);
-
-    assertNotNull(this.racerService.searchRacers(RacerSearchType.LAST_NAME, "test value"));
   }
 }
