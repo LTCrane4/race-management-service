@@ -1,7 +1,5 @@
 package com.teddycrane.racemanagement.model.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.UserStatus;
 import com.teddycrane.racemanagement.enums.UserType;
 import java.time.Instant;
@@ -23,6 +21,7 @@ import org.springframework.lang.NonNull;
 public class User {
 
   @Id
+  @NonNull
   @Column(name = "user_id", nullable = false, updatable = false, unique = true)
   private final UUID id;
 
@@ -191,16 +190,6 @@ public class User {
 
   public void setUpdatedTimestamp() {
     this.updatedTimestamp = Instant.now();
-  }
-
-  @Override
-  public String toString() {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.writeValueAsString(this);
-    } catch (JsonProcessingException e) {
-      return "";
-    }
   }
 
   @Override
