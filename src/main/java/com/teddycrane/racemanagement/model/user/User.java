@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -68,6 +69,7 @@ public class User {
 
   @NonNull
   @Column(name = "updated_timestamp")
+  @Setter
   private Instant updatedTimestamp;
 
   public User() {
@@ -105,6 +107,7 @@ public class User {
     this.updatedTimestamp = updatedTimestamp;
   }
 
+  @Generated
   public User(
       UUID id,
       String firstName,
@@ -188,11 +191,6 @@ public class User {
 
   public void setUpdatedTimestamp() {
     this.updatedTimestamp = Instant.now();
-  }
-
-  @Deprecated
-  public void setUpdatedTimestamp(@NonNull Instant updatedTimestamp) {
-    this.updatedTimestamp = updatedTimestamp;
   }
 
   @Override
