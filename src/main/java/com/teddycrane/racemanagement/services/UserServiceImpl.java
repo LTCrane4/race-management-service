@@ -100,12 +100,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
   @Override
   public User updateUser(
-      UUID id,
+      @NonNull UUID id,
+      @NonNull Instant updatedTimestamp,
       String firstName,
       String lastName,
       String email,
-      UserType userType,
-      Instant updatedTimestamp)
+      UserType userType)
       throws ConflictException, NotFoundException, InternalServerError {
     logger.info("updateUser called for user id {}", id);
 
@@ -150,7 +150,7 @@ public class UserServiceImpl extends BaseService implements UserService {
   @Override
   public AuthenticationResponse login(String username, String password)
       throws NotAuthorizedException {
-    logger.info("login called");
+    logger.info("login called for user {}", username);
     String token;
 
     try {

@@ -1,4 +1,4 @@
-FROM openjdk:17-oracle AS baseimage
+FROM gradle:jdk17 AS baseimage
 
 ENV APPLICATION_ROOT=/app
 WORKDIR $APPLICATION_ROOT

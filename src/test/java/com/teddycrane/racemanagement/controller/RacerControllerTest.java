@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
@@ -21,9 +20,10 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.UpdateRacerRequest;
-import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import com.teddycrane.racemanagement.services.RacerService;
+import com.teddycrane.racemanagement.utils.mapper.RacerMapper;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -65,12 +65,7 @@ class RacerControllerTest {
     assertAll(
         () -> assertNotNull(result, "The response should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
-        () ->
-            assertEquals(
-                new RacerCollectionResponse(expectedList).getRacers(),
-                body.getRacers(),
-                "The lists should match the expected list"));
+        () -> assertNotNull(body, "The response body should not be null"));
   }
 
   @Test
@@ -78,7 +73,7 @@ class RacerControllerTest {
     when(this.racerService.getRacer(testId)).thenReturn(expected);
 
     var result = this.racerController.getRacer(testString);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status should be 200"),
@@ -131,7 +126,7 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.createRacer(request);
-    var body = result.getBody();
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -201,7 +196,8 @@ class RacerControllerTest {
             eq("Middle"),
             eq("New Team Name"),
             eq("123-456-789"),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     var request =
@@ -216,12 +212,13 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should match the expected value"));
   }
 
@@ -236,7 +233,8 @@ class RacerControllerTest {
             isNull(),
             isNull(),
             isNull(),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     UpdateRacerRequest request =
@@ -246,12 +244,13 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should be the expected value"));
   }
 
@@ -266,7 +265,8 @@ class RacerControllerTest {
             isNull(),
             isNull(),
             eq("123-456-789"),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     UpdateRacerRequest request =
@@ -277,12 +277,13 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should be the expected value"));
   }
 
@@ -297,7 +298,8 @@ class RacerControllerTest {
             isNull(),
             eq("New Team Name"),
             eq("123-456-789"),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     UpdateRacerRequest request =
@@ -309,12 +311,13 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should be the expected value"));
   }
 
@@ -329,7 +332,8 @@ class RacerControllerTest {
             eq("Middle"),
             eq("New Team Name"),
             eq("123-456-789"),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     UpdateRacerRequest request =
@@ -342,17 +346,18 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should be the expected value"));
   }
 
   @Test
-  @DisplayName("Should update when a last name is provided")
+  @DisplayName("update racer should update when a last name is provided")
   void shouldUpdateWhenLastNameIsProvided() {
     when(this.racerService.updateRacer(
             eq(testId),
@@ -362,7 +367,8 @@ class RacerControllerTest {
             eq("Middle"),
             eq("New Team Name"),
             eq("123-456-789"),
-            eq("newemail@email.fake")))
+            eq("newemail@email.fake"),
+            any()))
         .thenReturn(expected);
 
     UpdateRacerRequest request =
@@ -375,17 +381,18 @@ class RacerControllerTest {
             .build();
 
     var result = this.racerController.updateRacer(testString, request);
-    var body = result.getBody();
+
+    assertNotNull(result.getBody(), "The response body should not be null");
+    var body = RacerMapper.convertDTOToEntity(result.getBody());
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
         () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
-        () -> assertNotNull(body, "The body should not be null"),
         () -> assertEquals(expected, body, "The body should be the expected value"));
   }
 
   @Test
-  @DisplayName("Should error if the request body is empty")
+  @DisplayName("Update racer should error if the request body is empty")
   void shouldErrorIfNoParamsProvided() {
     assertThrows(
         BadRequestException.class,
@@ -394,7 +401,7 @@ class RacerControllerTest {
   }
 
   @Test
-  @DisplayName("Should throw a NotFoundException when no racer is found")
+  @DisplayName("Update racer should throw a NotFoundException when no racer is found")
   void shouldHandleServiceErrors() {
     when(this.racerService.updateRacer(
             eq(testId),
@@ -404,7 +411,8 @@ class RacerControllerTest {
             isNull(),
             isNull(),
             isNull(),
-            isNull()))
+            isNull(),
+            any()))
         .thenThrow(NotFoundException.class);
 
     UpdateRacerRequest request =
@@ -431,7 +439,8 @@ class RacerControllerTest {
             isNull(),
             isNull(),
             isNull(),
-            isNull()))
+            isNull(),
+            any()))
         .thenThrow(ConflictException.class);
 
     assertThrows(
@@ -444,6 +453,17 @@ class RacerControllerTest {
                     .firstName("test")
                     .build()),
         "A ConflictException should be thrown");
+  }
+
+  @Test
+  @DisplayName("Update Racer should handle illegal timestamp formats")
+  void updateRacerShouldHandleBadTimestamp() {
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.racerController.updateRacer(
+                testString, UpdateRacerRequest.builder().updatedTimestamp("invalid vlaue").build()),
+        "A BadRequestException should be thrown");
   }
 
   @Test
@@ -516,9 +536,9 @@ class RacerControllerTest {
         () -> assertNotNull(response, "The response should not be null"),
         () ->
             assertEquals(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.BAD_REQUEST,
                 response.getStatusCode(),
-                "The response status should be 500"));
+                "The response status should be 400"));
   }
 
   @Test
@@ -536,42 +556,41 @@ class RacerControllerTest {
   }
 
   @Test
-  @DisplayName("Search Racers should return a 200")
-  void searchRacersShouldReturnA200() {
-    var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(RacerSearchType.CATEGORY, "cat1")).thenReturn(expectedList);
-
-    var result =
-        this.racerController.searchRacers(RacerSearchType.CATEGORY, Category.CAT1.toString());
+  @DisplayName("Search Racers (old) should return a 304")
+  void searchRacersShouldReturn304() {
+    var result = this.racerController.searchRacers(null, null);
 
     assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
-  }
-
-  @Test
-  @DisplayName("Search Racers should return a 200 when searching by name")
-  void searchRacersShouldReturn200WhenSearchingByName() {
-    var expectedList = TestResourceGenerator.generateRacerList(5);
-    when(this.racerService.searchRacers(RacerSearchType.FIRST_NAME, "Test"))
-        .thenReturn(expectedList);
-
-    var result = this.racerController.searchRacers(RacerSearchType.FIRST_NAME, "Test");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
-        () -> assertEquals(HttpStatus.OK, result.getStatusCode()));
-  }
-
-  @Test
-  @DisplayName("Search Racers should return a 400 if the input is not valid")
-  void searchRacersShouldReturn400() {
-    var result = this.racerController.searchRacers(RacerSearchType.CATEGORY, "not a category");
-
-    assertAll(
-        () -> assertNotNull(result, "The result should not be null"),
         () ->
             assertEquals(
-                HttpStatus.BAD_REQUEST, result.getStatusCode(), "The status should be 400"));
+                HttpStatus.MOVED_PERMANENTLY,
+                result.getStatusCode(),
+                "The status code should be 304"),
+        () -> assertNotNull(result.getBody(), "The response body should contain a message"));
+  }
+
+  @Test
+  @DisplayName("Search Racers (new) should return a list of racers")
+  void searchRacersNewShouldReturnList() {
+    var expectedList = TestResourceGenerator.generateRacerList(4);
+    when(this.racerService.searchRacers(any())).thenReturn(expectedList);
+
+    var request = SearchRacerRequest.builder().firstName("test").build();
+
+    var result = this.racerController.searchRacersNew(request);
+
+    assertAll(
+        () -> assertNotNull(result, "The response should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"),
+        () -> assertNotNull(result.getBody(), "The response body should not be null"));
+  }
+
+  @Test
+  @DisplayName("Search Racers (new) should handle invalid requests")
+  void searchRacersNewShouldHandleBadRequests() {
+    assertThrows(
+        BadRequestException.class,
+        () -> this.racerController.searchRacersNew(SearchRacerRequest.builder().build()),
+        "Search Racers (new) should throw a BadRequestException");
   }
 }

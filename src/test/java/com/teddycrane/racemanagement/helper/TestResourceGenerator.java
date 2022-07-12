@@ -5,11 +5,13 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.RacerDTO;
 import com.teddycrane.racemanagement.model.user.User;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
 
 public class TestResourceGenerator {
 
@@ -34,6 +36,7 @@ public class TestResourceGenerator {
         type);
   }
 
+  @NonNull
   public static Collection<User> generateUserList(int length) {
     ArrayList<User> result = new ArrayList<>();
     for (int i = 0; i < length; i++) {
@@ -44,12 +47,30 @@ public class TestResourceGenerator {
   }
 
   public static Racer generateRacer(Category category) {
-    return new Racer(
-        faker.name().firstName(), faker.name().lastName(), category, faker.name().firstName());
+    return Racer.builder()
+        .id(UUID.randomUUID())
+        .firstName(faker.name().firstName())
+        .lastName(faker.name().lastName())
+        .category(category)
+        .middleName(faker.name().firstName())
+        .build();
   }
 
   public static Racer generateRacer() {
     return generateRacer(Category.CAT1);
+  }
+
+  public static RacerDTO generateRacerDTO(Category category) {
+    return RacerDTO.builder()
+        .firstName(faker.name().firstName())
+        .lastName(faker.name().lastName())
+        .category(category)
+        .middleName(faker.name().firstName())
+        .build();
+  }
+
+  public static RacerDTO generateRacerDTO() {
+    return generateRacerDTO(Category.CAT1);
   }
 
   public static Collection<Racer> generateRacerList(int length, Category category) {

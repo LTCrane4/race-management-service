@@ -11,8 +11,8 @@ import com.teddycrane.racemanagement.model.user.User;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
-import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import com.teddycrane.racemanagement.utils.mapper.UserMapper;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collection;
@@ -132,25 +132,30 @@ class UserControllerTest {
 
   @Test
   void getAllUsersShouldReturnCorrectResponse() {
-    Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
-    when(this.userService.getAllUsers()).thenReturn(expectedList);
+    Collection<User> expectedServiceResponse = TestResourceGenerator.generateUserList(5);
+    when(this.userService.getAllUsers()).thenReturn(expectedServiceResponse);
 
     UserCollectionResponse actual = this.userController.getAllUsers().getBody();
 
+    assertNotNull(actual, "The response body should not be null");
+
     assertAll(
         () -> assertNotNull(actual, "The response entity body should not be null"),
-        () -> assertEquals(new UserCollectionResponse(expectedList).getUsers(), actual.getUsers()));
+        () ->
+            assertEquals(
+                UserMapper.convertEntityListToDTO(expectedServiceResponse).getUsers(),
+                actual.getUsers()));
   }
 
   @Test
   void updateUserShouldUpdateWithFullRequestBody() {
     when(this.userService.updateUser(
             any(UUID.class),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenReturn(expected);
 
     var result =
@@ -159,6 +164,8 @@ class UserControllerTest {
             new UpdateUserRequest(
                 "", "", "", UserType.ADMIN, expected.getUpdatedTimestamp().toString()));
     var actual = result.getBody();
+
+    assertNotNull(actual, "The response body should not be null");
 
     assertAll(
         () -> assertNotNull(result, "The result should not be null"),
@@ -179,7 +186,7 @@ class UserControllerTest {
   @Test
   void updateUserWithType() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), isNull(), any(UserType.class), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), isNull(), any(UserType.class)))
         .thenReturn(expected);
 
     var response =
@@ -188,10 +195,10 @@ class UserControllerTest {
             new UpdateUserRequest(
                 null, null, null, UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response should not be null");
+
     assertAll(
-        () -> assertNotNull(response, "The response should not be null"),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
-        () -> assertNotNull(body, "The response body should not be null"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -207,7 +214,7 @@ class UserControllerTest {
   @Test
   void updateUserWithEmail() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -215,9 +222,9 @@ class UserControllerTest {
             testString,
             new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response body should not be null");
 
     assertAll(
-        () -> assertNotNull(response),
         () -> assertEquals(HttpStatus.OK, response.getStatusCode(), "The status should be 200"),
         () ->
             assertEquals(
@@ -234,7 +241,7 @@ class UserControllerTest {
   @Test
   void updateUserWithLastName() {
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), anyString(), isNull(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), anyString(), isNull(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -243,9 +250,10 @@ class UserControllerTest {
             new UpdateUserRequest(null, "", null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "the response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -261,7 +269,7 @@ class UserControllerTest {
   @Test
   void updateUserWithFirstName() {
     when(this.userService.updateUser(
-            any(UUID.class), anyString(), isNull(), isNull(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), anyString(), isNull(), isNull(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -270,9 +278,10 @@ class UserControllerTest {
             new UpdateUserRequest("", null, null, null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "The response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -289,11 +298,11 @@ class UserControllerTest {
   void updateUserWithNoFirstOrLastName() {
     when(this.userService.updateUser(
             any(UUID.class),
+            any(Instant.class),
             isNull(),
             isNull(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenReturn(expected);
 
     var response =
@@ -303,9 +312,10 @@ class UserControllerTest {
                 null, null, "", UserType.USER, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
 
+    assertNotNull(body, "The response body should not be null");
     assertAll(
-        () -> assertNotNull(response),
-        () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+        () ->
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
                 expected.getUsername(),
@@ -322,7 +332,7 @@ class UserControllerTest {
   void updateUserWithEmailOnly() {
     // userType is null and email is not null
     when(this.userService.updateUser(
-            any(UUID.class), isNull(), isNull(), anyString(), isNull(), any(Instant.class)))
+            any(UUID.class), any(Instant.class), isNull(), isNull(), anyString(), isNull()))
         .thenReturn(expected);
 
     var response =
@@ -330,6 +340,7 @@ class UserControllerTest {
             testString,
             new UpdateUserRequest(null, null, "", null, expected.getUpdatedTimestamp().toString()));
     var body = response.getBody();
+    assertNotNull(body, "The response body should not be null");
 
     assertAll(
         () -> assertNotNull(response),
@@ -397,11 +408,11 @@ class UserControllerTest {
   void updateUserShouldThrowConflictException() {
     when(this.userService.updateUser(
             eq(testId),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenThrow(ConflictException.class);
 
     assertThrows(
@@ -418,11 +429,11 @@ class UserControllerTest {
   void updateUserShouldHandleNotFound() {
     when(this.userService.updateUser(
             eq(testId),
+            any(Instant.class),
             anyString(),
             anyString(),
             anyString(),
-            any(UserType.class),
-            any(Instant.class)))
+            any(UserType.class)))
         .thenThrow(NotFoundException.class);
 
     assertThrows(
@@ -458,7 +469,9 @@ class UserControllerTest {
         () -> assertEquals(HttpStatus.OK, actual.getStatusCode(), "The status code should be 200"),
         () ->
             assertEquals(
-                new UserResponse(expected), body, "The result should match the expected value"));
+                UserMapper.convertEntityToDTO(expected),
+                body,
+                "The result should match the expected value"));
   }
 
   @Test

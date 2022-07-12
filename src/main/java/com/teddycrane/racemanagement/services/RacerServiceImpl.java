@@ -1,20 +1,20 @@
 package com.teddycrane.racemanagement.services;
 
 import com.teddycrane.racemanagement.enums.Category;
-import com.teddycrane.racemanagement.enums.RacerSearchType;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.racer.Racer;
+import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 public class RacerServiceImpl extends BaseService implements RacerService {
@@ -57,9 +57,26 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       throws DuplicateItemException {
     logger.info("createRacer called");
 
+    Instant now = Instant.now();
     Racer r =
-        new Racer(
-            firstName, lastName, category, middleName, teamName, phoneNumber, email, bibNumber);
+        Racer.builder()
+            .id(UUID.randomUUID())
+            .createdTimestamp(now)
+            .updatedTimestamp(now)
+            .firstName(firstName)
+            .lastName(lastName)
+            .category(category)
+            .middleName(middleName)
+            .teamName(teamName)
+            .phoneNumber(phoneNumber)
+            .email(email)
+            .bibNumber(bibNumber)
+            .build();
+
+    if (this.racerRepository.findById(r.getId()).isPresent()) {
+      throw new DuplicateItemException(
+          String.format("A racer with the id %s already exists", r.getId()));
+    }
 
     return this.racerRepository.save(r);
   }
@@ -73,7 +90,8 @@ public class RacerServiceImpl extends BaseService implements RacerService {
       @Nullable String middleName,
       @Nullable String teamName,
       @Nullable String phoneNumber,
-      @Nullable String email)
+      @Nullable String email,
+      @Nullable Integer bibNumber)
       throws ConflictException, NotFoundException {
     logger.info("updateRacer called for id {}", id);
 
@@ -103,9 +121,12 @@ public class RacerServiceImpl extends BaseService implements RacerService {
     if (phoneNumber != null) {
       r.setPhoneNumber(phoneNumber);
     }
-    // todo email validation
+    // TODO email validation
     if (email != null) {
       r.setEmail(email);
+    }
+    if (bibNumber != null) {
+      r.setBibNumber(bibNumber);
     }
 
     r.setUpdatedTimestamp(Instant.now());
@@ -132,27 +153,14 @@ public class RacerServiceImpl extends BaseService implements RacerService {
   }
 
   @Override
-  public Collection<Racer> searchRacers(RacerSearchType searchType, String searchValue) {
-    logger.info("searchRacers called with search type {} and value {}", searchType, searchValue);
-
-    switch (searchType) {
-      case CATEGORY:
-        {
-          return this.racerRepository.findAllByCategory(
-              Category.valueOf(searchValue.toUpperCase()));
-        }
-      case FIRST_NAME:
-        {
-          return this.racerRepository.findAllByFirstName(searchValue);
-        }
-      case LAST_NAME:
-        {
-          return this.racerRepository.findAllByLastName(searchValue);
-        }
-      default:
-        {
-          return new ArrayList<Racer>();
-        }
-    }
+  public Collection<Racer> searchRacers(@NonNull @Validated SearchRacerRequest request) {
+    // TODO remove the (new)
+    logger.info("searchRacers (new) called");
+    return this.racerRepository.queryRacers(
+        request.getFirstName(),
+        request.getMiddleName(),
+        request.getLastName(),
+        request.getTeamName(),
+        request.getCategory().toString());
   }
 }

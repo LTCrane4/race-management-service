@@ -5,36 +5,71 @@ import com.teddycrane.racemanagement.enums.UserType;
 import java.time.Instant;
 import java.util.UUID;
 import javax.persistence.*;
-import lombok.EqualsAndHashCode;
+import javax.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
-@EqualsAndHashCode
-@ToString
+@Builder
+@AllArgsConstructor
 @Table(name = "_user")
 public class User {
 
-  @Id private final UUID id;
+  @Id
+  @NonNull
+  @Column(name = "user_id", nullable = false, updatable = false, unique = true)
+  private final UUID id;
 
+  @Column(name = "created_timestamp", nullable = false, updatable = false)
   private final Instant createdTimestamp;
 
-  @Setter @NonNull private String firstName, lastName, email, username, password;
+  @Setter
+  @NonNull
+  @Column(name = "first_name")
+  private String firstName;
+
+  @Setter
+  @NonNull
+  @Column(name = "last_name")
+  private String lastName;
+
+  @Setter
+  @Column(name = "email")
+  @Email
+  @NonNull
+  private String email;
+
+  @Setter
+  @NonNull
+  @Column(name = "username")
+  private String username;
+
+  @Setter
+  @NonNull
+  @Column(name = "password")
+  private String password;
 
   @Setter
   @Enumerated(EnumType.STRING)
   @NonNull
+  @Column(name = "user_type")
   private UserType userType;
 
   @Enumerated(EnumType.STRING)
   @Setter
   @NonNull
+  @Column(name = "status")
   private UserStatus status;
 
-  @NonNull private Instant updatedTimestamp;
+  @NonNull
+  @Column(name = "updated_timestamp")
+  @Setter
+  private Instant updatedTimestamp;
 
   public User() {
     this(UUID.randomUUID());
@@ -50,15 +85,15 @@ public class User {
 
   private User(
       UUID id,
-      String firstName,
-      String lastName,
-      String username,
-      String email,
-      String password,
-      UserType userType,
-      UserStatus status,
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password,
+      @NonNull UserType userType,
+      @NonNull UserStatus status,
       Instant createdTimestamp,
-      Instant updatedTimestamp) {
+      @NonNull Instant updatedTimestamp) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -71,6 +106,7 @@ public class User {
     this.updatedTimestamp = updatedTimestamp;
   }
 
+  @Generated
   public User(
       UUID id,
       String firstName,
@@ -79,19 +115,19 @@ public class User {
       String email,
       String password,
       UserType userType,
-      UserStatus status) {
+      @NonNull UserStatus status) {
     this(id, firstName, lastName, username, email, password, userType);
     this.status = status;
   }
 
   public User(
       UUID id,
-      String firstName,
-      String lastName,
-      String username,
-      String email,
-      String password,
-      UserType userType) {
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password,
+      @NonNull UserType userType) {
     this(id);
     this.firstName = firstName;
     this.lastName = lastName;
@@ -101,7 +137,12 @@ public class User {
     this.userType = userType;
   }
 
-  public User(String firstName, String lastName, String username, String email, String password) {
+  public User(
+      @NonNull String firstName,
+      @NonNull String lastName,
+      @NonNull String username,
+      @NonNull String email,
+      @NonNull String password) {
     this();
     this.firstName = firstName;
     this.lastName = lastName;
@@ -116,7 +157,7 @@ public class User {
       String username,
       String email,
       String password,
-      UserType userType) {
+      @NonNull UserType userType) {
     this(firstName, lastName, username, email, password);
     this.userType = userType;
   }
@@ -128,7 +169,7 @@ public class User {
       String email,
       String password,
       UserType userType,
-      UserStatus status) {
+      @NonNull UserStatus status) {
     this(firstName, lastName, username, email, password, userType);
     this.status = status;
   }
@@ -151,8 +192,44 @@ public class User {
     this.updatedTimestamp = Instant.now();
   }
 
-  @Deprecated
-  public void setUpdatedTimestamp(@NonNull Instant updatedTimestamp) {
-    this.updatedTimestamp = updatedTimestamp;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    User user = (User) o;
+
+    if (!id.equals(user.id)) {
+      return false;
+    }
+    if (!createdTimestamp.equals(user.createdTimestamp)) {
+      return false;
+    }
+    if (!firstName.equals(user.firstName)) {
+      return false;
+    }
+    if (!lastName.equals(user.lastName)) {
+      return false;
+    }
+    if (!email.equals(user.email)) {
+      return false;
+    }
+    if (!username.equals(user.username)) {
+      return false;
+    }
+    if (!password.equals(user.password)) {
+      return false;
+    }
+    if (userType != user.userType) {
+      return false;
+    }
+    if (status != user.status) {
+      return false;
+    }
+    return updatedTimestamp.equals(user.updatedTimestamp);
   }
 }

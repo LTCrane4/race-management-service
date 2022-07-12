@@ -167,11 +167,11 @@ class UserServiceTest {
     var actual =
         this.userService.updateUser(
             testId,
+            existing.getUpdatedTimestamp(),
             "firstName",
             "lastName",
             "email@email.com",
-            UserType.ADMIN,
-            existing.getUpdatedTimestamp());
+            UserType.ADMIN);
 
     verify(this.userRepository).save(userCaptor.capture());
 
@@ -194,7 +194,7 @@ class UserServiceTest {
 
     assertThrows(
         ConflictException.class,
-        () -> this.userService.updateUser(testId, null, null, null, null, Instant.now()));
+        () -> this.userService.updateUser(testId, Instant.now(), null, null, null, null));
   }
 
   @Test
@@ -206,7 +206,7 @@ class UserServiceTest {
         InternalServerError.class,
         () ->
             this.userService.updateUser(
-                testId, null, null, null, null, existing.getUpdatedTimestamp()));
+                testId, existing.getUpdatedTimestamp(), null, null, null, null));
   }
 
   @Test

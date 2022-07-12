@@ -1,7 +1,6 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.UserType;
-import com.teddycrane.racemanagement.model.response.ErrorResponse;
 import com.teddycrane.racemanagement.model.user.UserPrincipal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,9 +60,5 @@ public abstract class BaseController {
     private String userName;
     private UUID userId;
     private UserType userType;
-  }
-
-  protected ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus status) {
-    return new ResponseEntity<ErrorResponse>(new ErrorResponse(message), status);
   }
 }

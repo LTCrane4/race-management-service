@@ -1,63 +1,89 @@
 package com.teddycrane.racemanagement.model.racer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teddycrane.racemanagement.enums.Category;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
+import lombok.Generated;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 import org.springframework.lang.NonNull;
 
 @Entity
 @Getter
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
-@RequiredArgsConstructor
+@Table(name = "racer")
 public class Racer {
 
-  @NonNull private final Instant createdTimestamp;
+  @NonNull
+  @Column(name = "created_timestamp", nullable = false, updatable = false)
+  @Builder.Default
+  private Instant createdTimestamp = Instant.now();
 
   @Id
-  @Type(type = "uuid-char")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  //  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "racer_id", unique = true, nullable = false, updatable = false)
   private UUID id;
 
-  @Setter @NonNull private String firstName;
-  @Setter private String middleName;
-  @Setter @NonNull private String lastName;
-  @Setter private String teamName, phoneNumber;
-  @Setter @Email private String email;
+  @Setter
+  @Column(name = "first_name", nullable = false)
+  private String firstName;
+
+  @Setter
+  @Column(name = "middle_name")
+  private String middleName;
+
+  @Setter
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
+
+  @Setter
+  @Column(name = "team_name")
+  private String teamName;
+
+  @Setter
+  @Column(name = "phone_number")
+  private String phoneNumber;
+
+  @Setter
+  @Email
+  @Column(name = "email")
+  private String email;
 
   @Enumerated(EnumType.STRING)
-  @NonNull
+  @Column(name = "category", nullable = false)
   private Category category;
 
-  @Setter @NonNull private Instant updatedTimestamp;
+  @Setter
+  @NonNull
+  @Column(name = "updated_timestamp", nullable = false)
+  @Builder.Default
+  private Instant updatedTimestamp = Instant.now();
 
-  @Setter private int bibNumber;
+  @Setter
+  @Column(name = "bib_number")
+  private int bibNumber;
 
-  @Setter @Builder.Default private boolean isDeleted = false;
+  @Setter
+  @Builder.Default
+  @Column(name = "is_deleted", nullable = false)
+  private boolean isDeleted = false;
 
   public Racer() {
     this.id = UUID.randomUUID();
-
-    Instant now = Instant.now();
-    this.createdTimestamp = now;
-    this.updatedTimestamp = now;
+    this.createdTimestamp = Instant.now();
+    this.updatedTimestamp = Instant.now();
+    this.isDeleted = false;
   }
 
   private Racer(
@@ -88,18 +114,7 @@ public class Racer {
     this.isDeleted = isDeleted;
   }
 
-  public Racer(
-      @NonNull String firstName,
-      @NonNull String lastName,
-      @NonNull Category category,
-      String middleName) {
-    this();
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.category = category;
-    this.middleName = middleName;
-  }
-
+  @Deprecated
   public Racer(
       @NonNull String firstName,
       @NonNull String lastName,
@@ -109,14 +124,18 @@ public class Racer {
       String phoneNumber,
       String email,
       int bibNumber) {
-    this(firstName, lastName, category, middleName);
+    this();
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.middleName = middleName;
+    this.category = category;
     this.teamName = teamName;
     this.phoneNumber = phoneNumber;
     this.email = email;
     this.bibNumber = bibNumber;
   }
 
-  public Racer(@NonNull Racer other) {
+  private Racer(@NonNull Racer other) {
     this(
         other.firstName,
         other.lastName,
@@ -132,13 +151,29 @@ public class Racer {
         other.id);
   }
 
+  // TODO deprecate this
+  public static Racer copyOf(Racer original) {
+    return new Racer(original);
+  }
+
+  @Generated
   @Override
-  public String toString() {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.writeValueAsString(this);
-    } catch (JsonProcessingException e) {
-      return "";
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    Racer racer = (Racer) o;
+    return bibNumber == racer.bibNumber
+        && isDeleted == racer.isDeleted
+        && createdTimestamp.equals(racer.createdTimestamp)
+        && id.equals(racer.id)
+        && Objects.equals(firstName, racer.firstName)
+        && Objects.equals(middleName, racer.middleName)
+        && Objects.equals(lastName, racer.lastName)
+        && Objects.equals(teamName, racer.teamName)
+        && Objects.equals(phoneNumber, racer.phoneNumber)
+        && Objects.equals(email, racer.email)
+        && category == racer.category
+        && updatedTimestamp.equals(racer.updatedTimestamp);
   }
 }

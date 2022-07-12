@@ -2,13 +2,13 @@ package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
-import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
+import com.teddycrane.racemanagement.model.user.UserDTO;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
-import com.teddycrane.racemanagement.model.user.response.UserResponse;
 import com.teddycrane.racemanagement.services.UserService;
+import com.teddycrane.racemanagement.utils.mapper.UserMapper;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -27,18 +27,20 @@ public class UserController extends BaseController implements UserApi {
     this.userService = userService;
   }
 
+  @Override
   public ResponseEntity<UserCollectionResponse> getAllUsers() {
     logger.info("getAllUsers called");
 
-    return ResponseEntity.ok(new UserCollectionResponse(this.userService.getAllUsers()));
+    return ResponseEntity.ok(UserMapper.convertEntityListToDTO(this.userService.getAllUsers()));
   }
 
-  public ResponseEntity<UserResponse> getUser(String id) throws BadRequestException {
+  @Override
+  public ResponseEntity<UserDTO> getUser(String id) throws BadRequestException {
     logger.info("getUser called");
 
     try {
       UUID userId = UUID.fromString(id);
-      return ResponseEntity.ok(new UserResponse(this.userService.getUser(userId)));
+      return ResponseEntity.ok(UserMapper.convertEntityToDTO(this.userService.getUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id", id);
       throw new BadRequestException(String.format("The id %s is not a valid user id", id));
@@ -53,13 +55,16 @@ public class UserController extends BaseController implements UserApi {
         .body(new ErrorResponse("Permanently moved to POST /users/search"));
   }
 
-  public ResponseEntity<? extends Response> createUser(CreateUserRequest request) {
+  @Override
+  public ResponseEntity<UserDTO> createUser(@Valid CreateUserRequest request)
+      throws DuplicateItemException {
     logger.info("createUser called");
 
-    return ResponseEntity.ok(new UserResponse(this.userService.createUser(request)));
+    return ResponseEntity.ok(UserMapper.convertEntityToDTO(this.userService.createUser(request)));
   }
 
-  public ResponseEntity<UserResponse> updateUser(String id, UpdateUserRequest request)
+  @Override
+  public ResponseEntity<UserDTO> updateUser(String id, @Valid UpdateUserRequest request)
       throws BadRequestException, ForbiddenException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
@@ -73,7 +78,7 @@ public class UserController extends BaseController implements UserApi {
 
     try {
       UUID userId = UUID.fromString(id);
-      Instant updated = null;
+      Instant updated;
 
       if (request.getUpdatedTimestamp() != null) {
         updated = Instant.parse(request.getUpdatedTimestamp());
@@ -87,14 +92,14 @@ public class UserController extends BaseController implements UserApi {
           || request.getEmail() != null
           || request.getUserType() != null) {
         return ResponseEntity.ok(
-            new UserResponse(
+            UserMapper.convertEntityToDTO(
                 this.userService.updateUser(
                     userId,
+                    updated,
                     request.getFirstName(),
                     request.getLastName(),
                     request.getEmail(),
-                    request.getUserType(),
-                    updated)));
+                    request.getUserType())));
       } else {
         logger.error("At least one parameter must be supplied to update a User!");
         throw new BadRequestException("At least one parameter must be provided to update a User!");
@@ -109,7 +114,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<? extends Response> changePassword(
+  public ResponseEntity<ChangePasswordResponse> changePassword(
       String id, @Valid ChangePasswordRequest request)
       throws BadRequestException, ForbiddenException {
     logger.info("changePassword called");
@@ -140,7 +145,8 @@ public class UserController extends BaseController implements UserApi {
     }
   }
 
-  public ResponseEntity<UserResponse> deleteUser(String id)
+  @Override
+  public ResponseEntity<UserDTO> deleteUser(String id)
       throws BadRequestException, NotFoundException, ForbiddenException,
           TransitionNotAllowedException {
     logger.info("deleteUser called");
@@ -160,7 +166,7 @@ public class UserController extends BaseController implements UserApi {
         throw new TransitionNotAllowedException("A user cannot delete themselves");
       }
 
-      return ResponseEntity.ok(new UserResponse(this.userService.deleteUser(userId)));
+      return ResponseEntity.ok(UserMapper.convertEntityToDTO(this.userService.deleteUser(userId)));
     } catch (IllegalArgumentException e) {
       logger.error("Unable to parse the provided id {}", id);
       throw new BadRequestException("Unable to parse the provided id");
@@ -168,7 +174,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<? extends Response> changeStatus(String id, ChangeStatusRequest request) {
+  public ResponseEntity<UserDTO> changeStatus(String id, ChangeStatusRequest request) {
     logger.info("changeStatus called");
 
     try {
@@ -176,7 +182,8 @@ public class UserController extends BaseController implements UserApi {
       Instant timestamp = Instant.parse(request.getUpdatedTimestamp());
 
       return ResponseEntity.ok(
-          new UserResponse(this.userService.changeStatus(userId, request.getStatus(), timestamp)));
+          UserMapper.convertEntityToDTO(
+              this.userService.changeStatus(userId, request.getStatus(), timestamp)));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       throw new BadRequestException("Unable to parse the provided ID or timestamp");
     }

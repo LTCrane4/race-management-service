@@ -1,8 +1,8 @@
 package com.teddycrane.racemanagement.controller;
 
 import com.teddycrane.racemanagement.error.BadRequestException;
-import com.teddycrane.racemanagement.model.Response;
 import com.teddycrane.racemanagement.model.user.request.SearchUserRequest;
+import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,6 @@ public interface UserSearchApi {
       consumes = "application/json",
       produces = "application/json")
   @Operation(summary = "Search Users", description = "New user search endpoint")
-  ResponseEntity<? extends Response> searchUsers(@Valid @RequestBody SearchUserRequest request)
+  ResponseEntity<UserCollectionResponse> searchUsers(@Valid @RequestBody SearchUserRequest request)
       throws BadRequestException;
 }
