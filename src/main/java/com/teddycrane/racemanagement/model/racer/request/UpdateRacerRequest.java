@@ -4,6 +4,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class UpdateRacerRequest {
 
   @Email private String email;
 
+  @Generated
   public boolean allParamsNull() {
     return this.firstName == null
         && this.lastName == null

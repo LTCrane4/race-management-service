@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -102,6 +103,7 @@ public class Race implements Response {
   }
 
   @Override
+  @Generated
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -114,6 +116,7 @@ public class Race implements Response {
   }
 
   @Override
+  @Generated
   public int hashCode() {
     return getClass().hashCode();
   }

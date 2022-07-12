@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Generated;
 
 @Data
 @EqualsAndHashCode
@@ -30,6 +31,7 @@ public class RaceDTO {
   private LocalTime startTime;
   private LocalTime finishTime;
 
+  @Generated
   @Override
   public String toString() {
     try {

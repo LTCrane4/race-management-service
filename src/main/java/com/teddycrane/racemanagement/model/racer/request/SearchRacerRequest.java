@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -18,6 +19,7 @@ public class SearchRacerRequest implements SearchRequest {
   private Boolean isDeleted;
 
   @Override
+  @Generated
   public boolean isValidRequest() {
     return firstName != null
         || lastName != null

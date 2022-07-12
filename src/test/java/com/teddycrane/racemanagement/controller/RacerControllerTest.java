@@ -456,6 +456,17 @@ class RacerControllerTest {
   }
 
   @Test
+  @DisplayName("Update Racer should handle illegal timestamp formats")
+  void updateRacerShouldHandleBadTimestamp() {
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.racerController.updateRacer(
+                testString, UpdateRacerRequest.builder().updatedTimestamp("invalid vlaue").build()),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
   @DisplayName("Delete racer should successfully delete a racer")
   void deleteShouldBeSuccessful() {
     when(this.racerService.deleteRacer(eq(testId), any(Instant.class))).thenReturn(true);
