@@ -25,6 +25,7 @@ class CreateUser extends UserBase {
         .perform(
             post(CREATE_USER_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
                 .content(object.toString())
                 .header(AUTHORIZATION_HEADER, USER_TOKEN))
         .andExpectAll(

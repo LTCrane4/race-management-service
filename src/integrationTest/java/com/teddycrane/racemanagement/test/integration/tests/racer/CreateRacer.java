@@ -24,6 +24,7 @@ class CreateRacer extends RacerBase {
         .perform(
             post(this.RACER_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION_HEADER, USER_TOKEN)
                 .content(this.mapper.writeValueAsString(body)))
         .andExpect(status().isOk())

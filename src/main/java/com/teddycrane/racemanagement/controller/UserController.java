@@ -44,6 +44,9 @@ public class UserController extends BaseController implements UserApi {
     } catch (IllegalArgumentException e) {
       logger.error("The id {} is not a valid user id", id);
       throw new BadRequestException(String.format("The id %s is not a valid user id", id));
+    } catch (NotFoundException e) {
+      logger.error("No user found for the id {}", id);
+      throw new NotFoundException(e.getMessage());
     }
   }
 
