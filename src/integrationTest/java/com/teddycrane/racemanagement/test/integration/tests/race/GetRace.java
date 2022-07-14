@@ -14,10 +14,12 @@ class GetRace extends RaceBase {
 
   @Test
   @Disabled
-  // this is disabled since it fails for no reason
   void getRace_shouldGetRace() throws Exception {
     this.mockMvc
-        .perform(get(RACE_BASE_PATH + "/" + RACE_ID).contentType(MediaType.APPLICATION_JSON))
+        .perform(
+            get(RACE_BASE_PATH + "/" + RACE_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists());
   }

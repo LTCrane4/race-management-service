@@ -17,7 +17,8 @@ class GetUser extends UserBase {
     this.mockMvc
         .perform(
             get("/user/" + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(AUTHORIZATION_HEADER, USER_TOKEN))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())

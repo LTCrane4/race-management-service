@@ -28,7 +28,8 @@ class GetRacer extends RacerBase {
     this.mockMvc
         .perform(
             get(this.RACER_PATH + "/" + this.TEST_RACER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(AUTHORIZATION_HEADER, USER_TOKEN))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
