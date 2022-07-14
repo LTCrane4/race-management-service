@@ -115,13 +115,13 @@ workflows:
             - install-dependencies
           post-steps:
             - codecov/upload
-      - integration-test:
-          requires:
-            - install-dependencies
-          filters:
-            branches:
-              only:
-                - main
+#      - integration-test:
+#          requires:
+#            - install-dependencies
+#          filters:
+#            branches:
+#              only:
+#                - main
 #       - store-built-application:
 #           requires:
 #             - test
