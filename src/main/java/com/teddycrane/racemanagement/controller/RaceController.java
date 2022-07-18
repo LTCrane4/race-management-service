@@ -8,6 +8,7 @@ import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.RaceDTO;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.model.race.response.RaceCollectionResponse;
@@ -209,6 +210,21 @@ public class RaceController extends BaseController implements RaceApi {
     } catch (NotFoundException e) {
       logger.error("No race found!");
       throw new NotFoundException(String.format("No race found for the id %s", id));
+    }
+  }
+
+  @Override
+  public ResponseEntity<RaceCollectionResponse> searchRaces(@Valid SearchRaceRequest request)
+      throws BadRequestException {
+    logger.info("searchRaces called");
+
+    if (request.isValidRequest()) {
+      return ResponseEntity.ok(
+          new RaceCollectionResponse(
+              this.mapper.convertEntityListToDTOList(this.raceService.searchRaces(request))));
+    } else {
+      logger.error("Invalid request!");
+      throw new BadRequestException("The request must not be empty");
     }
   }
 }

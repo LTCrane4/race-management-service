@@ -4,12 +4,15 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
 import java.time.Instant;
 // import java.time.LocalDate;
 // import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 public interface RaceService {
@@ -42,4 +45,6 @@ public interface RaceService {
   // throws ConflictException, NotFoundException;
 
   boolean deleteRace(UUID raceId) throws NotFoundException;
+
+  Collection<Race> searchRaces(@Validated SearchRaceRequest request);
 }

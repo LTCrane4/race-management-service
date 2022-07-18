@@ -17,6 +17,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
@@ -328,5 +329,20 @@ class RaceServiceTest {
     when(this.raceRepository.findById(eq(testId))).thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class, () -> this.raceService.deleteRace(testId));
+  }
+
+  @Test
+  @DisplayName("Search Races should return query results")
+  void searchRacesShouldReturnValue() {
+    var expected = TestResourceGenerator.generateRaceList();
+    when(this.raceRepository.queryRaces(anyString(), anyString())).thenReturn(expected);
+
+    var result =
+        this.raceService.searchRaces(
+            SearchRaceRequest.builder().name("test").category(Category.CAT1).build());
+
+    assertAll(
+        () -> assertNotNull(result, "The result should not be null"),
+        () -> assertEquals(result, expected, "The result list should match the expected value"));
   }
 }

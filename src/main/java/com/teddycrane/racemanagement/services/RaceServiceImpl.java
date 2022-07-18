@@ -4,6 +4,7 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.race.Race;
+import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
 import com.teddycrane.racemanagement.model.racer.Racer;
 import com.teddycrane.racemanagement.repositories.RaceRepository;
 import com.teddycrane.racemanagement.repositories.RacerRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 public class RaceServiceImpl extends BaseService implements RaceService {
@@ -179,5 +181,11 @@ public class RaceServiceImpl extends BaseService implements RaceService {
 
     this.raceRepository.delete(r);
     return true;
+  }
+
+  @Override
+  public Collection<Race> searchRaces(@Validated SearchRaceRequest request) {
+    logger.info("searchRaces called");
+    return this.raceRepository.queryRaces(request.getName(), request.getCategory().toString());
   }
 }

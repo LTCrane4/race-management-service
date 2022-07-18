@@ -19,6 +19,7 @@ import com.teddycrane.racemanagement.helper.TestResourceGenerator;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
+import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.StartRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.UpdateRaceRequest;
 import com.teddycrane.racemanagement.services.RaceService;
@@ -449,5 +450,31 @@ class RaceControllerTest {
         InternalServerError.class,
         () -> this.raceController.deleteRace(UUID.randomUUID().toString()),
         "An InternalServerError should be thrown");
+  }
+
+  @Test
+  @DisplayName("Search Races should return results")
+  void searchRacesReturnsResults() {
+    var expected = TestResourceGenerator.generateRaceList();
+    when(this.raceService.searchRaces(any())).thenReturn(expected);
+
+    var result =
+        this.raceController.searchRaces(
+            SearchRaceRequest.builder().name("Test").category(Category.CAT1).build());
+
+    assertAll(
+        () -> assertNotNull(result, "the result should not be null"),
+        () -> assertEquals(HttpStatus.OK, result.getStatusCode(), "The status code should be 200"));
+  }
+
+  @Test
+  @DisplayName("Search Races should handle invalid requests")
+  void searchRacesShouldHandleInvalidRequests() {
+    var request = SearchRaceRequest.builder().build();
+
+    assertThrows(
+        BadRequestException.class,
+        () -> this.raceController.searchRaces(request),
+        "A BadRequestException should be thrown");
   }
 }
