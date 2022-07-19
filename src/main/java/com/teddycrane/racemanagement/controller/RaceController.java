@@ -120,9 +120,8 @@ public class RaceController extends BaseController implements RaceApi {
       UUID raceId = UUID.fromString(id);
 
       // verify required parameters are present
-      if (request.getName() == null && request.getCategory() == null) {
-        throw new BadRequestException("Bad request!");
-      }
+      if (!request.isValidRequest())
+        throw new BadRequestException("Not all required parameters are provided");
 
       return ResponseEntity.ok(
           this.mapper.convertEntityToDTO(

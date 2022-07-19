@@ -4,6 +4,7 @@ import com.teddycrane.racemanagement.enums.Category;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +19,9 @@ public class UpdateRaceRequest {
 
   private String name;
   private Category category;
+
+  @Generated
+  public boolean isValidRequest() {
+    return name != null || category != null;
+  }
 }

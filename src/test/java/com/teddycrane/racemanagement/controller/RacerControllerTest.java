@@ -456,6 +456,21 @@ class RacerControllerTest {
   }
 
   @Test
+  @DisplayName("Update Racer should handle invalid UUID")
+  void updateRacerShouldHandleInvalidUUID() {
+    assertThrows(
+        BadRequestException.class,
+        () ->
+            this.racerController.updateRacer(
+                "invalid uuidi",
+                UpdateRacerRequest.builder()
+                    .firstName("test")
+                    .updatedTimestamp(Instant.now().toString())
+                    .build()),
+        "A BadRequestException should be thrown");
+  }
+
+  @Test
   @DisplayName("Update Racer should handle illegal timestamp formats")
   void updateRacerShouldHandleBadTimestamp() {
     assertThrows(

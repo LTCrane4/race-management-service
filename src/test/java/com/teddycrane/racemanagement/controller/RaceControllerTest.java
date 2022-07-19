@@ -262,7 +262,7 @@ class RaceControllerTest {
     assertThrows(
         BadRequestException.class,
         () -> this.raceController.updateRace(testString, request),
-        "A BadRequestException should be thrown");
+        "A BadRequestException should be thrown when no name or category is provided");
   }
 
   @Test

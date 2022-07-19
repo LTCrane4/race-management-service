@@ -17,3 +17,6 @@ ij_any_label_indent_size = 2
 [*.sql]
 ij_any_align_consecutive_assignments = true
 indent_size = 4
+
+[build.gradle]
+indent_size = 4
