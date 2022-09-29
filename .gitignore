@@ -42,3 +42,5 @@ build/
 ### DS_store
 .DS_Store
 .vim
+
+.jpb

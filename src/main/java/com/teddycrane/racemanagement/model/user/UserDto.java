@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class UserDTO {
+public class UserDto {
   private final UUID id;
   private final Instant createdTimestamp;
   private String firstName, lastName;

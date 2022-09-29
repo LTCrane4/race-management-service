@@ -3,7 +3,7 @@ package com.teddycrane.racemanagement.controller;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.error.*;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDto;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
@@ -35,7 +35,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserDTO> getUser(String id) throws BadRequestException {
+  public ResponseEntity<UserDto> getUser(String id) throws BadRequestException {
     logger.info("getUser called");
 
     try {
@@ -59,7 +59,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserDTO> createUser(@Valid CreateUserRequest request)
+  public ResponseEntity<UserDto> createUser(@Valid CreateUserRequest request)
       throws DuplicateItemException {
     logger.info("createUser called");
 
@@ -67,7 +67,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserDTO> updateUser(String id, @Valid UpdateUserRequest request)
+  public ResponseEntity<UserDto> updateUser(String id, @Valid UpdateUserRequest request)
       throws BadRequestException, ForbiddenException {
     logger.info("updateUser called");
     UserAuditData auditData = this.getUserAuditData();
@@ -149,7 +149,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserDTO> deleteUser(String id)
+  public ResponseEntity<UserDto> deleteUser(String id)
       throws BadRequestException, NotFoundException, ForbiddenException,
           TransitionNotAllowedException {
     logger.info("deleteUser called");
@@ -177,7 +177,7 @@ public class UserController extends BaseController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserDTO> changeStatus(String id, ChangeStatusRequest request) {
+  public ResponseEntity<UserDto> changeStatus(String id, ChangeStatusRequest request) {
     logger.info("changeStatus called");
 
     try {

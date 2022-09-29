@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.model.race.response;
 
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.race.RaceDTO;
+import com.teddycrane.racemanagement.model.race.RaceDto;
 import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +13,5 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class RaceCollectionResponse implements Response {
-  private Collection<RaceDTO> data;
+  private Collection<RaceDto> data;
 }

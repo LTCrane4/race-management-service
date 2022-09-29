@@ -5,7 +5,7 @@ import com.teddycrane.racemanagement.enums.Category;
 import com.teddycrane.racemanagement.enums.UserType;
 import com.teddycrane.racemanagement.model.race.Race;
 import com.teddycrane.racemanagement.model.racer.Racer;
-import com.teddycrane.racemanagement.model.racer.RacerDTO;
+import com.teddycrane.racemanagement.model.racer.RacerDto;
 import com.teddycrane.racemanagement.model.user.User;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -60,8 +60,8 @@ public class TestResourceGenerator {
     return generateRacer(Category.CAT1);
   }
 
-  public static RacerDTO generateRacerDTO(Category category) {
-    return RacerDTO.builder()
+  public static RacerDto generateRacerDTO(Category category) {
+    return RacerDto.builder()
         .firstName(faker.name().firstName())
         .lastName(faker.name().lastName())
         .category(category)
@@ -69,7 +69,7 @@ public class TestResourceGenerator {
         .build();
   }
 
-  public static RacerDTO generateRacerDTO() {
+  public static RacerDto generateRacerDTO() {
     return generateRacerDTO(Category.CAT1);
   }
 

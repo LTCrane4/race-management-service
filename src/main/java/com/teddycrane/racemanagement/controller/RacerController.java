@@ -7,7 +7,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.racer.RacerDTO;
+import com.teddycrane.racemanagement.model.racer.RacerDto;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
@@ -45,7 +45,7 @@ public class RacerController extends BaseController implements RacerApi {
   }
 
   @Override
-  public ResponseEntity<RacerDTO> getRacer(String id)
+  public ResponseEntity<RacerDto> getRacer(String id)
       throws BadRequestException, NotFoundException {
     logger.info("getRacer called");
 
@@ -59,7 +59,7 @@ public class RacerController extends BaseController implements RacerApi {
   }
 
   @Override
-  public ResponseEntity<RacerDTO> createRacer(@NonNull CreateRacerRequest request)
+  public ResponseEntity<RacerDto> createRacer(@NonNull CreateRacerRequest request)
       throws DuplicateItemException, BadRequestException {
     logger.info("createRacer called");
 
@@ -85,7 +85,7 @@ public class RacerController extends BaseController implements RacerApi {
   }
 
   @Override
-  public ResponseEntity<RacerDTO> updateRacer(String id, @NonNull @Valid UpdateRacerRequest request)
+  public ResponseEntity<RacerDto> updateRacer(String id, @NonNull @Valid UpdateRacerRequest request)
       throws BadRequestException, NotFoundException, ConflictException {
     logger.info("updateRacer called");
 

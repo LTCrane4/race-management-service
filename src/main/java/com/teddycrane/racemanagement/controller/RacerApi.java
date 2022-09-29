@@ -6,7 +6,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.DuplicateItemException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.racer.RacerDTO;
+import com.teddycrane.racemanagement.model.racer.RacerDto;
 import com.teddycrane.racemanagement.model.racer.request.CreateRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.DeleteRacerRequest;
 import com.teddycrane.racemanagement.model.racer.request.SearchRacerRequest;
@@ -58,7 +58,7 @@ public interface RacerApi {
             content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = RacerDTO.class))
+                  schema = @Schema(implementation = RacerDto.class))
             }),
         @ApiResponse(
             responseCode = "400",
@@ -77,7 +77,7 @@ public interface RacerApi {
                   schema = @Schema(implementation = ErrorResponse.class))
             })
       })
-  ResponseEntity<RacerDTO> getRacer(@PathVariable("id") String id)
+  ResponseEntity<RacerDto> getRacer(@PathVariable("id") String id)
       throws BadRequestException, NotFoundException;
 
   @PostMapping
@@ -90,7 +90,7 @@ public interface RacerApi {
             content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = RacerDTO.class))
+                  schema = @Schema(implementation = RacerDto.class))
             }),
         @ApiResponse(
             responseCode = "400",
@@ -109,7 +109,7 @@ public interface RacerApi {
                   schema = @Schema(implementation = ErrorResponse.class))
             })
       })
-  ResponseEntity<RacerDTO> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request)
+  ResponseEntity<RacerDto> createRacer(@NonNull @Valid @RequestBody CreateRacerRequest request)
       throws DuplicateItemException, BadRequestException;
 
   @PatchMapping("/{id}")
@@ -122,7 +122,7 @@ public interface RacerApi {
             content = {
               @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = RacerDTO.class))
+                  schema = @Schema(implementation = RacerDto.class))
             }),
         @ApiResponse(
             responseCode = "400",
@@ -149,7 +149,7 @@ public interface RacerApi {
                   schema = @Schema(implementation = ErrorResponse.class))
             })
       })
-  ResponseEntity<RacerDTO> updateRacer(
+  ResponseEntity<RacerDto> updateRacer(
       @PathVariable("id") String id, @Valid @RequestBody @NonNull UpdateRacerRequest request)
       throws BadRequestException, NotFoundException, ConflictException;
 

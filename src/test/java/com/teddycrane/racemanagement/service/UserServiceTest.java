@@ -64,6 +64,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Get user should return a valid user")
   void getUserShouldReturnUser() {
     when(this.userRepository.findById(testId)).thenReturn(Optional.of(existing));
 
@@ -75,6 +76,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Get user should throw a 404 if a user is not found")
   void getUserShouldThrowErrorIfNotFound() {
     assertThrows(
         NotFoundException.class,
@@ -83,6 +85,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Create user should create a user")
   void createUserShouldCreate() {
     when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.save(any(User.class)))
@@ -103,6 +106,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Create user should create a user without a user type")
   public void createUserShouldCreateWithNoType() {
     User expected = TestResourceGenerator.generateUser();
     when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
@@ -129,6 +133,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("The login endpoint should return a valid token when the user is authenticated")
   void loginShouldReturnToken() throws Exception {
     when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.of(this.existing));
 
@@ -138,6 +143,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("The login endpoint should throw a 401 when the user is not found")
   void loginShouldHandleUserNotFound() {
     when(this.userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
@@ -145,6 +151,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Get all users should return a list of all users")
   public void getAllUsersShouldReturnListOfUsers() {
     Collection<User> expectedList = TestResourceGenerator.generateUserList(5);
     when(this.userRepository.findAll()).thenReturn((List<User>) expectedList);
@@ -220,6 +227,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Search users should return a filtered list of users by UserType")
   void shouldReturnUsersFromTypeSearch() {
     List<User> expectedList = new ArrayList<>(TestResourceGenerator.generateUserList(3));
     when(this.userRepository.findAllByUserType(UserType.USER)).thenReturn(expectedList);
@@ -232,6 +240,7 @@ class UserServiceTest {
   }
 
   @Test
+  @DisplayName("Search users should return a list of users filtered by the user name")
   void shouldReturnUsersFromNameSearch() {
     List<User> expectedList = new ArrayList<>(TestResourceGenerator.generateUserList(3));
     when(this.userRepository.findAllByLastName(anyString())).thenReturn(expectedList);

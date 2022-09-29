@@ -5,7 +5,7 @@ import com.teddycrane.racemanagement.error.BadRequestException;
 import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotFoundException;
-import com.teddycrane.racemanagement.model.race.RaceDTO;
+import com.teddycrane.racemanagement.model.race.RaceDto;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
@@ -48,7 +48,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<RaceDTO> getRace(String id) {
+  public ResponseEntity<RaceDto> getRace(String id) {
     logger.info("getRace called for id: {}", id);
 
     try {
@@ -64,7 +64,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<RaceDTO> createRace(@NonNull CreateRaceRequest request) {
+  public ResponseEntity<RaceDto> createRace(@NonNull CreateRaceRequest request) {
     logger.info("createRace called");
     String name = request.getName();
     Category category = request.getCategory();
@@ -85,7 +85,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<RaceDTO> addRacersToRace(String raceId, @NonNull AddRacersRequest request)
+  public ResponseEntity<RaceDto> addRacersToRace(String raceId, @NonNull AddRacersRequest request)
       throws BadRequestException, ConflictException, NotFoundException {
     logger.info("addRacersToRace called");
 
@@ -112,7 +112,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<RaceDTO> updateRace(String id, UpdateRaceRequest request)
+  public ResponseEntity<RaceDto> updateRace(String id, UpdateRaceRequest request)
       throws BadRequestException, ConflictException, NotFoundException {
     logger.info("updateRace called");
 
@@ -170,7 +170,7 @@ public class RaceController extends BaseController implements RaceApi {
   }
 
   @Override
-  public ResponseEntity<RaceDTO> startRace(String id, @Valid StartRaceRequest request)
+  public ResponseEntity<RaceDto> startRace(String id, @Valid StartRaceRequest request)
       throws BadRequestException, ConflictException, NotFoundException {
     logger.info("startRace called");
 

@@ -25,8 +25,6 @@ public class TokenManager implements Serializable {
 
   private static final long TOKEN_VALIDITY = 60 * 60;
 
-  public TokenManager() {}
-
   public TokenManager(@Value("${secret}") String secret) {
     this.jwtSecret = secret;
   }

@@ -5,7 +5,7 @@ import com.teddycrane.racemanagement.error.ConflictException;
 import com.teddycrane.racemanagement.error.InternalServerError;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.model.Response;
-import com.teddycrane.racemanagement.model.race.RaceDTO;
+import com.teddycrane.racemanagement.model.race.RaceDto;
 import com.teddycrane.racemanagement.model.race.request.AddRacersRequest;
 import com.teddycrane.racemanagement.model.race.request.CreateRaceRequest;
 import com.teddycrane.racemanagement.model.race.request.SearchRaceRequest;
@@ -48,7 +48,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully found race",
-            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDto.class))}),
         @ApiResponse(
             responseCode = "404",
             description = "No race found",
@@ -58,7 +58,7 @@ public interface RaceApi {
             description = "Invalid id provided",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<RaceDTO> getRace(@PathVariable("id") String id);
+  ResponseEntity<RaceDto> getRace(@PathVariable("id") String id);
 
   @PostMapping(produces = "application/json", consumes = "application/json")
   @Operation(description = "Create new race")
@@ -67,13 +67,13 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully created Race",
-            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDto.class))}),
         @ApiResponse(
             responseCode = "409",
             description = "Could not create race: A race with the same name already exists",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<RaceDTO> createRace(@Valid @RequestBody CreateRaceRequest request);
+  ResponseEntity<RaceDto> createRace(@Valid @RequestBody CreateRaceRequest request);
 
   @PostMapping(
       value = "/{raceId}/add-racers",
@@ -85,7 +85,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully added Racers",
-            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDto.class))}),
         @ApiResponse(
             responseCode = "404",
             description = "No race found for the id",
@@ -95,7 +95,7 @@ public interface RaceApi {
             description = "New edits are available, fetch data and retry",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<RaceDTO> addRacersToRace(
+  ResponseEntity<RaceDto> addRacersToRace(
       @PathVariable String raceId, @Valid @RequestBody AddRacersRequest request);
 
   /**
@@ -116,7 +116,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully updated Race",
-            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDto.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request",
@@ -130,7 +130,7 @@ public interface RaceApi {
             description = "Timestamp not up to date",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
       })
-  ResponseEntity<RaceDTO> updateRace(
+  ResponseEntity<RaceDto> updateRace(
       @PathVariable("id") String id, @Valid @RequestBody UpdateRaceRequest request)
       throws BadRequestException, ConflictException, NotFoundException;
 
@@ -163,7 +163,7 @@ public interface RaceApi {
         @ApiResponse(
             responseCode = "200",
             description = "Race successfully started",
-            content = {@Content(schema = @Schema(implementation = RaceDTO.class))}),
+            content = {@Content(schema = @Schema(implementation = RaceDto.class))}),
         @ApiResponse(
             responseCode = "400",
             description = "Bad Request - Invalid UUID",
@@ -173,7 +173,7 @@ public interface RaceApi {
             description = "Race not found",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<RaceDTO> startRace(
+  ResponseEntity<RaceDto> startRace(
       @PathVariable("id") String id, @Valid @RequestBody StartRaceRequest request)
       throws BadRequestException, ConflictException, NotFoundException;
 

@@ -1,7 +1,7 @@
 package com.teddycrane.racemanagement.utils.mapper;
 
 import com.teddycrane.racemanagement.model.racer.Racer;
-import com.teddycrane.racemanagement.model.racer.RacerDTO;
+import com.teddycrane.racemanagement.model.racer.RacerDto;
 import com.teddycrane.racemanagement.model.racer.response.RacerCollectionResponse;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -11,7 +11,7 @@ import org.springframework.lang.NonNull;
 @UtilityClass
 public class RacerMapper {
 
-  public static Collection<RacerDTO> convertEntityListToDTO(@NonNull Collection<Racer> racerList) {
+  public static Collection<RacerDto> convertEntityListToDTO(@NonNull Collection<Racer> racerList) {
     return racerList.stream().map(RacerMapper::convertEntityToDTO).collect(Collectors.toList());
   }
 
@@ -19,8 +19,8 @@ public class RacerMapper {
     return new RacerCollectionResponse(RacerMapper.convertEntityListToDTO(racers));
   }
 
-  public static RacerDTO convertEntityToDTO(@NonNull Racer racer) {
-    return RacerDTO.builder()
+  public static RacerDto convertEntityToDTO(@NonNull Racer racer) {
+    return RacerDto.builder()
         .id(racer.getId())
         .createdTimestamp(racer.getCreatedTimestamp())
         .updatedTimestamp(racer.getUpdatedTimestamp())
@@ -36,7 +36,7 @@ public class RacerMapper {
         .build();
   }
 
-  public static Racer convertDTOToEntity(@NonNull RacerDTO dto) {
+  public static Racer convertDTOToEntity(@NonNull RacerDto dto) {
     return Racer.builder()
         .id(dto.getId())
         .createdTimestamp(dto.getCreatedTimestamp())

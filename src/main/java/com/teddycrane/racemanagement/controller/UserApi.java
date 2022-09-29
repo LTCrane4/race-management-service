@@ -6,7 +6,7 @@ import com.teddycrane.racemanagement.error.ForbiddenException;
 import com.teddycrane.racemanagement.error.NotFoundException;
 import com.teddycrane.racemanagement.error.TransitionNotAllowedException;
 import com.teddycrane.racemanagement.model.response.ErrorResponse;
-import com.teddycrane.racemanagement.model.user.UserDTO;
+import com.teddycrane.racemanagement.model.user.UserDto;
 import com.teddycrane.racemanagement.model.user.request.*;
 import com.teddycrane.racemanagement.model.user.response.ChangePasswordResponse;
 import com.teddycrane.racemanagement.model.user.response.UserCollectionResponse;
@@ -44,12 +44,12 @@ public interface UserApi {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = UserDTO.class))
+                  schema = @Schema(implementation = UserDto.class))
             }),
         @ApiResponse(responseCode = "404", description = "User not found"),
         @ApiResponse(responseCode = "400", description = "Bad request - Invalid id")
       })
-  ResponseEntity<UserDTO> getUser(@PathVariable("id") String id) throws BadRequestException;
+  ResponseEntity<UserDto> getUser(@PathVariable("id") String id) throws BadRequestException;
 
   @PostMapping(value = "/user/search", produces = "application/json", consumes = "application/json")
   @Operation(summary = "Search users (deprecated)")
@@ -77,7 +77,7 @@ public interface UserApi {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = UserDTO.class))
+                  schema = @Schema(implementation = UserDto.class))
             }),
         @ApiResponse(
             responseCode = "400",
@@ -93,11 +93,11 @@ public interface UserApi {
                 "Failed to create - A user with the provided username/email already exists",
             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
       })
-  ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequest request)
+  ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserRequest request)
       throws DuplicateItemException;
 
   @PatchMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
-  ResponseEntity<UserDTO> updateUser(
+  ResponseEntity<UserDto> updateUser(
       @PathVariable("id") String id, @Valid @RequestBody UpdateUserRequest request)
       throws BadRequestException, ForbiddenException;
 
@@ -122,7 +122,7 @@ public interface UserApi {
       throws BadRequestException, ForbiddenException;
 
   @DeleteMapping(value = "/user/{id}", produces = "application/json", consumes = "application/json")
-  ResponseEntity<UserDTO> deleteUser(@PathVariable("id") String id)
+  ResponseEntity<UserDto> deleteUser(@PathVariable("id") String id)
       throws BadRequestException, NotFoundException, ForbiddenException,
           TransitionNotAllowedException;
 
@@ -139,7 +139,7 @@ public interface UserApi {
             content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = UserDTO.class))
+                  schema = @Schema(implementation = UserDto.class))
             }),
         @ApiResponse(
             responseCode = "400",
@@ -158,6 +158,6 @@ public interface UserApi {
                   schema = @Schema(implementation = ErrorResponse.class))
             }),
       })
-  ResponseEntity<UserDTO> changeStatus(
+  ResponseEntity<UserDto> changeStatus(
       @PathVariable("id") String id, @Valid @RequestBody ChangeStatusRequest request);
 }

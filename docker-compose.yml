@@ -1,8 +1,9 @@
 version: "3.4"
 
 services:
-  docker-mysql:
+  postgres:
     container_name: postgres
+    image: postgres
     restart: unless-stopped
     build:
       context: .
@@ -22,8 +23,8 @@ services:
     container_name: racemanagement
     image: racemanagement
     depends_on:
-      - docker-mysql
-    build: 
+      - postgres
+    build:
       context: .
       target: dev
       dockerfile: containers/racemanagement.dockerfile
